@@ -1,11 +1,11 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Navbar from '../components/Navbar.astro';
-import Hero from '../components/Hero.astro';
-import Footer from '../components/Footer.astro';
+import LandingLayout from '../layouts/LandingLayout.astro';
+import Navbar from '../components/landing/Navbar.astro';
+import Hero from '../components/landing/Hero.astro';
+import Footer from '../components/shared/Footer.astro';
 ---
 
-<Layout
+<LandingLayout
   title="SigmaBuilder"
   description="SigmaBuilder es la plataforma SaaS que te permite crear proyectos dinámicos y añadir tus propios modales y estructuras personalizadas. Empieza gratis."
 >
@@ -16,4 +16,4 @@ import Footer from '../components/Footer.astro';
   </main>
 
   <Footer />
-</Layout>
+</LandingLayout>
