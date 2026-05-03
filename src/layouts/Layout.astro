@@ -53,7 +53,19 @@ const {
       })()
     </script>
   </head>
-  <body class="min-h-screen bg-background font-sans text-foreground antialiased">
+  <body class="relative min-h-screen bg-background font-sans text-foreground antialiased">
+    <!-- Gradiente Global -->
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute top-0 inset-x-0 h-[800px] -z-10"
+      style="
+        background: radial-gradient(
+          ellipse 90% 60% at 50% -10%,
+          oklch(0.546 0.245 262.9 / 22%) 0%,
+          transparent 80%
+        );
+      "
+    ></div>
     <slot />
   </body>
 </html>
