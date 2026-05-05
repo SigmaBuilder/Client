@@ -1,5 +1,7 @@
 ---
-import '@/styles/global.css';
+import BaseLayout from './BaseLayout.astro'
+import Navbar from '@/components/landing/Navbar.astro'
+import Footer from '@/components/shared/Footer.astro'
 
 interface Props {
   title?: string
@@ -14,48 +16,8 @@ const {
 } = Astro.props;
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <!-- SEO -->
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <meta name="generator" content={Astro.generator} />
-
-    <!-- Favicons -->
-    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
-    <link rel="icon" type="image/svg+xml" href="/light-icon.svg?v=2" media="(prefers-color-scheme: dark)" />
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:locale" content="es_ES" />
-    <meta property="og:site_name" content="SigmaBuilder" />
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImage} />
-
-    <script is:inline>
-      (function () {
-        const stored = localStorage.getItem('theme')
-        if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-          document.documentElement.classList.add('dark')
-        } else {
-          document.documentElement.classList.remove('dark')
-        }
-      })()
-    </script>
-  </head>
-  <body class="relative min-h-screen bg-background font-sans text-foreground antialiased">
-    <!-- Gradiente Global -->
+<BaseLayout {title} {description} {ogImage}>
+  <div class="relative min-h-screen">
     <div
       aria-hidden="true"
       class="pointer-events-none absolute top-0 inset-x-0 h-[800px] -z-10"
@@ -67,6 +29,8 @@ const {
         );
       "
     ></div>
+    <Navbar />
     <slot />
-  </body>
-</html>
+    <Footer />
+  </div>
+</BaseLayout>

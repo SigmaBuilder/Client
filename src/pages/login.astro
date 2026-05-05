@@ -1,12 +1,12 @@
 ---
-import LandingLayout from '../layouts/LandingLayout.astro';
+import AuthLayout from '../layouts/AuthLayout.astro';
 import { LoginForm } from '@/components/login-form';
 ---
 
-<LandingLayout>
+<AuthLayout title="Iniciar sesión | SigmaBuilder" description="Accede a tu cuenta de SigmaBuilder.">
   <div class="flex min-h-svh w-full items-center justify-center p-6 md:p-10 bg-muted/50">
     <div class="w-full max-w-4xl">
       <LoginForm client:load />
     </div>
   </div>
-</LandingLayout>
+</AuthLayout>
