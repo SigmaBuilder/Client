@@ -9,16 +9,41 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { login } from "@/lib/auth";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await login(email, password);
+      
+      if (!response.success) {
+        alert(response.error || "Credenciales incorrectas o error en el servidor.");
+      } else {
+        window.location.href = "/dashboard"; // O "/dashboard" según corresponda
+      }
+    } catch (err: any) {
+      alert("Ocurrió un error inesperado al intentar iniciar sesión.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form className="p-6 md:p-8" onSubmit={handleSubmit}>
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Inicia sesión</h1>
@@ -32,7 +57,10 @@ export function LoginForm({
                   id="email"
                   type="email"
                   placeholder="m@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={loading}
                 />
               </Field>
               <Field>
@@ -45,11 +73,18 @@ export function LoginForm({
                     ¿Olvidaste tu contraseña?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input 
+                  id="password" 
+                  type="password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required 
+                  disabled={loading}
+                />
               </Field>
               <Field>
-                <Button type="submit">
-                  Iniciar sesión<nav></nav>
+                <Button type="submit" disabled={loading} className="w-full">
+                  {loading ? "Iniciando sesión..." : "Iniciar sesión"}
                 </Button>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
