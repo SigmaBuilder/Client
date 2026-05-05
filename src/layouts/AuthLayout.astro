@@ -1,0 +1,44 @@
+---
+import '@/styles/global.css';
+
+interface Props {
+  title?: string
+  description?: string
+}
+
+const {
+  title = 'Autenticación | SigmaBuilder',
+  description = 'Accede a tu cuenta de SigmaBuilder o regístrate para empezar.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- SEO -->
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/light-icon.svg?v=2" media="(prefers-color-scheme: dark)" />
+
+    <script is:inline>
+      (function () {
+        const stored = localStorage.getItem('theme')
+        if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark')
+        } else {
+          document.documentElement.classList.remove('dark')
+        }
+      })()
+    </script>
+  </head>
+  <body class="min-h-screen bg-background font-sans text-foreground antialiased">
+    <slot />
+  </body>
+</html>
