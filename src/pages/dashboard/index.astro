@@ -1,6 +1,9 @@
 ---
+import { toast } from 'sonner';
 import DashboardLayout from '../../layouts/DashboardLayout.astro';
 import { ModeToggle } from '@/components/shared/ThemeToggle';
+import { Button } from '@/components/ui/button';
+import { Toaster } from '@/components/ui/sonner';
 ---
 
 <DashboardLayout title="Dashboard | SigmaBuilder">
@@ -21,7 +24,19 @@ import { ModeToggle } from '@/components/shared/ThemeToggle';
         <p class="mt-2 text-muted-foreground">
           Aquí podrás gestionar tus proyectos y configuraciones.
         </p>
+        <Button id="toast-btn">Toast de prueba</Button>
       </div>
     </main>
   </div>
 </DashboardLayout>
+
+<script>
+  import { toast } from 'sonner';
+
+  const btn = document.getElementById('toast-btn');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      toast.success('Toast de prueba funcionado 🎉');
+    });
+  }
+</script>
