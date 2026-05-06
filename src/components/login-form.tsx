@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { login } from "@/lib/auth";
+import { toast } from "sonner";
 
 export function LoginForm({
   className,
@@ -28,12 +29,12 @@ export function LoginForm({
       const response = await login(email, password);
       
       if (!response.success) {
-        alert(response.error || "Credenciales incorrectas o error en el servidor.");
+        toast.error(response.error || "Credenciales incorrectas o error en el servidor.");
       } else {
-        window.location.href = "/dashboard"; // O "/dashboard" según corresponda
+        window.location.href = "/dashboard"; 
       }
     } catch (err: any) {
-      alert("Ocurrió un error inesperado al intentar iniciar sesión.");
+      toast.error("Ocurrió un error inesperado al intentar iniciar sesión.");
     } finally {
       setLoading(false);
     }

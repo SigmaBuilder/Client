@@ -1,5 +1,6 @@
 ---
 import '@/styles/global.css'
+import { Toaster } from '@/components/ui/sonner'
 import ThemeScript from '@/components/shared/ThemeScript.astro'
 
 interface Props {
@@ -45,6 +46,7 @@ const {
     <ThemeScript />
   </head>
   <body class="min-h-screen bg-background font-sans text-foreground antialiased">
+    <Toaster client:idle />    
     <slot />
   </body>
 </html>
