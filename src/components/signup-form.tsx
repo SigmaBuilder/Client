@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { register as registerUser } from "@/lib/auth";
+import { toast } from "sonner";
 
 export function SignupForm({
   className,
@@ -27,7 +28,7 @@ export function SignupForm({
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      alert("Las contraseñas no coinciden");
+      toast.error("Las contraseñas no coinciden");
       return;
     }
 
@@ -37,12 +38,12 @@ export function SignupForm({
       const response = await registerUser(email, password, firstName, lastName);
       
       if (!response.success) {
-        alert(response.error || "Ocurrió un error al crear la cuenta.");
+        toast.error(response.error || "Ocurrió un error al crear la cuenta.");
       } else {
         window.location.href = "/dashboard"; 
       }
     } catch (err: any) {
-      alert("Ocurrió un error inesperado.");
+      toast.error("Ocurrió un error inesperado.");
     } finally {
       setLoading(false);
     }
