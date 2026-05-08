@@ -9,14 +9,18 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Link, useSearchParams } from "react-router-dom";
 import { useState } from "react";
-import { register as registerUser } from "@/lib/auth";
+import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const { register } = useAuth();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || undefined;
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -35,15 +39,9 @@ export function SignupForm({
     setLoading(true);
 
     try {
-      const response = await registerUser(email, password, firstName, lastName);
-      
-      if (!response.success) {
-        toast.error(response.error || "Ocurrió un error al crear la cuenta.");
-      } else {
-        window.location.href = "/dashboard"; 
-      }
+      await register(email, password, firstName, lastName, redirectTo);
     } catch (err: any) {
-      toast.error("Ocurrió un error inesperado.");
+      toast.error(err.message || "Ocurrió un error al crear la cuenta.");
     } finally {
       setLoading(false);
     }
@@ -164,7 +162,7 @@ export function SignupForm({
                 </Button>
               </Field>
               <FieldDescription className="text-center">
-                ¿Ya tienes una cuenta? <a href="/login">Inicia sesión</a>
+                ¿Ya tienes una cuenta? <Link to="/login" className="underline underline-offset-4 hover:text-primary">Inicia sesión</Link>
               </FieldDescription>
             </FieldGroup>
           </form>
