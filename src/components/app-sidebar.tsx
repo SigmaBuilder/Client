@@ -4,7 +4,6 @@ import {
   BookOpen,
   Bot,
   Briefcase,
-  Command,
   LifeBuoy,
   Newspaper,
   Send,
@@ -89,7 +88,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link to="/dashboard">
-                <img src="/icon.svg" alt="SigmaBuilder Logo" className="flex aspect-square size-8 items-center justify-center text-sidebar-primary-foreground" />
+                <img src="/dark-icon.svg" alt="SigmaBuilder Logo" className="dark:hidden flex aspect-square size-8 items-center justify-center text-sidebar-primary-foreground" />
+                <img src="/icon.svg" alt="SigmaBuilder Logo" className="hidden dark:flex aspect-square size-8 items-center justify-center text-sidebar-primary-foreground" />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">SigmaBuilder</span>
                   <span className="truncate text-xs">Dashboard</span>
