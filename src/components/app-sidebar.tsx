@@ -3,18 +3,17 @@ import { Link } from "react-router-dom";
 import {
   BookOpen,
   Bot,
+  Briefcase,
   Command,
-  Frame,
   LifeBuoy,
-  Map,
-  PieChart,
+  Newspaper,
   Send,
   Settings2,
   SquareTerminal,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
+import { NavModules } from "@/components/nav-modules";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
 import {
@@ -31,119 +30,49 @@ import { useAuth } from "@/hooks/use-auth";
 const data = {
   navMain: [
     {
-      title: "Playground",
+      title: "Inicio",
       url: "/dashboard",
       icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "/dashboard",
-        },
-        {
-          title: "Starred",
-          url: "/dashboard",
-        },
-        {
-          title: "Settings",
-          url: "/dashboard",
-        },
-      ],
     },
     {
-      title: "Models",
+      title: "Módulos",
       url: "#",
       icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
     },
     {
-      title: "Documentation",
+      title: "Actvidad",
       url: "#",
       icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
     },
     {
-      title: "Settings",
+      title: "Ajustes",
       url: "#",
       icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
     },
   ],
   navSecondary: [
     {
-      title: "Support",
+      title: "Soporte",
       url: "#",
       icon: LifeBuoy,
     },
     {
-      title: "Feedback",
+      title: "Comentarios",
       url: "#",
       icon: Send,
     },
   ],
-  projects: [
+  modules: [
     {
-      name: "Design Engineering",
+      name: "Blog",
       url: "#",
-      icon: Frame,
+      icon: Newspaper,
     },
     {
-      name: "Sales & Marketing",
+      name: "Portfolio",
       url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
+      icon: Briefcase,
+    }
   ],
 };
 
@@ -174,7 +103,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavModules modules={data.modules} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
