@@ -9,14 +9,18 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { Link, useSearchParams } from "react-router-dom";
 import { useState } from "react";
-import { login } from "@/lib/auth";
+import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const { login } = useAuth();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || undefined;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,15 +30,9 @@ export function LoginForm({
     setLoading(true);
 
     try {
-      const response = await login(email, password);
-      
-      if (!response.success) {
-        toast.error(response.error || "Credenciales incorrectas o error en el servidor.");
-      } else {
-        window.location.href = "/dashboard"; 
-      }
+      await login(email, password, redirectTo);
     } catch (err: any) {
-      toast.error("Ocurrió un error inesperado al intentar iniciar sesión.");
+      toast.error(err.message || "Credenciales incorrectas o error en el servidor.");
     } finally {
       setLoading(false);
     }
@@ -115,7 +113,7 @@ export function LoginForm({
                 </Button>
               </Field>
               <FieldDescription className="text-center">
-                ¿No tienes una cuenta? <a href="/signup">Crea tu cuenta</a>
+                ¿No tienes una cuenta? <Link to="/signup" className="underline underline-offset-4 hover:text-primary">Crea tu cuenta</Link>
               </FieldDescription>
             </FieldGroup>
           </form>

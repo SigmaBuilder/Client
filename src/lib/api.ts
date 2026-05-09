@@ -41,24 +41,27 @@ class ApiClient {
             localStorage.removeItem('accessToken');
             localStorage.removeItem('user');
             if (typeof window !== 'undefined') {
-              window.location.href = '/login';
+              window.dispatchEvent(new CustomEvent('auth:expired'));
             }
             return { success: false, error: 'Sesión expirada. Por favor, inicia sesión de nuevo.' };
           }
         }
 
-        const data = await response.json();
+        const body = await response.json();
 
         if (!response.ok) {
           return {
             success: false,
-            error: data.error || data.message || 'Error en la petición'
+            error: body.error || body.message || 'Error en la petición'
           }
         }
 
+        // Si el backend devuelve { success: true, data: ... }, extraemos el data
+        const returnData = (body && body.data !== undefined) ? body.data : body;
+
         return {
             success: true,
-            data: data
+            data: returnData
         }
         } catch (error: any) {
             return {
@@ -86,6 +89,14 @@ class ApiClient {
       return this.request<T>('auth/refresh', {
         method: 'POST',
       });
+    }
+
+    async me<T>(): Promise<ApiResponse<T>> {
+      return this.request<T>('auth/me');
+    }
+
+    async logout(): Promise<ApiResponse<void>> {
+      return this.request('auth/logout', { method: 'POST' });
     }
 }
 

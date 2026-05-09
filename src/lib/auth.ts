@@ -69,3 +69,13 @@ export const refresh = async () => {
   }
   return response;
 };
+
+export const fetchMe = async () => {
+  return api.me<{ user: User }>();
+};
+
+export const logout = async () => {
+  const response = await api.logout();
+  clearAuthData();
+  return response;
+};
