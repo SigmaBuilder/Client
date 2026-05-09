@@ -89,9 +89,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <Link to="/dashboard">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Command className="size-4" />
-                </div>
+                <img src="/icon.svg" alt="SigmaBuilder Logo" className="flex aspect-square size-8 items-center justify-center text-sidebar-primary-foreground" />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">SigmaBuilder</span>
                   <span className="truncate text-xs">Dashboard</span>
