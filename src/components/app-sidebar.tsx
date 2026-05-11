@@ -14,7 +14,6 @@ import {
 import { NavMain } from "@/components/nav-main";
 import { NavModules } from "@/components/nav-modules";
 import { NavSecondary } from "@/components/nav-secondary";
-import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -24,7 +23,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { useAuth } from "@/hooks/use-auth";
 
 const data = {
   navMain: [
@@ -76,7 +74,7 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user } = useAuth();
+  
 
   return (
     <Sidebar
@@ -102,10 +100,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={data.navMain} />
         <NavModules modules={data.modules} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} />
+        <NavSecondary items={data.navSecondary} />
       </SidebarFooter>
     </Sidebar>
   );
