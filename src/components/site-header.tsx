@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom"
-import { SearchForm } from "@/components/search-form"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -12,9 +11,12 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useSidebar } from "@/components/ui/sidebar"
 import { PanelLeftIcon } from "lucide-react"
+import { NavUser } from "@/components/nav-user"
+import { useAuth } from "@/hooks/use-auth";
 
 export function SiteHeader() {
   const { toggleSidebar } = useSidebar()
+  const { user } = useAuth();
 
   return (
     <header className="sticky top-0 z-50 flex w-full items-center border-b bg-background">
@@ -28,6 +30,11 @@ export function SiteHeader() {
           <PanelLeftIcon
           />
         </Button>
+        {/*
+        TODO: LOGO LOADER WHEN NO SIDEBAR
+        <img src="/dark-icon.svg" alt="SigmaBuilder Logo" className="dark:hidden flex aspect-square size-6 items-center justify-center text-sidebar-primary-foreground" />
+        <img src="/icon.svg" alt="SigmaBuilder Logo" className="hidden dark:flex aspect-square size-6 items-center justify-center text-sidebar-primary-foreground" />
+        */}
         <Separator
           orientation="vertical"
           className="mr-2 data-vertical:h-4 data-vertical:self-auto"
@@ -45,7 +52,7 @@ export function SiteHeader() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <SearchForm className="w-full sm:ml-auto sm:w-auto" />
+        <NavUser user={user} />
       </div>
     </header>
   )
