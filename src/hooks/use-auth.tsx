@@ -6,8 +6,8 @@ import {
   useCallback,
 } from "react";
 import { useNavigate } from "react-router-dom";
+import { User } from "../types/auth";
 import {
-  User,
   login as authLogin,
   register as authRegister,
   logout as authLogout,
@@ -51,7 +51,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   const verifySession = useCallback(async () => {
-    const start = Date.now();
     const token = getAccessToken();
     if (!token) {
       setIsLoading(false);
@@ -68,10 +67,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
     }
 
-    const elapsed = Date.now() - start;
-    if (elapsed < 2000) {
-      await new Promise((r) => setTimeout(r, 2000 - elapsed));
-    }
     setIsLoading(false);
   }, []);
 
