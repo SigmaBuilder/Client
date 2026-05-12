@@ -23,6 +23,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { PanelLeftIcon } from "lucide-react"
+import { useWorkspace } from "@/hooks/use-workspace";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -161,9 +162,14 @@ function Sidebar({
   variant?: "sidebar" | "floating" | "inset"
   collapsible?: "offcanvas" | "icon" | "none"
 }) {
-  const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+  const { isMobile, state: sidebarState, openMobile, setOpenMobile } = useSidebar()
+  const { currentSite } = useWorkspace()
 
-  if (collapsible === "none") {
+  // Forzamos el estado a collapsed y offcanvas para animar el ocultamiento total
+  const state = currentSite ? sidebarState : "collapsed"
+  const activeCollapsible = currentSite ? collapsible : "offcanvas"
+
+  if (activeCollapsible === "none") {
     return (
       <div
         data-slot="sidebar"
@@ -177,10 +183,10 @@ function Sidebar({
       </div>
     )
   }
-
+  
   if (isMobile) {
     return (
-      <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+      <Sheet open={currentSite ? openMobile : false} onOpenChange={setOpenMobile} {...props}>
         <SheetContent
           dir={dir}
           data-sidebar="sidebar"
@@ -208,7 +214,7 @@ function Sidebar({
     <div
       className="group peer hidden text-sidebar-foreground md:block"
       data-state={state}
-      data-collapsible={state === "collapsed" ? collapsible : ""}
+      data-collapsible={state === "collapsed" ? activeCollapsible : ""}
       data-variant={variant}
       data-side={side}
       data-slot="sidebar"
