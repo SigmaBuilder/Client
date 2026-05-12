@@ -1,10 +1,8 @@
-import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
-import { Loader } from "lucide-react";
 import LoaderComponent from "@/components/loader";
 
-export function ProtectedRoute() {
+export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
@@ -17,5 +15,5 @@ export function ProtectedRoute() {
     return <Navigate to={`/login?redirect=${redirect}`} replace />;
   }
 
-  return <Outlet />;
+  return children;
 }
