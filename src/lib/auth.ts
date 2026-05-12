@@ -1,18 +1,5 @@
 import api from './api';
-
-export interface User {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  avatar_url?: string;
-  projects?: any[]; // Incluido al hacer fetch de me()
-}
-
-export interface AuthResponse {
-  accessToken: string;
-  user: User;
-}
+import { User, AuthResponse } from '../types/auth';
 
 export const setAuthData = (accessToken: string, user: User) => {
   localStorage.setItem('accessToken', accessToken);
