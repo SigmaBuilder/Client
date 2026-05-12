@@ -1,9 +1,15 @@
-const LoaderComponent = () => {
+const LoaderComponent = ({
+  className = "min-h-screen",
+}: {
+  className?: string;
+}) => {
   const pathData =
     "M 0 0 L 100 0 L 100 100 L 0 100 Z M 82 13 L 82 35 L 70 35 L 70 24 L 36 24 L 57 49 L 36 75 L 70 75 L 70 64 L 82 64 L 82 86 L 18 86 L 18 76 L 41 49 L 18 22 L 18 13 Z";
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen overflow-hidden m-0">
+    <div
+      className={`flex flex-col items-center justify-center overflow-hidden m-0 ${className}`}
+    >
       {/* Estilos específicos para la animación del SVG */}
       <style>{`
         @keyframes minimalistFlow {
@@ -29,17 +35,16 @@ const LoaderComponent = () => {
           <path
             d={pathData}
             fill="none"
-            stroke="rgba(255, 255, 255, 0.08)" // Si quieres que este también sea del tema, podrías usar stroke-primary/20
+            className="stroke-primary/20" /* <-- El cambio clave: Adaptable al tema */
             strokeWidth="1"
             fillRule="evenodd"
           />
 
           {/* Capa Activa: Línea de trazado animada */}
           <path
-            className="trace-line stroke-primary" /* <-- Aquí está la magia de shadcn/tailwind */
+            className="trace-line stroke-primary"
             d={pathData}
             fill="none"
-            /* Se eliminó: stroke="#4C51BF" */
             strokeWidth="1.5"
             fillRule="evenodd"
           />
