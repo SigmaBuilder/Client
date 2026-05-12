@@ -90,7 +90,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <img src="/icon.svg" alt="SigmaBuilder Logo" className="hidden dark:flex aspect-square size-8 items-center justify-center text-sidebar-primary-foreground" />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">SigmaBuilder</span>
-                  <span className="truncate text-xs">Dashboard</span>
+                  <span className="truncate text-xs">Panel de control</span>
                 </div>
               </Link>
             </SidebarMenuButton>
