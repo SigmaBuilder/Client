@@ -11,6 +11,7 @@ import {
   login as authLogin,
   register as authRegister,
   logout as authLogout,
+  logoutAll as authLogoutAll,
   updateProfile as authUpdateProfile,
   updateEmail as authUpdateEmail,
   updatePassword as authUpdatePassword,
@@ -38,6 +39,7 @@ interface AuthContextType {
     redirectTo?: string,
   ) => Promise<void>;
   logout: () => Promise<void>;
+  logoutAll: () => Promise<void>;
   updateProfile: (data: { first_name?: string; last_name?: string; avatar_url?: string }) => Promise<any>;
   updateEmail: (email: string) => Promise<any>;
   updatePassword: (current_password: string, new_password: string) => Promise<any>;
@@ -125,6 +127,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     navigate("/login");
   };
 
+  const logoutAll = async () => {
+    await authLogoutAll();
+    setUser(null);
+    navigate("/login");
+  };
+
   const updateProfile = async (data: { first_name?: string; last_name?: string; avatar_url?: string }) => {
     const response = await authUpdateProfile(data);
     if (response.success && response.data?.user) {
@@ -154,6 +162,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         register,
         logout,
+        logoutAll,
         updateProfile,
         updateEmail,
         updatePassword,
