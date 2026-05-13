@@ -18,12 +18,17 @@ import AccountPage from '../pages/dashboard/account'
 
 export const router = createBrowserRouter([
   {
-    path: '/',
-    element: <AuthProvider><GlobalLayout /></AuthProvider>,
+    path: "/",
+    element: (
+      <AuthProvider>
+        <GlobalLayout />
+      </AuthProvider>
+    ),
     children: [
       { index: true, element: <Landing /> },
-      { path: 'login', element: <Login /> },
-      { path: 'signup', element: <Signup /> },
+      { path: "login", element: <Login /> },
+      { path: "signup", element: <Signup /> },
+      { path: "reset-password", element: <ResetPasswordPage /> },
       {
         path: 'invite',
         element: <ProtectedRoute><InvitePage /></ProtectedRoute>
@@ -32,20 +37,20 @@ export const router = createBrowserRouter([
         path: 'dashboard',
         element: <ProtectedRoute><WorkspaceProvider><DashboardLayout /></WorkspaceProvider></ProtectedRoute>,
         children: [
-              { index: true, element: <ProjectsList /> },
-              { path: 'account', element: <AccountPage /> },
-              {
-                path: ':id',
-                element: <ProjectLayout />,
-                children: [
-                  { index: true, element: <ProjectSitesPage /> },
-                  { path: 'members', element: <ProjectMembersPage /> },
-                  { path: 'roles', element: <ProjectRolesPage /> },
-                ],
-              },
-              { path: 'site/:slug', element: <SiteDashboard /> },
+          { index: true, element: <ProjectsList /> },
+          { path: "account", element: <AccountPage /> },
+          {
+            path: ":id",
+            element: <ProjectLayout />,
+            children: [
+              { index: true, element: <ProjectSitesPage /> },
+              { path: "members", element: <ProjectMembersPage /> },
+              { path: "roles", element: <ProjectRolesPage /> },
             ],
+          },
+          { path: "site/:slug", element: <SiteDashboard /> },
+        ],
       },
     ],
   },
-])
+]);
