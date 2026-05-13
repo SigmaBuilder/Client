@@ -2,6 +2,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import ProfileField from "./ProfileField";
+import AvatarProfileField from "./AvatarProfileField";
 
 export default function ProfileSection() {
   const { user } = useAuth();
@@ -11,7 +12,7 @@ export default function ProfileSection() {
   };
 
   return (
-    <Card className="max-w-2xl border shadow-sm">
+    <Card className="w-full border shadow-sm">
       <CardHeader>
         <CardTitle className="text-xl">Información Personal</CardTitle>
         <CardDescription>
@@ -20,6 +21,8 @@ export default function ProfileSection() {
       </CardHeader>
       <CardContent>
         <div className="flex flex-col">
+          <AvatarProfileField />
+          <Separator />
           <ProfileField 
             label="Nombre completo" 
             value={user ? `${user.first_name} ${user.last_name}` : ""} 
