@@ -1,20 +1,20 @@
-import { createBrowserRouter } from "react-router-dom";
-import GlobalLayout from "../layouts/GlobalLayout";
-import DashboardLayout from "../layouts/DashboardLayout";
-import ProjectLayout from "../layouts/ProjectLayout";
-import { AuthProvider } from "../hooks/use-auth";
-import { ProtectedRoute } from "../components/auth/ProtectedRoute";
-import Landing from "../pages/landing";
-import Login from "../pages/login";
-import Signup from "../pages/signup";
-import { WorkspaceProvider } from "../hooks/use-workspace";
-import ProjectsList from "../pages/dashboard";
-import ProjectSitesPage from "../pages/dashboard/project-sites";
-import ProjectMembersPage from "../pages/dashboard/project-members";
-import ProjectRolesPage from "../pages/dashboard/project-roles";
-import SiteDashboard from "../pages/dashboard/site-dashboard";
-import AccountPage from "../pages/dashboard/account";
-import { ResetPasswordPage } from "../pages/reset-password";
+import { createBrowserRouter } from 'react-router-dom'
+import GlobalLayout from '../layouts/GlobalLayout'
+import DashboardLayout from '../layouts/DashboardLayout'
+import ProjectLayout from '../layouts/ProjectLayout'
+import { AuthProvider } from '../hooks/use-auth'
+import { ProtectedRoute } from '../components/auth/ProtectedRoute'
+import Landing from '../pages/landing'
+import Login from '../pages/login'
+import Signup from '../pages/signup'
+import { WorkspaceProvider } from '../hooks/use-workspace'
+import ProjectsList from '../pages/dashboard'
+import ProjectSitesPage from '../pages/dashboard/project-sites'
+import ProjectMembersPage from '../pages/dashboard/project-members'
+import ProjectRolesPage from '../pages/dashboard/project-roles'
+import SiteDashboard from '../pages/dashboard/site-dashboard'
+import { InvitePage } from '../pages/invite'
+import AccountPage from '../pages/dashboard/account'
 
 export const router = createBrowserRouter([
   {
@@ -30,14 +30,12 @@ export const router = createBrowserRouter([
       { path: "signup", element: <Signup /> },
       { path: "reset-password", element: <ResetPasswordPage /> },
       {
-        path: "dashboard",
-        element: (
-          <ProtectedRoute>
-            <WorkspaceProvider>
-              <DashboardLayout />
-            </WorkspaceProvider>
-          </ProtectedRoute>
-        ),
+        path: 'invite',
+        element: <ProtectedRoute><InvitePage /></ProtectedRoute>
+      },
+      {
+        path: 'dashboard',
+        element: <ProtectedRoute><WorkspaceProvider><DashboardLayout /></WorkspaceProvider></ProtectedRoute>,
         children: [
           { index: true, element: <ProjectsList /> },
           { path: "account", element: <AccountPage /> },

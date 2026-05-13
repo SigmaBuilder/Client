@@ -8,11 +8,20 @@ import {
   FieldLabel,
   FieldSeparator,
 } from "@/components/ui/field";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Link, useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import api from "@/lib/api";
 
 export function LoginForm({
   className,
@@ -25,6 +34,10 @@ export function LoginForm({
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
+  const [isForgotDialogOpen, setIsForgotDialogOpen] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -35,6 +48,27 @@ export function LoginForm({
       toast.error(err.message || "Credenciales incorrectas o error en el servidor.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotPasswordEmail) return;
+
+    setForgotPasswordLoading(true);
+    try {
+      const response = await api.forgotPassword(forgotPasswordEmail);
+      if (response.success) {
+        toast.success("Si el correo existe, recibirás un enlace para recuperar tu contraseña.");
+        setIsForgotDialogOpen(false);
+        setForgotPasswordEmail("");
+      } else {
+        toast.error(response.error || "Ocurrió un error al intentar recuperar la contraseña.");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Error al conectar con el servidor.");
+    } finally {
+      setForgotPasswordLoading(false);
     }
   };
 
@@ -65,12 +99,41 @@ export function LoginForm({
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Contraseña</FieldLabel>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-2 hover:underline"
-                  >
-                    ¿Olvidaste tu contraseña?
-                  </a>
+                  <Dialog open={isForgotDialogOpen} onOpenChange={setIsForgotDialogOpen}>
+                    <DialogTrigger asChild>
+                      <button
+                        type="button"
+                        className="ml-auto text-sm underline-offset-2 hover:underline bg-transparent border-0 cursor-pointer"
+                      >
+                        ¿Olvidaste tu contraseña?
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Recuperar Contraseña</DialogTitle>
+                        <DialogDescription>
+                          Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handleForgotPassword} className="flex flex-col gap-4 py-4">
+                        <Field>
+                          <FieldLabel htmlFor="forgot-email">Email</FieldLabel>
+                          <Input
+                            id="forgot-email"
+                            type="email"
+                            placeholder="m@example.com"
+                            value={forgotPasswordEmail}
+                            onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                            required
+                            disabled={forgotPasswordLoading}
+                          />
+                        </Field>
+                        <Button type="submit" disabled={forgotPasswordLoading}>
+                          {forgotPasswordLoading ? "Enviando..." : "Enviar enlace"}
+                        </Button>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
                 </div>
                 <Input 
                   id="password" 
@@ -113,7 +176,7 @@ export function LoginForm({
                 </Button>
               </Field>
               <FieldDescription className="text-center">
-                ¿No tienes una cuenta? <Link to="/signup" className="underline underline-offset-4 hover:text-primary">Crea tu cuenta</Link>
+                ¿No tienes una cuenta? <Link to={redirectTo ? `/signup?redirect=${encodeURIComponent(redirectTo)}` : "/signup"} className="underline underline-offset-4 hover:text-primary">Crea tu cuenta</Link>
               </FieldDescription>
             </FieldGroup>
           </form>

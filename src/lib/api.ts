@@ -109,23 +109,6 @@ class ApiClient {
     });
   }
 
-  async forgotPassword<T>(email: string): Promise<ApiResponse<T>> {
-    return this.request<T>("auth/forgot-password", {
-      method: "POST",
-      body: JSON.stringify({ email }),
-    });
-  }
-
-  async resetPassword<T>(
-    token: string,
-    newPassword: string,
-  ): Promise<ApiResponse<T>> {
-    return this.request<T>("auth/reset-password", {
-      method: "POST",
-      body: JSON.stringify({ token, newPassword }),
-    });
-  }
-
   async me<T>(): Promise<ApiResponse<T>> {
     return this.request<T>("auth/me");
   }
@@ -208,6 +191,28 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     return this.request<T>(`projects/${projectId}/members/${userId}`, {
       method: "DELETE",
+    });
+  }
+
+  async inviteProjectMember<T>(
+    projectId: string,
+    email: string,
+    roleId: string,
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>(`projects/${projectId}/members/invite`, {
+      method: "POST",
+      body: JSON.stringify({ email, roleId }),
+    });
+  }
+
+  // Invitations
+  async getInvitation<T>(token: string): Promise<ApiResponse<T>> {
+    return this.request<T>(`invitations/${token}`);
+  }
+
+  async acceptInvitation<T>(token: string): Promise<ApiResponse<T>> {
+    return this.request<T>(`invitations/${token}/accept`, {
+      method: "POST",
     });
   }
 

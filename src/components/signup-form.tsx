@@ -162,7 +162,7 @@ export function SignupForm({
                 </Button>
               </Field>
               <FieldDescription className="text-center">
-                ¿Ya tienes una cuenta? <Link to="/login" className="underline underline-offset-4 hover:text-primary">Inicia sesión</Link>
+                ¿Ya tienes una cuenta? <Link to={redirectTo ? `/login?redirect=${encodeURIComponent(redirectTo)}` : "/login"} className="underline underline-offset-4 hover:text-primary">Inicia sesión</Link>
               </FieldDescription>
             </FieldGroup>
           </form>
