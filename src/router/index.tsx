@@ -15,6 +15,7 @@ import ProjectRolesPage from '../pages/dashboard/project-roles'
 import SiteDashboard from '../pages/dashboard/site-dashboard'
 import { InvitePage } from '../pages/invite'
 import AccountPage from '../pages/dashboard/account'
+import { ResetPasswordPage } from "../pages/reset-password";
 
 export const router = createBrowserRouter([
   {
