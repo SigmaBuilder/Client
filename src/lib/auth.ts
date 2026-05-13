@@ -61,6 +61,38 @@ export const fetchMe = async () => {
   return api.me<{ user: User }>();
 };
 
+export const updateProfile = async (data: { first_name?: string; last_name?: string; avatar_url?: string }) => {
+  const response = await api.updateProfile<{ user: User }>(data);
+  if (response.success && response.data?.user) {
+    const currentToken = getAccessToken();
+    if (currentToken) setAuthData(currentToken, response.data.user);
+  }
+  return response;
+};
+
+export const updateEmail = async (email: string) => {
+  const response = await api.updateEmail<{ user: User }>(email);
+  if (response.success && response.data?.user) {
+    const currentToken = getAccessToken();
+    if (currentToken) setAuthData(currentToken, response.data.user);
+  }
+  return response;
+};
+
+export const updatePassword = async (current_password: string, new_password: string) => {
+  return api.updatePassword<{ message: string }>(current_password, new_password);
+};
+
+export const getSessions = async () => {
+  return api.getSessions<{ sessions: any[] }>();
+};
+
+export const logoutAll = async () => {
+  const response = await api.logoutAll();
+  clearAuthData();
+  return response;
+};
+
 export const logout = async () => {
   const response = await api.logout();
   clearAuthData();

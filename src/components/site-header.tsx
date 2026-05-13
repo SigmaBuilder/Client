@@ -76,6 +76,13 @@ function useBreadcrumbs(): Crumb[] {
     return crumbs;
   }
 
+  if (pathname === "/dashboard/account") {
+    return [
+      { type: "link", label: "Inicio", to: "/dashboard" },
+      { type: "page", label: "Cuenta" },
+    ];
+  }
+
   // /dashboard/:id  (sites tab, index)
   if (pathname.match(/\/dashboard\/[^/]+$/)) {
     const crumbs: Crumb[] = [
