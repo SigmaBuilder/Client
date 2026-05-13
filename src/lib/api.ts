@@ -113,6 +113,27 @@ class ApiClient {
     return this.request<T>("auth/me");
   }
 
+  async updateProfile<T>(body: { first_name?: string; last_name?: string; avatar_url?: string }): Promise<ApiResponse<T>> {
+    return this.request<T>("auth/me/profile", {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    });
+  }
+
+  async updateEmail<T>(email: string): Promise<ApiResponse<T>> {
+    return this.request<T>("auth/me/email", {
+      method: "PATCH",
+      body: JSON.stringify({ email }),
+    });
+  }
+
+  async updatePassword<T>(current_password: string, new_password: string): Promise<ApiResponse<T>> {
+    return this.request<T>("auth/me/password", {
+      method: "PATCH",
+      body: JSON.stringify({ current_password, new_password }),
+    });
+  }
+
   async logout(): Promise<ApiResponse<void>> {
     return this.request("auth/logout", { method: "POST" });
   }
