@@ -13,6 +13,7 @@ import ProjectSitesPage from '../pages/dashboard/project-sites'
 import ProjectMembersPage from '../pages/dashboard/project-members'
 import ProjectRolesPage from '../pages/dashboard/project-roles'
 import SiteDashboard from '../pages/dashboard/site-dashboard'
+import { InvitePage } from '../pages/invite'
 import AccountPage from '../pages/dashboard/account'
 
 export const router = createBrowserRouter([
@@ -23,6 +24,10 @@ export const router = createBrowserRouter([
       { index: true, element: <Landing /> },
       { path: 'login', element: <Login /> },
       { path: 'signup', element: <Signup /> },
+      {
+        path: 'invite',
+        element: <ProtectedRoute><InvitePage /></ProtectedRoute>
+      },
       {
         path: 'dashboard',
         element: <ProtectedRoute><WorkspaceProvider><DashboardLayout /></WorkspaceProvider></ProtectedRoute>,
