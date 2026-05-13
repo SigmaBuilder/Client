@@ -83,6 +83,16 @@ export const updatePassword = async (current_password: string, new_password: str
   return api.updatePassword<{ message: string }>(current_password, new_password);
 };
 
+export const getSessions = async () => {
+  return api.getSessions<{ sessions: any[] }>();
+};
+
+export const logoutAll = async () => {
+  const response = await api.logoutAll();
+  clearAuthData();
+  return response;
+};
+
 export const logout = async () => {
   const response = await api.logout();
   clearAuthData();
