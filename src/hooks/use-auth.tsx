@@ -11,6 +11,9 @@ import {
   login as authLogin,
   register as authRegister,
   logout as authLogout,
+  updateProfile as authUpdateProfile,
+  updateEmail as authUpdateEmail,
+  updatePassword as authUpdatePassword,
   fetchMe,
   getAccessToken,
   getUser,
@@ -35,6 +38,9 @@ interface AuthContextType {
     redirectTo?: string,
   ) => Promise<void>;
   logout: () => Promise<void>;
+  updateProfile: (data: { first_name?: string; last_name?: string; avatar_url?: string }) => Promise<any>;
+  updateEmail: (email: string) => Promise<any>;
+  updatePassword: (current_password: string, new_password: string) => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -119,6 +125,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     navigate("/login");
   };
 
+  const updateProfile = async (data: { first_name?: string; last_name?: string; avatar_url?: string }) => {
+    const response = await authUpdateProfile(data);
+    if (response.success && response.data?.user) {
+      setUser(response.data.user);
+    }
+    return response;
+  };
+
+  const updateEmail = async (email: string) => {
+    const response = await authUpdateEmail(email);
+    if (response.success && response.data?.user) {
+      setUser(response.data.user);
+    }
+    return response;
+  };
+
+  const updatePassword = async (current_password: string, new_password: string) => {
+    return authUpdatePassword(current_password, new_password);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -128,6 +154,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         register,
         logout,
+        updateProfile,
+        updateEmail,
+        updatePassword,
       }}
     >
       {children}
