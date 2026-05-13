@@ -6,11 +6,13 @@ import ProfileField from "./ProfileField";
 import AvatarProfileField from "./AvatarProfileField";
 import EditNameDialog from "./EditNameDialog";
 import EditEmailDialog from "./EditEmailDialog";
+import EditPasswordDialog from "./EditPasswordDialog";
 
 export default function ProfileSection() {
   const { user } = useAuth();
   const [isNameModalOpen, setIsNameModalOpen] = useState(false);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   const handleEdit = (field: string) => {
     switch (field) {
@@ -21,7 +23,7 @@ export default function ProfileSection() {
         setIsEmailModalOpen(true);
         break;
       case "password":
-        alert("Modal de contraseña próximamente");
+        setIsPasswordModalOpen(true);
         break;
     }
   };
@@ -68,6 +70,10 @@ export default function ProfileSection() {
       <EditEmailDialog 
         open={isEmailModalOpen} 
         onOpenChange={setIsEmailModalOpen} 
+      />
+      <EditPasswordDialog 
+        open={isPasswordModalOpen} 
+        onOpenChange={setIsPasswordModalOpen} 
       />
     </>
   );
