@@ -194,6 +194,28 @@ class ApiClient {
     });
   }
 
+  async inviteProjectMember<T>(
+    projectId: string,
+    email: string,
+    roleId: string,
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>(`projects/${projectId}/members/invite`, {
+      method: "POST",
+      body: JSON.stringify({ email, roleId }),
+    });
+  }
+
+  // Invitations
+  async getInvitation<T>(token: string): Promise<ApiResponse<T>> {
+    return this.request<T>(`invitations/${token}`);
+  }
+
+  async acceptInvitation<T>(token: string): Promise<ApiResponse<T>> {
+    return this.request<T>(`invitations/${token}/accept`, {
+      method: "POST",
+    });
+  }
+
   // Roles
   async getProjectRoles<T>(projectId: string): Promise<ApiResponse<T>> {
     return this.request<T>(`projects/${projectId}/roles`);

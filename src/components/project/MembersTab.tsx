@@ -18,13 +18,9 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import api from '@/lib/api';
 import type { Member, Role } from '@/types/project';
+import { InviteMemberDialog } from './invite-member-dialog';
 
 interface MembersTabProps {
   projectId: string;
@@ -59,9 +55,6 @@ export function MembersTab({ projectId, roles }: MembersTabProps) {
 
   // Invite dialog state
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteRoleId, setInviteRoleId] = useState('');
-  const [inviting, setInviting] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -106,27 +99,6 @@ export function MembersTab({ projectId, roles }: MembersTabProps) {
     setRemoving(false);
     setRemoveDialogOpen(false);
     setRemovingMember(null);
-  };
-
-  const handleInvite = async () => {
-    if (!inviteEmail.trim() || !inviteRoleId) {
-      toast.error('Completa todos los campos');
-      return;
-    }
-    setInviting(true);
-    // Find user by email is not a direct API call here; we use addProjectMember with email as userId
-    // In reality the backend should accept email. For now we pass the email as userId.
-    const res = await api.addProjectMember<{ member: Member }>(projectId, inviteEmail.trim(), inviteRoleId);
-    if (res.success) {
-      await load();
-      toast.success(`Invitación enviada a ${inviteEmail}`);
-      setInviteEmail('');
-      setInviteRoleId('');
-      setInviteOpen(false);
-    } else {
-      toast.error(res.error ?? 'Error invitando miembro');
-    }
-    setInviting(false);
   };
 
   return (
@@ -252,46 +224,13 @@ export function MembersTab({ projectId, roles }: MembersTabProps) {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Invite member dialog */}
-      <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Invitar miembro</DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col gap-4 py-2">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="invite-email">Correo electrónico</Label>
-              <Input
-                id="invite-email"
-                type="email"
-                placeholder="usuario@ejemplo.com"
-                value={inviteEmail}
-                onChange={e => setInviteEmail(e.target.value)}
-                disabled={inviting}
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="invite-role">Rol</Label>
-              <Select value={inviteRoleId} onValueChange={setInviteRoleId} disabled={inviting}>
-                <SelectTrigger id="invite-role">
-                  <SelectValue placeholder="Seleccionar rol…" />
-                </SelectTrigger>
-                <SelectContent>
-                  {roles.map(r => (
-                    <SelectItem key={r.id} value={r.id}>{r.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter showCloseButton>
-            <Button onClick={handleInvite} disabled={inviting}>
-              {inviting && <Loader2 className="size-3.5 animate-spin" />}
-              Enviar invitación
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <InviteMemberDialog
+        open={inviteOpen}
+        onOpenChange={setInviteOpen}
+        projectId={projectId}
+        roles={roles}
+        onInvited={load}
+      />
     </div>
   );
 }
