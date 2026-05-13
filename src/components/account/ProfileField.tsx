@@ -13,20 +13,21 @@ export default function ProfileField({ label, value, type = "text", onEdit }: Pr
   const displayValue = type === "password" ? "••••••••" : value;
 
   return (
-    <div className="flex items-center justify-between py-4 group">
-      <div className="space-y-1">
-        <p className="text-sm font-medium leading-none text-muted-foreground">{label}</p>
-        <p className="text-base font-medium">{displayValue}</p>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 py-4 items-center group">
+      <p className="text-sm font-medium text-muted-foreground">{label}</p>
+      
+      <div className="flex items-center justify-between sm:col-span-2">
+        <p className="text-base font-medium truncate pr-4">{displayValue}</p>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={onEdit} 
+          aria-label={`Editar ${label}`}
+          className="opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 shrink-0"
+        >
+          <Pencil className="h-4 w-4 text-muted-foreground" />
+        </Button>
       </div>
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        onClick={onEdit} 
-        aria-label={`Editar ${label}`}
-        className="opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100"
-      >
-        <Pencil className="h-4 w-4 text-muted-foreground" />
-      </Button>
     </div>
   );
 }
