@@ -13,6 +13,7 @@ import ProjectSitesPage from '../pages/dashboard/project-sites'
 import ProjectMembersPage from '../pages/dashboard/project-members'
 import ProjectRolesPage from '../pages/dashboard/project-roles'
 import SiteDashboard from '../pages/dashboard/site-dashboard'
+import AccountPage from '../pages/dashboard/account'
 
 export const router = createBrowserRouter([
   {
@@ -27,6 +28,7 @@ export const router = createBrowserRouter([
         element: <ProtectedRoute><WorkspaceProvider><DashboardLayout /></WorkspaceProvider></ProtectedRoute>,
         children: [
               { index: true, element: <ProjectsList /> },
+              { path: 'account', element: <AccountPage /> },
               {
                 path: ':id',
                 element: <ProjectLayout />,
