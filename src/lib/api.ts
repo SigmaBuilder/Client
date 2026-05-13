@@ -134,6 +134,14 @@ class ApiClient {
     });
   }
 
+  async getSessions<T>(): Promise<ApiResponse<T>> {
+    return this.request<T>("auth/sessions");
+  }
+
+  async logoutAll<T>(): Promise<ApiResponse<T>> {
+    return this.request<T>("auth/logout-all", { method: "POST" });
+  }
+
   async logout(): Promise<ApiResponse<void>> {
     return this.request("auth/logout", { method: "POST" });
   }
