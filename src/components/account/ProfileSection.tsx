@@ -5,10 +5,12 @@ import { Separator } from "@/components/ui/separator";
 import ProfileField from "./ProfileField";
 import AvatarProfileField from "./AvatarProfileField";
 import EditNameDialog from "./EditNameDialog";
+import EditEmailDialog from "./EditEmailDialog";
 
 export default function ProfileSection() {
   const { user } = useAuth();
   const [isNameModalOpen, setIsNameModalOpen] = useState(false);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
 
   const handleEdit = (field: string) => {
     switch (field) {
@@ -16,7 +18,7 @@ export default function ProfileSection() {
         setIsNameModalOpen(true);
         break;
       case "email":
-        alert("Modal de email próximamente");
+        setIsEmailModalOpen(true);
         break;
       case "password":
         alert("Modal de contraseña próximamente");
@@ -62,6 +64,10 @@ export default function ProfileSection() {
       <EditNameDialog 
         open={isNameModalOpen} 
         onOpenChange={setIsNameModalOpen} 
+      />
+      <EditEmailDialog 
+        open={isEmailModalOpen} 
+        onOpenChange={setIsEmailModalOpen} 
       />
     </>
   );
