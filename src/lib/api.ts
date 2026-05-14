@@ -138,6 +138,10 @@ class ApiClient {
     return this.request<T>("auth/sessions");
   }
 
+  async deleteSession<T>(sessionId: string): Promise<ApiResponse<T>> {
+    return this.request<T>(`auth/sessions/${sessionId}`, { method: "DELETE" });
+  }
+
   async logoutAll<T>(): Promise<ApiResponse<T>> {
     return this.request<T>("auth/logout-all", { method: "POST" });
   }
