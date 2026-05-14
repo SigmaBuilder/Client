@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Laptop, Smartphone, Monitor } from "lucide-react";
+import { Laptop, Smartphone, Monitor, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { getSessions } from "@/lib/auth";
+import { getSessions, deleteSession } from "@/lib/auth";
 import { toast } from "sonner";
 
 interface Session {
@@ -20,6 +20,7 @@ export default function ConnectedDevices() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggingOutAll, setIsLoggingOutAll] = useState(false);
+  const [revokingSessionId, setRevokingSessionId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSessions();
@@ -54,6 +55,23 @@ export default function ConnectedDevices() {
     } catch (error) {
       toast.error("Error al cerrar todas las sesiones");
       setIsLoggingOutAll(false);
+    }
+  };
+
+  const handleRevokeSession = async (sessionId: string) => {
+    setRevokingSessionId(sessionId);
+    try {
+      const res = await deleteSession(sessionId);
+      if (res.success) {
+        toast.success("Dispositivo desconectado correctamente");
+        setSessions((prev) => prev.filter((s) => s.id !== sessionId));
+      } else {
+        toast.error(res.error || "Error al desconectar el dispositivo");
+      }
+    } catch (error) {
+      toast.error("Error inesperado al desconectar el dispositivo");
+    } finally {
+      setRevokingSessionId(null);
     }
   };
 
@@ -160,6 +178,20 @@ export default function ConnectedDevices() {
                       Última vez activo: {formatDate(session.last_used_at || session.created_at)}
                     </p>
                   </div>
+                  
+                  {/* Solo mostramos el botón de revocar si no es la sesión actual */}
+                  {!isCurrent && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full shrink-0"
+                      title="Cerrar sesión en este dispositivo"
+                      onClick={() => handleRevokeSession(session.id)}
+                      disabled={revokingSessionId === session.id}
+                    >
+                      <LogOut className={`h-4 w-4 ${revokingSessionId === session.id ? 'animate-pulse' : ''}`} />
+                    </Button>
+                  )}
                 </div>
               </div>
             );
