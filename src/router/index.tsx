@@ -16,6 +16,7 @@ import SiteDashboard from '../pages/dashboard/site-dashboard'
 import { InvitePage } from '../pages/invite'
 import AccountPage from '../pages/dashboard/account'
 import { ResetPasswordPage } from "../pages/reset-password";
+import NotFoundPage from '../pages/not-found';
 
 export const router = createBrowserRouter([
   {
@@ -52,6 +53,7 @@ export const router = createBrowserRouter([
           { path: "site/:slug", element: <SiteDashboard /> },
         ],
       },
+      { path: "*", element: <NotFoundPage /> },
     ],
   },
 ]);
