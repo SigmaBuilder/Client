@@ -28,13 +28,17 @@ class ApiClient {
     _retry = false,
   ): Promise<ApiResponse<T>> {
     try {
+      // Si el body es FormData, el navegador necesita generar el boundary, no le forzamos application/json
+      const isFormData = options.body instanceof FormData;
+      const headers = { ...this.getAuthHeaders(), ...options.headers };
+      if (isFormData && headers['Content-Type'] === 'application/json') {
+        delete (headers as any)['Content-Type'];
+      }
+
       const response = await fetch(`${this.API_URL}/${endpoint}`, {
         credentials: "include",
         ...options,
-        headers: {
-          ...this.getAuthHeaders(),
-          ...options.headers,
-        },
+        headers,
       });
 
       if (
@@ -103,6 +107,20 @@ class ApiClient {
     });
   }
 
+  async forgotPassword<T>(email: string): Promise<ApiResponse<T>> {
+    return this.request<T>("auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+  }
+
+  async resetPassword<T>(token: string, newPassword: string): Promise<ApiResponse<T>> {
+    return this.request<T>("auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify({ token, newPassword }),
+    });
+  }
+
   async refresh<T>(): Promise<ApiResponse<T>> {
     return this.request<T>("auth/refresh", {
       method: "POST",
@@ -132,6 +150,13 @@ class ApiClient {
     return this.request<T>("auth/me/profile", {
       method: "PATCH",
       body: JSON.stringify(body),
+    });
+  }
+
+  async uploadAvatar<T>(formData: FormData): Promise<ApiResponse<T>> {
+    return this.request<T>("auth/me/avatar", {
+      method: "POST",
+      body: formData as any,
     });
   }
 
@@ -317,6 +342,48 @@ class ApiClient {
         body: JSON.stringify({ permissionIds }),
       },
     );
+  }
+  // Media
+  async getMediaFolders<T>(projectId: string, queryParams = ""): Promise<ApiResponse<T>> {
+    return this.request<T>(`projects/${projectId}/media/folders${queryParams}`);
+  }
+
+  async createMediaFolder<T>(projectId: string, name: string, parentId: string | null): Promise<ApiResponse<T>> {
+    return this.request<T>(`projects/${projectId}/media/folders`, {
+      method: "POST",
+      body: JSON.stringify({ name, parentId }),
+    });
+  }
+
+  async getMediaAssets<T>(projectId: string, queryParams = ""): Promise<ApiResponse<T>> {
+    return this.request<T>(`projects/${projectId}/media/assets${queryParams}`);
+  }
+
+  async uploadMediaAsset<T>(projectId: string, formData: FormData): Promise<ApiResponse<T>> {
+    // FormData NO debe llevar header de Content-Type 'application/json' ni ninguno manual para que el browser ponga el boundary
+    return this.request<T>(`projects/${projectId}/media/assets/upload`, {
+      method: "POST",
+      body: formData as any,
+    });
+  }
+
+  async moveMediaAsset<T>(projectId: string, assetId: string, folderId: string | null): Promise<ApiResponse<T>> {
+    return this.request<T>(`projects/${projectId}/media/assets/${assetId}`, {
+      method: "PUT",
+      body: JSON.stringify({ folderId }),
+    });
+  }
+
+  async deleteMediaAsset<T>(projectId: string, assetId: string): Promise<ApiResponse<T>> {
+    return this.request<T>(`projects/${projectId}/media/assets/${assetId}`, {
+      method: "DELETE",
+    });
+  }
+
+  async deleteMediaFolder<T>(projectId: string, folderId: string): Promise<ApiResponse<T>> {
+    return this.request<T>(`projects/${projectId}/media/folders/${folderId}`, {
+      method: "DELETE",
+    });
   }
 }
 
