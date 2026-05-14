@@ -87,6 +87,10 @@ export const getSessions = async () => {
   return api.getSessions<{ sessions: any[] }>();
 };
 
+export const deleteSession = async (sessionId: string) => {
+  return api.deleteSession<{ message: string }>(sessionId);
+};
+
 export const logoutAll = async () => {
   const response = await api.logoutAll();
   clearAuthData();
