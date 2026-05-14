@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useWorkspace } from '@/hooks/use-workspace';
 import api from '@/lib/api';
 import type { Role } from '@/types/project';
+import DashboardNotFound from '../pages/dashboard/not-found';
 
 const TABS = [
   { key: 'sites',   label: 'Sitios',           icon: Globe,   path: '' },
@@ -23,7 +24,7 @@ export interface ProjectOutletContext {
 
 export default function ProjectLayout() {
   const { id } = useParams<{ id: string }>();
-  const { sites, currentProject, isLoading, fetchProjectSites, setCurrentSite } = useWorkspace();
+  const { sites, currentProject, isLoading, error, fetchProjectSites, setCurrentSite } = useWorkspace();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -56,6 +57,10 @@ export default function ProjectLayout() {
     roles,
     rolesLoading,
   };
+
+  if (!isLoading && !currentProject && error) {
+    return <DashboardNotFound />;
+  }
 
   return (
     <div className="flex flex-col h-full min-h-0">

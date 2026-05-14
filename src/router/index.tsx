@@ -17,6 +17,7 @@ import { InvitePage } from '../pages/invite'
 import AccountPage from '../pages/dashboard/account'
 import { ResetPasswordPage } from "../pages/reset-password";
 import NotFoundPage from '../pages/not-found';
+import DashboardNotFound from '../pages/dashboard/not-found';
 import ErrorPage from '@/pages/error'
 
 export const router = createBrowserRouter([
@@ -50,9 +51,11 @@ export const router = createBrowserRouter([
               { index: true, element: <ProjectSitesPage /> },
               { path: "members", element: <ProjectMembersPage /> },
               { path: "roles", element: <ProjectRolesPage /> },
+              { path: "*", element: <DashboardNotFound /> },
             ],
           },
           { path: "site/:slug", element: <SiteDashboard /> },
+          { path: "*", element: <DashboardNotFound /> },
         ],
       },
       { path: "*", element: <NotFoundPage /> },
