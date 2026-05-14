@@ -10,10 +10,11 @@ import {
 import { Skeleton } from "../../components/ui/skeleton";
 import { Settings, Globe, ArrowLeft } from "lucide-react";
 import { Button } from "../../components/ui/button";
+import DashboardNotFound from "./not-found";
 
 export default function SiteDashboard() {
   const { slug } = useParams<{ slug: string }>();
-  const { currentSite, currentProject, isLoading, fetchSiteBySlug, error } =
+  const { currentSite, currentProject, isLoading, fetchSiteBySlug } =
     useWorkspace();
   const navigate = useNavigate();
 
@@ -44,12 +45,8 @@ export default function SiteDashboard() {
     );
   }
 
-  if (error) {
-    return <div className="p-8 text-red-500">{error}</div>;
-  }
-
   if (!currentSite && !isLoading) {
-    return <div className="p-8">Sitio no encontrado.</div>;
+    return <div className="p-8"><DashboardNotFound /></div>;
   } else if (currentSite) {
     return (
       <div className="flex-1 space-y-4 p-8 pt-6">
