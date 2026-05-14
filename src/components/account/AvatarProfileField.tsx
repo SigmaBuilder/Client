@@ -1,12 +1,15 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera } from "lucide-react";
+import { Camera, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
 
 export default function AvatarProfileField() {
-  const { user } = useAuth();
+  const { user, updateProfile } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const initials = user
     ? `${user.first_name?.charAt(0) ?? ""}${user.last_name?.charAt(0) ?? ""}`.toUpperCase()
@@ -16,12 +19,30 @@ export default function AvatarProfileField() {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      console.log("Archivo seleccionado para foto de perfil:", file.name);
-      // TODO: Lógica de subida al servidor en la próxima fase
-    }
+    if (!file) return;
+
+    setIsUploading(true);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const uploadPromise = api.uploadAvatar<any>(formData).then((res) => {
+      if (!res.success) throw new Error(res.error || 'Error al subir la imagen');
+      if (res.data?.user) {
+         updateProfile({ avatar_url: res.data.user.avatar_url });
+      }
+    }).finally(() => {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    });
+
+    toast.promise(uploadPromise, {
+      loading: 'Subiendo avatar...',
+      success: 'Foto de perfil actualizada correctamente',
+      error: 'No se pudo subir la foto de perfil',
+    });
   };
 
   return (
@@ -45,9 +66,10 @@ export default function AvatarProfileField() {
           variant="outline" 
           size="sm" 
           onClick={handleEditClick} 
+          disabled={isUploading}
           className="shrink-0"
         >
-          <Camera className="h-4 w-4 mr-2" />
+          {isUploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Camera className="h-4 w-4 mr-2" />}
           Cambiar
         </Button>
       </div>
