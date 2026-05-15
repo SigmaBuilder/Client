@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useMatches } from "react-router-dom";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,95 +14,41 @@ import { PanelLeftIcon } from "lucide-react";
 import { NavUser } from "@/components/nav-user";
 import { useWorkspace } from "@/hooks/use-workspace";
 
-type Crumb =
-  | { type: "link"; label: string; to: string }
-  | { type: "page"; label: string };
+interface RouteHandle {
+  breadcrumb?: string | ((data: unknown) => string);
+}
 
-function useBreadcrumbs(): Crumb[] {
-  const location = useLocation();
+interface BreadcrumbItem {
+  label: string;
+  to: string;
+  isPage: boolean;
+}
+
+function useBreadcrumbs(): BreadcrumbItem[] {
+  const matches = useMatches();
   const { currentProject, currentSite } = useWorkspace();
-  const { pathname } = location;
 
-  // /dashboard/site/:slug
-  if (pathname.startsWith("/dashboard/site/")) {
-    const crumbs: Crumb[] = [
-      { type: "link", label: "Proyectos", to: "/dashboard" },
-    ];
-    if (currentProject) {
-      crumbs.push({
-        type: "link",
-        label: currentProject.name,
-        to: `/dashboard/${currentProject.id}`,
-      });
-    }
-    if (currentSite) {
-      crumbs.push({
-        type: "page",
-        label: currentSite.name || currentSite.slug,
-      });
-    }
-    return crumbs;
-  }
+  const contextData: Record<string, unknown> = {
+    project: currentProject,
+    site: currentSite,
+  };
 
-  // /dashboard/:id/members
-  if (pathname.match(/\/dashboard\/[^/]+\/members/)) {
-    const crumbs: Crumb[] = [
-      { type: "link", label: "Proyectos", to: "/dashboard" },
-    ];
-    if (currentProject) {
-      crumbs.push({
-        type: "link",
-        label: currentProject.name,
-        to: pathname.replace("/members", ""),
-      });
-    }
-    crumbs.push({ type: "page", label: "Miembros" });
-    return crumbs;
-  }
+  return matches
+    .filter((match) => {
+      const handle = match.handle as RouteHandle | undefined;
+      return handle?.breadcrumb !== undefined;
+    })
+    .map((match, index, arr) => {
+      const handle = match.handle as RouteHandle;
+      const raw = handle.breadcrumb!;
+      const label = typeof raw === "function" ? raw(contextData) : raw;
 
-  // /dashboard/:id/roles
-  if (pathname.match(/\/dashboard\/[^/]+\/roles/)) {
-    const crumbs: Crumb[] = [
-      { type: "link", label: "Proyectos", to: "/dashboard" },
-    ];
-    if (currentProject) {
-      crumbs.push({
-        type: "link",
-        label: currentProject.name,
-        to: pathname.replace("/roles", ""),
-      });
-    }
-    crumbs.push({ type: "page", label: "Roles y Permisos" });
-    return crumbs;
-  }
-
-  if (pathname === "/dashboard/account") {
-    return [
-      { type: "link", label: "Inicio", to: "/dashboard" },
-      { type: "page", label: "Cuenta" },
-    ];
-  }
-
-  // /dashboard/:id  (sites tab, index)
-  if (pathname.match(/\/dashboard\/[^/]+$/)) {
-    const crumbs: Crumb[] = [
-      { type: "link", label: "Proyectos", to: "/dashboard" },
-    ];
-    if (currentProject) {
-      crumbs.push({ type: "page", label: currentProject.name });
-    } else {
-      crumbs.push({ type: "page", label: "Proyecto" });
-    }
-    return crumbs;
-  }
-
-  // /dashboard
-  if (pathname === "/dashboard") {
-    return [{ type: "page", label: "Proyectos" }];
-  }
-
-  // /dashboard (home)
-  return [{ type: "page", label: "Inicio" }];
+      return {
+        label,
+        to: match.pathname,
+        isPage: index === arr.length - 1,
+      };
+    });
 }
 
 export function SiteHeader() {
@@ -145,15 +91,15 @@ export function SiteHeader() {
         <Breadcrumb className="hidden sm:block flex-1 min-w-0">
           <BreadcrumbList>
             {crumbs.map((crumb, i) => (
-              <span key={i} className="contents">
+              <span key={crumb.to} className="contents">
                 {i > 0 && <BreadcrumbSeparator />}
                 <BreadcrumbItem>
-                  {crumb.type === "link" ? (
+                  {crumb.isPage ? (
+                    <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                  ) : (
                     <BreadcrumbLink asChild>
                       <Link to={crumb.to}>{crumb.label}</Link>
                     </BreadcrumbLink>
-                  ) : (
-                    <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
                   )}
                 </BreadcrumbItem>
               </span>
