@@ -64,6 +64,10 @@ class ApiClient {
         }
       }
 
+      if (response.status === 204) {
+        return { success: true, data: null };
+      }
+
       const body = await response.json();
 
       if (!response.ok) {
