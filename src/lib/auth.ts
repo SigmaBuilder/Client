@@ -61,7 +61,7 @@ export const fetchMe = async () => {
   return api.me<{ user: User }>();
 };
 
-export const updateProfile = async (data: { first_name?: string; last_name?: string; avatar_url?: string }) => {
+export const updateProfile = async (data: { first_name?: string; last_name?: string }) => {
   const response = await api.updateProfile<{ user: User }>(data);
   if (response.success && response.data?.user) {
     const currentToken = getAccessToken();
