@@ -3,7 +3,7 @@ import { Outlet, useParams } from 'react-router-dom';
 import { Globe } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useWorkspace } from '@/hooks/use-workspace';
-import { PageActionsProvider } from '@/components/site/PageActions';
+import { SitePageHeaderProvider } from '@/components/site/SitePageHeader';
 import DashboardNotFound from '../pages/dashboard/not-found';
 
 export default function SiteLayout() {
@@ -36,8 +36,8 @@ export default function SiteLayout() {
   }
 
   return (
-    <PageActionsProvider
-      renderSlot={(actions) => (
+    <SitePageHeaderProvider
+      renderSlot={(header) => (
         <div className="flex flex-col h-full min-h-0">
           {/* Compact header */}
           <div className="flex items-center justify-between px-6 py-3 gap-4 border-b bg-background shrink-0">
@@ -48,10 +48,8 @@ export default function SiteLayout() {
               </h1>
             </div>
 
-            {/* Page actions injected by child pages */}
-            <div className="flex items-center gap-2 shrink-0">
-              {actions}
-            </div>
+            {/* Page header injected by child pages (breadcrumbs, search, actions) */}
+            {header}
           </div>
 
           {/* Content */}
@@ -62,6 +60,6 @@ export default function SiteLayout() {
       )}
     >
       {/* Child pages */}
-    </PageActionsProvider>
+    </SitePageHeaderProvider>
   );
 }

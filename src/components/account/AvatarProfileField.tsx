@@ -1,27 +1,37 @@
-import { useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera } from "lucide-react";
+import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import { api } from "@/lib/api";
+import { toast } from "sonner";
+import ImageUploadDropzone from "@/components/upload/ImageUploadDropzone";
 
 export default function AvatarProfileField() {
-  const { user } = useAuth();
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user, updateCurrentUser } = useAuth();
+  const [isUploading, setIsUploading] = useState(false);
 
   const initials = user
     ? `${user.first_name?.charAt(0) ?? ""}${user.last_name?.charAt(0) ?? ""}`.toUpperCase()
     : "??";
 
-  const handleEditClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleFileSelect = (file: File) => {
+    setIsUploading(true);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      console.log("Archivo seleccionado para foto de perfil:", file.name);
-      // TODO: Lógica de subida al servidor en la próxima fase
-    }
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const uploadPromise = api.uploadAvatar<any>(formData).then((res) => {
+      if (!res.success) throw new Error(res.error || 'Error al subir la imagen');
+      if (res.data?.user) {
+        updateCurrentUser(res.data.user);
+      }
+    }).finally(() => {
+      setIsUploading(false);
+    });
+
+    toast.promise(uploadPromise, {
+      loading: 'Subiendo avatar...',
+      success: 'Foto de perfil actualizada correctamente',
+      error: 'No se pudo subir la foto de perfil. Usa JPG, PNG o WebP de hasta 2 MB.',
+    });
   };
 
   return (
@@ -31,35 +41,16 @@ export default function AvatarProfileField() {
         <p className="text-xs text-muted-foreground">Recomendado 256x256px</p>
       </div>
 
-      <div className="flex items-center justify-between sm:col-span-2">
-        <Avatar className="h-16 w-16 border shadow-sm">
-          {user?.avatar_url && (
-            <AvatarImage src={user.avatar_url} alt={user.first_name} />
-          )}
-          <AvatarFallback className="text-lg bg-primary/10 text-primary">
-            {initials}
-          </AvatarFallback>
-        </Avatar>
-        
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={handleEditClick} 
-          className="shrink-0"
-        >
-          <Camera className="h-4 w-4 mr-2" />
-          Cambiar
-        </Button>
+      <div className="sm:col-span-2">
+        <ImageUploadDropzone
+          value={user?.avatar_url}
+          fallback={initials}
+          label="Foto de perfil"
+          description="Arrastra una imagen o selecciona JPG, PNG o WebP de hasta 2 MB"
+          loading={isUploading}
+          onFileSelect={handleFileSelect}
+        />
       </div>
-      
-      {/* Input oculto para subir archivos */}
-      <input 
-        type="file" 
-        ref={fileInputRef} 
-        onChange={handleFileChange} 
-        accept="image/png, image/jpeg, image/webp" 
-        className="hidden" 
-      />
     </div>
   );
 }

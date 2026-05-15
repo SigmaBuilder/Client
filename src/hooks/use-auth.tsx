@@ -40,7 +40,8 @@ interface AuthContextType {
   ) => Promise<void>;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
-  updateProfile: (data: { first_name?: string; last_name?: string; avatar_url?: string }) => Promise<any>;
+  updateProfile: (data: { first_name?: string; last_name?: string }) => Promise<any>;
+  updateCurrentUser: (user: User) => void;
   updateEmail: (email: string) => Promise<any>;
   updatePassword: (current_password: string, new_password: string) => Promise<any>;
 }
@@ -133,12 +134,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     navigate("/login");
   };
 
-  const updateProfile = async (data: { first_name?: string; last_name?: string; avatar_url?: string }) => {
+  const updateProfile = async (data: { first_name?: string; last_name?: string }) => {
     const response = await authUpdateProfile(data);
     if (response.success && response.data?.user) {
       setUser(response.data.user);
     }
     return response;
+  };
+
+  const updateCurrentUser = (updatedUser: User) => {
+    const currentToken = getAccessToken();
+    if (currentToken) setAuthData(currentToken, updatedUser);
+    setUser(updatedUser);
   };
 
   const updateEmail = async (email: string) => {
@@ -164,6 +171,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         logoutAll,
         updateProfile,
+        updateCurrentUser,
         updateEmail,
         updatePassword,
       }}

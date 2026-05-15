@@ -20,6 +20,7 @@ import { ResetPasswordPage } from "../pages/reset-password";
 import NotFoundPage from "../pages/not-found";
 import DashboardNotFound from "../pages/dashboard/not-found";
 import ErrorPage from "@/pages/error";
+import SiteMediaPage from "@/pages/dashboard/site-media";
 
 export const router = createBrowserRouter([
   {
@@ -63,15 +64,9 @@ export const router = createBrowserRouter([
           {
             path: ":id",
             element: <ProjectLayout />,
-            handle: {
-              breadcrumb: ({ project }: any) => project?.name || "Proyecto",
-            },
+            handle: { breadcrumb: ({ project }: any) => project?.name || "Proyecto" },
             children: [
-              {
-                index: true,
-                element: <ProjectSitesPage />,
-                handle: { breadcrumb: "Sitios" },
-              },
+              { index: true, element: <ProjectSitesPage />, handle: { breadcrumb: "Sitios" } },
               {
                 path: "members",
                 element: <ProjectMembersPage />,
@@ -88,11 +83,15 @@ export const router = createBrowserRouter([
           {
             path: "site/:slug",
             element: <SiteLayout />,
-            handle: {
-              breadcrumb: ({ site }: any) =>
-                site?.name || site?.slug || "Sitio",
-            },
-            children: [{ index: true, element: <SiteDashboard /> }],
+            handle: { breadcrumb: ({ site }: any) => site?.name || site?.slug || "Sitio" },
+            children: [
+              { index: true, element: <SiteDashboard /> },
+              {
+                path: "media",
+                element: <SiteMediaPage />,
+                handle: { breadcrumb: "Medios" },
+              },
+            ],
           },
           { path: "*", element: <DashboardNotFound /> },
         ],
