@@ -135,7 +135,7 @@ class ApiClient {
     return this.request<T>("auth/me");
   }
 
-  async updateProfile<T>(body: { first_name?: string; last_name?: string; avatar_url?: string }): Promise<ApiResponse<T>> {
+  async updateProfile<T>(body: { first_name?: string; last_name?: string }): Promise<ApiResponse<T>> {
     return this.request<T>("auth/me/profile", {
       method: "PATCH",
       body: JSON.stringify(body),
