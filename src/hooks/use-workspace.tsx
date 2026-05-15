@@ -103,6 +103,7 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   const fetchSiteBySlug = useCallback(async (slug: string) => {
+    if (currentSite && currentSite.slug === slug) return;
     setCurrentSite(null);
     setIsLoading(true);
     setError(null);
@@ -132,7 +133,7 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({
         setIsLoading(false);
       }
     }
-  }, []);
+  }, [currentSite]);
 
   const clearWorkspace = useCallback(() => {
     activeRequests.current.projects++;
