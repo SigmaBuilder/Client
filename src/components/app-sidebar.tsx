@@ -1,14 +1,13 @@
 import * as React from "react";
 import { Link } from "react-router-dom";
+import { useWorkspace } from "@/hooks/use-workspace";
 import {
-  BookOpen,
   Bot,
   Briefcase,
-  LifeBuoy,
   Newspaper,
   Send,
-  Settings2,
   SquareTerminal,
+  Image,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -24,58 +23,74 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-const data = {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { currentProject, currentSite } = useWorkspace();
+
+  const data = {
   navMain: [
     {
       title: "Inicio",
-      url: "/dashboard",
+      url: `/dashboard/site/${currentSite?.slug}`,
       icon: SquareTerminal,
     },
     {
       title: "Módulos",
-      url: "#",
+      url: `/dashboard/site/${currentSite?.slug}/modules`,
       icon: Bot,
     },
     {
-      title: "Actvidad",
-      url: "#",
-      icon: BookOpen,
-    },
-    {
-      title: "Ajustes",
-      url: "#",
-      icon: Settings2,
-    },
+      title: "Libreria de Medios",
+      url: `/dashboard/site/${currentSite?.slug}/media`,
+      icon: Image,
+    }
   ],
   navSecondary: [
     {
-      title: "Soporte",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
       title: "Comentarios",
-      url: "#",
+      url: "https://github.com/SigmaBuilder/Client/issues/new",
       icon: Send,
     },
+    {
+      title: "Ir al proyecto",
+      url: `/dashboard/${currentProject?.id}`,
+      icon: Bot,
+    }
   ],
   modules: [
     {
-      name: "Blog",
+      title: "Blog",
       url: "#",
       icon: Newspaper,
+      isActive: true,
+      items: [
+        {
+          title: "Posts",
+          url: "/posts",
+        },
+        {
+          title: "Categorías",
+          url: "/categories",
+        }
+      ]
     },
     {
-      name: "Portfolio",
+      title: "Portfolio",
       url: "#",
       icon: Briefcase,
+      isActive: true,
+      items: [
+        {
+          title: "Projects",
+          url: "/projects",
+        },
+        {
+          title: "Categories",
+          url: "/categories",
+        }
+      ]
     }
   ],
 };
-
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  
-
   return (
     <Sidebar
       className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
@@ -99,7 +114,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavModules modules={data.modules} />
+        <NavModules items={data.modules} />
         
       </SidebarContent>
       <SidebarFooter>
