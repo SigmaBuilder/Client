@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import GlobalLayout from "../layouts/GlobalLayout";
 import DashboardLayout from "../layouts/DashboardLayout";
 import ProjectLayout from "../layouts/ProjectLayout";
@@ -21,6 +21,9 @@ import NotFoundPage from "../pages/not-found";
 import DashboardNotFound from "../pages/dashboard/not-found";
 import ErrorPage from "@/pages/error";
 import SiteMediaPage from "@/pages/dashboard/site-media";
+import SiteBlogCategoriesPage from "@/pages/dashboard/blog/site-blog-categories";
+import SiteBlogPostsPage from "@/pages/dashboard/blog/site-blog-posts";
+import SiteBlogPostEditorPage from "@/pages/dashboard/blog/site-blog-post-editor";
 
 export const router = createBrowserRouter([
   {
@@ -30,7 +33,11 @@ export const router = createBrowserRouter([
         <GlobalLayout />
       </AuthProvider>
     ),
-    errorElement: <ErrorPage />,
+    errorElement: (
+      <AuthProvider>
+        <ErrorPage />
+      </AuthProvider>
+    ),
     children: [
       { index: true, element: <Landing /> },
       { path: "login", element: <Login /> },
@@ -90,6 +97,17 @@ export const router = createBrowserRouter([
                 path: "media",
                 element: <SiteMediaPage />,
                 handle: { breadcrumb: "Medios" },
+              },
+              {
+                path: "blog",
+                handle: { breadcrumb: "Blog" },
+                children: [
+                  { index: true, element: <Navigate to="posts" replace /> },
+                  { path: "categories", element: <SiteBlogCategoriesPage />, handle: { breadcrumb: "Categorías" } },
+                  { path: "posts", element: <SiteBlogPostsPage />, handle: { breadcrumb: "Posts" } },
+                  { path: "posts/new", element: <SiteBlogPostEditorPage />, handle: { breadcrumb: "Nuevo Post" } },
+                  { path: "posts/:postId", element: <SiteBlogPostEditorPage />, handle: { breadcrumb: "Editar Post" } },
+                ],
               },
             ],
           },
