@@ -25,7 +25,7 @@ export function MediaLibraryManager({ projectId, siteId, onSelect, trigger }: Me
       <DialogTrigger asChild>
         {trigger || <Button variant="outline">Abrir Media Library</Button>}
       </DialogTrigger>
-      <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
+      <DialogContent className="w-full max-w-6xl h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Librería de Medios</DialogTitle>
         </DialogHeader>
