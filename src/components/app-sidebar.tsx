@@ -65,11 +65,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       items: [
         {
           title: "Posts",
-          url: "/posts",
+          url: `/dashboard/site/${currentSite?.slug}/blog/posts`,
         },
         {
           title: "Categorías",
-          url: "/categories",
+          url: `/dashboard/site/${currentSite?.slug}/blog/categories`,
         }
       ]
     },
