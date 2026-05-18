@@ -30,6 +30,7 @@ import PortfolioItemForm from "../pages/dashboard/site-portfolio/item-form";
 import SiteBlogCategoriesPage from "@/pages/dashboard/blog/site-blog-categories";
 import SiteBlogPostsPage from "@/pages/dashboard/blog/site-blog-posts";
 import SiteBlogPostEditorPage from "@/pages/dashboard/blog/site-blog-post-editor";
+import SiteModulesPage from "@/pages/dashboard/site-modules";
 
 export const router = createBrowserRouter([
   {
@@ -99,6 +100,11 @@ export const router = createBrowserRouter([
             handle: { breadcrumb: ({ site }: any) => site?.name || site?.slug || "Sitio" },
             children: [
               { index: true, element: <SiteDashboard /> },
+              {
+                path: "modules",
+                element: <SiteModulesPage />,
+                handle: { breadcrumb: "Módulos" },
+              },
               {
                 path: "media",
                 element: <SiteMediaPage />,
