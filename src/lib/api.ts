@@ -481,6 +481,59 @@ class ApiClient {
       method: "DELETE",
     });
   }
+
+  // Blog
+  async getBlogCategories<T>(siteId: string): Promise<ApiResponse<T>> {
+    return this.request<T>(`sites/${siteId}/modules/blog/categories`);
+  }
+
+  async createBlogCategory<T>(siteId: string, body: { name: string; slug: string }): Promise<ApiResponse<T>> {
+    return this.request<T>(`sites/${siteId}/modules/blog/categories`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+  }
+
+  async updateBlogCategory<T>(siteId: string, categoryId: string, body: { name?: string; slug?: string }): Promise<ApiResponse<T>> {
+    return this.request<T>(`sites/${siteId}/modules/blog/categories/${categoryId}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    });
+  }
+
+  async deleteBlogCategory<T>(siteId: string, categoryId: string): Promise<ApiResponse<T>> {
+    return this.request<T>(`sites/${siteId}/modules/blog/categories/${categoryId}`, {
+      method: "DELETE",
+    });
+  }
+
+  async getBlogPosts<T>(siteId: string): Promise<ApiResponse<T>> {
+    return this.request<T>(`sites/${siteId}/modules/blog/posts`);
+  }
+
+  async getBlogPost<T>(siteId: string, postId: string): Promise<ApiResponse<T>> {
+    return this.request<T>(`sites/${siteId}/modules/blog/posts/${postId}`);
+  }
+
+  async createBlogPost<T>(siteId: string, body: any): Promise<ApiResponse<T>> {
+    return this.request<T>(`sites/${siteId}/modules/blog/posts`, {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+  }
+
+  async updateBlogPost<T>(siteId: string, postId: string, body: any): Promise<ApiResponse<T>> {
+    return this.request<T>(`sites/${siteId}/modules/blog/posts/${postId}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    });
+  }
+
+  async deleteBlogPost<T>(siteId: string, postId: string): Promise<ApiResponse<T>> {
+    return this.request<T>(`sites/${siteId}/modules/blog/posts/${postId}`, {
+      method: "DELETE",
+    });
+  }
 }
 
 export const api = new ApiClient(API_URL);

@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import GlobalLayout from "../layouts/GlobalLayout";
 import DashboardLayout from "../layouts/DashboardLayout";
 import ProjectLayout from "../layouts/ProjectLayout";
@@ -27,6 +27,9 @@ import PortfolioStackList from "../pages/dashboard/site-portfolio/stack-list";
 import PortfolioStackForm from "../pages/dashboard/site-portfolio/stack-form";
 import PortfolioItemsList from "../pages/dashboard/site-portfolio/items-list";
 import PortfolioItemForm from "../pages/dashboard/site-portfolio/item-form";
+import SiteBlogCategoriesPage from "@/pages/dashboard/blog/site-blog-categories";
+import SiteBlogPostsPage from "@/pages/dashboard/blog/site-blog-posts";
+import SiteBlogPostEditorPage from "@/pages/dashboard/blog/site-blog-post-editor";
 
 export const router = createBrowserRouter([
   {
@@ -36,7 +39,11 @@ export const router = createBrowserRouter([
         <GlobalLayout />
       </AuthProvider>
     ),
-    errorElement: <ErrorPage />,
+    errorElement: (
+      <AuthProvider>
+        <ErrorPage />
+      </AuthProvider>
+    ),
     children: [
       { index: true, element: <Landing /> },
       { path: "login", element: <Login /> },
@@ -141,6 +148,15 @@ export const router = createBrowserRouter([
                 path: "portfolio/items/:itemId/edit",
                 element: <PortfolioItemForm />,
                 handle: { breadcrumb: "Editar Proyecto" },
+                path: "blog",
+                handle: { breadcrumb: "Blog" },
+                children: [
+                  { index: true, element: <Navigate to="posts" replace /> },
+                  { path: "categories", element: <SiteBlogCategoriesPage />, handle: { breadcrumb: "Categorías" } },
+                  { path: "posts", element: <SiteBlogPostsPage />, handle: { breadcrumb: "Posts" } },
+                  { path: "posts/new", element: <SiteBlogPostEditorPage />, handle: { breadcrumb: "Nuevo Post" } },
+                  { path: "posts/:postId", element: <SiteBlogPostEditorPage />, handle: { breadcrumb: "Editar Post" } },
+                ],
               },
             ],
           },
