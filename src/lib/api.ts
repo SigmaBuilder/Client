@@ -220,6 +220,16 @@ class ApiClient {
     );
   }
 
+  async updateSite<T>(
+    siteId: string,
+    body: { features?: Record<string, any> },
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>(`sites/${siteId}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    });
+  }
+
   // Members
   async getProjectMembers<T>(projectId: string): Promise<ApiResponse<T>> {
     return this.request<T>(`projects/${projectId}/members`);
