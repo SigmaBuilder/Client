@@ -21,6 +21,12 @@ import NotFoundPage from "../pages/not-found";
 import DashboardNotFound from "../pages/dashboard/not-found";
 import ErrorPage from "@/pages/error";
 import SiteMediaPage from "@/pages/dashboard/site-media";
+import PortfolioSectionsList from "../pages/dashboard/site-portfolio/sections-list";
+import PortfolioSectionForm from "../pages/dashboard/site-portfolio/section-form";
+import PortfolioStackList from "../pages/dashboard/site-portfolio/stack-list";
+import PortfolioStackForm from "../pages/dashboard/site-portfolio/stack-form";
+import PortfolioItemsList from "../pages/dashboard/site-portfolio/items-list";
+import PortfolioItemForm from "../pages/dashboard/site-portfolio/item-form";
 import SiteBlogCategoriesPage from "@/pages/dashboard/blog/site-blog-categories";
 import SiteBlogPostsPage from "@/pages/dashboard/blog/site-blog-posts";
 import SiteBlogPostEditorPage from "@/pages/dashboard/blog/site-blog-post-editor";
@@ -97,6 +103,51 @@ export const router = createBrowserRouter([
                 path: "media",
                 element: <SiteMediaPage />,
                 handle: { breadcrumb: "Medios" },
+              },
+              {
+                path: "portfolio/sections",
+                element: <PortfolioSectionsList />,
+                handle: { breadcrumb: "Secciones de Portfolio" },
+              },
+              {
+                path: "portfolio/sections/new",
+                element: <PortfolioSectionForm />,
+                handle: { breadcrumb: "Nueva Sección" },
+              },
+              {
+                path: "portfolio/sections/:sectionId/edit",
+                element: <PortfolioSectionForm />,
+                handle: { breadcrumb: "Editar Sección" },
+              },
+              {
+                path: "portfolio/stack",
+                element: <PortfolioStackList />,
+                handle: { breadcrumb: "Stack Tecnológico" },
+              },
+              {
+                path: "portfolio/stack/new",
+                element: <PortfolioStackForm />,
+                handle: { breadcrumb: "Nueva Tecnología" },
+              },
+              {
+                path: "portfolio/stack/:stackId/edit",
+                element: <PortfolioStackForm />,
+                handle: { breadcrumb: "Editar Tecnología" },
+              },
+              {
+                path: "portfolio/items",
+                element: <PortfolioItemsList />,
+                handle: { breadcrumb: "Proyectos" },
+              },
+              {
+                path: "portfolio/items/new",
+                element: <PortfolioItemForm />,
+                handle: { breadcrumb: "Nuevo Proyecto" },
+              },
+              {
+                path: "portfolio/items/:itemId/edit",
+                element: <PortfolioItemForm />,
+                handle: { breadcrumb: "Editar Proyecto" },
               },
               {
                 path: "blog",

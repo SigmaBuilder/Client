@@ -80,12 +80,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       isActive: true,
       items: [
         {
-          title: "Projects",
-          url: "/projects",
+          title: "Secciones",
+          url: `/dashboard/site/${currentSite?.slug}/portfolio/sections`,
         },
         {
-          title: "Categories",
-          url: "/categories",
+          title: "Proyectos",
+          url: `/dashboard/site/${currentSite?.slug}/portfolio/items`,
+        },
+        {
+          title: "Stack",
+          url: `/dashboard/site/${currentSite?.slug}/portfolio/stack`,
         }
       ]
     }

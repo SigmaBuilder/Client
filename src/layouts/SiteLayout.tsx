@@ -40,8 +40,8 @@ export default function SiteLayout() {
       renderSlot={(header) => (
         <div className="flex flex-col h-full min-h-0">
           {/* Compact header */}
-          <div className="flex items-center justify-between px-6 py-3 gap-4 border-b bg-background shrink-0">
-            <div className="flex items-center gap-2 min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between px-4 sm:px-6 py-3 gap-2 sm:gap-4 border-b bg-background shrink-0">
+            <div className="flex items-center gap-2 min-w-0 shrink-0">
               <Globe className="h-5 w-5 text-primary shrink-0" />
               <h1 className="text-base font-semibold truncate">
                 {currentSite.name || currentSite.slug}

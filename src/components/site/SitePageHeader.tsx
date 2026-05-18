@@ -41,9 +41,8 @@ export function SitePageHeaderProvider({
   const contextValue = useMemo(() => ({ setHeader, clearHeader }), [setHeader, clearHeader]);
 
   const headerNode = headerState ? (
-    <div className="flex items-center gap-4 flex-1 min-w-0">
-      {/* Center: breadcrumbs - takes available space */}
-      <div className="flex-1 min-w-0 flex justify-center">
+    <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+      <div className="hidden sm:flex flex-1 min-w-0 justify-center">
         {headerState.breadcrumbs && headerState.breadcrumbs.length > 0 ? (
           <nav className="flex items-center gap-1 text-sm" aria-label="Breadcrumb">
             {headerState.breadcrumbs.map((crumb, i) => {
@@ -89,15 +88,22 @@ export function SitePageHeaderProvider({
         )}
       </div>
 
+      {/* Mobile: show last breadcrumb only as context */}
+      {headerState.breadcrumbs && headerState.breadcrumbs.length > 0 && (
+        <span className="sm:hidden text-sm text-muted-foreground truncate">
+          {headerState.breadcrumbs[headerState.breadcrumbs.length - 1].label}
+        </span>
+      )}
+
       {/* Right: searchbar + actions */}
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-auto">
         {headerState.search && (
           <input
             type="text"
             placeholder={headerState.search.placeholder || 'Buscar...'}
             value={headerState.search.value}
             onChange={(e) => headerState.search!.onChange(e.target.value)}
-            className="w-52 h-8 px-3 text-sm rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            className="hidden sm:block w-44 lg:w-52 h-8 px-3 text-sm rounded-md border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
           />
         )}
         {headerState.actions && (
