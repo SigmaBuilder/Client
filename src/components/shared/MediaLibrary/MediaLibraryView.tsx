@@ -178,7 +178,7 @@ export function MediaLibraryView({
     [projectId, currentFolderId, fetchContent],
   );
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, open: openFileDialog } = useDropzone({
     onDrop,
     noClick: true,
   });
@@ -362,12 +362,15 @@ export function MediaLibraryView({
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              <Button onClick={openFileDialog} variant="default" size="sm" className="h-9">
+                <Upload className="mr-2 h-4 w-4" /> Subir archivo
+              </Button>
               <Input
                 placeholder="Buscar archivos..."
                 value={search}
                 onChange={(e) => setInternalSearch(e.target.value)}
-                className="w-56 bg-background hidden sm:block"
+                className="w-56 bg-background hidden sm:block h-9"
               />
             </div>
           </div>
@@ -385,8 +388,11 @@ export function MediaLibraryView({
           <input {...getInputProps()} />
 
           {isLoading ? (
-            <div className="flex items-center justify-center h-full text-muted-foreground">
-              Cargando...
+            <div className="flex items-center justify-center h-full w-full min-h-[300px]">
+              <div className="flex flex-col items-center gap-4 text-muted-foreground">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary/30 border-t-primary" />
+                <p className="text-sm font-medium animate-pulse">Cargando medios...</p>
+              </div>
             </div>
           ) : folders.length === 0 && assets.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
@@ -396,9 +402,12 @@ export function MediaLibraryView({
               <p className="font-medium text-foreground">
                 Esta carpeta está vacía
               </p>
-              <p className="text-sm opacity-80 mt-1">
-                Arrastra archivos aquí para subirlos.
+              <p className="text-sm opacity-80 mt-1 mb-4">
+                Arrastra archivos aquí o haz clic para subir.
               </p>
+              <Button onClick={openFileDialog} variant="outline" size="sm">
+                <Upload className="mr-2 h-4 w-4" /> Seleccionar archivo
+              </Button>
             </div>
           ) : (
             <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3 content-start">
@@ -482,6 +491,9 @@ export function MediaLibraryView({
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedItem({ type: "asset", data: asset });
+                        }}
+                        onDoubleClick={(e) => {
+                          e.stopPropagation();
                           if (onSelect) onSelect(asset);
                         }}
                       >
@@ -643,6 +655,14 @@ export function MediaLibraryView({
                 </div>
 
                 <div className="pt-4 border-t space-y-2">
+                  {onSelect && (
+                    <Button
+                      className="w-full justify-start bg-primary text-primary-foreground hover:bg-primary/90"
+                      onClick={() => onSelect(selectedItem.data)}
+                    >
+                      <FileIcon className="mr-2 h-4 w-4" /> Seleccionar
+                    </Button>
+                  )}
                   <Button
                     variant="secondary"
                     className="w-full justify-start"
