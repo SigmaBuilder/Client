@@ -148,6 +148,8 @@ export const router = createBrowserRouter([
                 path: "portfolio/items/:itemId/edit",
                 element: <PortfolioItemForm />,
                 handle: { breadcrumb: "Editar Proyecto" },
+              },
+              {
                 path: "blog",
                 handle: { breadcrumb: "Blog" },
                 children: [
