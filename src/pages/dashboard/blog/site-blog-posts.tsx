@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
 import { useWorkspace } from "@/hooks/use-workspace";
@@ -6,6 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Plus, Edit2, Trash2, FileText, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useSetSitePageHeader } from "@/components/site/SitePageHeader";
 
 interface BlogPost {
   id: string;
@@ -19,7 +23,10 @@ interface BlogPost {
 export default function SiteBlogPostsPage() {
   const { currentSite } = useWorkspace();
   const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const newPostUrl = `/dashboard/site/${currentSite?.slug}/blog/posts/new`;
 
   const fetchPosts = async () => {
     if (!currentSite?.id) return;
@@ -54,83 +61,143 @@ export default function SiteBlogPostsPage() {
     }
   };
 
+  const filteredPosts = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return posts;
+
+    return posts.filter((post) =>
+      [post.title, post.slug, post.status].some((value) =>
+        value.toLowerCase().includes(query),
+      ),
+    );
+  }, [posts, search]);
+
+  const headerState = useMemo(() => ({
+    breadcrumbs: [
+      { label: "Blog" },
+      { label: "Posts" },
+    ],
+    search: {
+      value: search,
+      onChange: setSearch,
+      placeholder: "Buscar posts...",
+    },
+    actions: (
+      <>
+        <Badge variant="secondary">{posts.length} posts</Badge>
+        <Button asChild size="sm">
+          <Link to={newPostUrl}>
+            <Plus data-icon="inline-start" />
+            Nuevo post
+          </Link>
+        </Button>
+      </>
+    ),
+  }), [newPostUrl, posts.length, search]);
+
+  useSetSitePageHeader(currentSite ? headerState : null);
+
+  const getStatusLabel = (status: string) => {
+    if (status === "published") return "Publicado";
+    if (status === "archived") return "Archivado";
+    return "Borrador";
+  };
+
+  const getStatusVariant = (status: string) => {
+    if (status === "published") return "default";
+    if (status === "archived") return "outline";
+    return "secondary";
+  };
+
   if (loading) {
-    return <div className="p-8">Cargando posts...</div>;
+    return (
+      <div className="flex-1 p-6">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-72 w-full" />
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6 max-w-6xl mx-auto w-full">
-      <div className="flex items-center justify-between space-y-2">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Posts del Blog</h2>
-          <p className="text-muted-foreground mt-1 text-sm">Administra y publica el contenido de tu blog.</p>
-        </div>
-        <Link to={`/dashboard/site/${currentSite?.slug}/blog/posts/new`}>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Nuevo Post
-          </Button>
-        </Link>
-      </div>
-
-      <div className="rounded-md border bg-card">
-        <div className="w-full">
-          <div className="border-b px-4 py-3 flex items-center justify-between font-medium text-sm text-muted-foreground bg-muted/50">
-            <div className="w-1/2">Post</div>
-            <div className="w-1/6">Estado</div>
-            <div className="w-1/6">Fecha</div>
-            <div className="w-1/6 text-right">Acciones</div>
-          </div>
-          <div className="divide-y">
-            {posts.length === 0 ? (
-              <div className="p-12 text-center text-muted-foreground flex flex-col items-center">
-                <FileText className="h-12 w-12 opacity-20 mb-4" />
-                <p className="text-lg font-medium text-foreground">Aún no tienes posts</p>
-                <p className="text-sm mt-1">Empieza creando tu primer post en el blog.</p>
-                <Link to={`/dashboard/site/${currentSite?.slug}/blog/posts/new`} className="mt-6">
-                  <Button variant="outline">Crear un post ahora</Button>
-                </Link>
+    <div className="flex-1 p-6">
+      <Card className="mx-auto w-full max-w-6xl">
+        <CardHeader>
+          <CardTitle>Posts del blog</CardTitle>
+          <CardDescription>Administra borradores, publicaciones y contenido archivado.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {filteredPosts.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed p-12 text-center">
+              <FileText className="size-12 text-muted-foreground" />
+              <div className="flex flex-col gap-1">
+                <p className="font-medium text-foreground">
+                  {posts.length === 0 ? "Aún no tienes posts" : "No hay posts para esta búsqueda"}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {posts.length === 0 ? "Empieza creando tu primer post en el blog." : "Prueba con otro título, slug o estado."}
+                </p>
               </div>
-            ) : (
-              posts.map((post) => (
-                <div key={post.id} className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors">
-                  <div className="w-1/2 flex items-center gap-3">
-                    {post.cover_image ? (
-                       <img src={post.cover_image} alt="cover" className="w-12 h-12 rounded object-cover border" />
-                    ) : (
-                       <div className="w-12 h-12 rounded bg-muted flex items-center justify-center border">
-                          <ImageIcon className="w-5 h-5 text-muted-foreground/50" />
-                       </div>
-                    )}
-                    <div>
-                      <div className="font-medium text-foreground line-clamp-1">{post.title}</div>
-                      <div className="text-muted-foreground text-xs">{post.slug}</div>
-                    </div>
-                  </div>
-                  <div className="w-1/6">
-                    <Badge variant={post.status === 'published' ? 'default' : 'secondary'} className={post.status === 'published' ? 'bg-green-500/15 text-green-700 hover:bg-green-500/25 dark:text-green-400' : ''}>
-                      {post.status === 'published' ? 'Publicado' : post.status === 'archived' ? 'Archivado' : 'Borrador'}
-                    </Badge>
-                  </div>
-                  <div className="w-1/6 text-muted-foreground text-sm">
-                    {new Date(post.created_at).toLocaleDateString()}
-                  </div>
-                  <div className="w-1/6 flex justify-end gap-2">
-                    <Link to={`/dashboard/site/${currentSite?.slug}/blog/posts/${post.id}`}>
-                      <Button variant="ghost" size="sm">
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(post.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </div>
+              {posts.length === 0 && (
+                <Button asChild variant="outline">
+                  <Link to={newPostUrl}>Crear un post ahora</Link>
+                </Button>
+              )}
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Post</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead>Fecha</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredPosts.map((post) => (
+                  <TableRow key={post.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        {post.cover_image ? (
+                          <img src={post.cover_image} alt="" className="size-12 rounded-md border object-cover" />
+                        ) : (
+                          <div className="flex size-12 items-center justify-center rounded-md border bg-muted">
+                            <ImageIcon className="text-muted-foreground" />
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <div className="truncate font-medium text-foreground">{post.title}</div>
+                          <div className="truncate text-xs text-muted-foreground">{post.slug}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusVariant(post.status)}>{getStatusLabel(post.status)}</Badge>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {new Date(post.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex justify-end gap-2">
+                        <Button asChild variant="ghost" size="icon-sm">
+                          <Link to={`/dashboard/site/${currentSite?.slug}/blog/posts/${post.id}`} aria-label={`Editar ${post.title}`}>
+                            <Edit2 />
+                          </Link>
+                        </Button>
+                        <Button variant="destructive" size="icon-sm" onClick={() => handleDelete(post.id)} aria-label={`Eliminar ${post.title}`}>
+                          <Trash2 />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
