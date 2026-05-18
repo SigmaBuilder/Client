@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
 
 import { api } from "@/lib/api";
 import { useWorkspace } from "@/hooks/use-workspace";
@@ -12,7 +12,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useSetSitePageHeader } from "@/components/site/SitePageHeader";
 
 interface Category {
   id: string;
@@ -24,6 +29,7 @@ interface Category {
 export default function SiteBlogCategoriesPage() {
   const { currentSite } = useWorkspace();
   const [categories, setCategories] = useState<Category[]>([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -51,7 +57,7 @@ export default function SiteBlogCategoriesPage() {
     }
   }, [currentSite?.id]);
 
-  const handleOpenDialog = (category?: Category) => {
+  const handleOpenDialog = useCallback((category?: Category) => {
     if (category) {
       setEditingId(category.id);
       setFormData({ name: category.name, slug: category.slug });
@@ -60,9 +66,9 @@ export default function SiteBlogCategoriesPage() {
       setFormData({ name: "", slug: "" });
     }
     setIsOpen(true);
-  };
+  }, []);
 
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSave = async (e: FormEvent) => {
     e.preventDefault();
     if (!currentSite?.id) return;
     try {
@@ -92,7 +98,7 @@ export default function SiteBlogCategoriesPage() {
     }
   };
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
     setFormData((prev) => ({
       ...prev,
@@ -101,80 +107,139 @@ export default function SiteBlogCategoriesPage() {
     }));
   };
 
+  const filteredCategories = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return categories;
+
+    return categories.filter((category) =>
+      [category.name, category.slug].some((value) => value.toLowerCase().includes(query)),
+    );
+  }, [categories, search]);
+
+  const headerState = useMemo(() => ({
+    breadcrumbs: [
+      { label: "Blog" },
+      { label: "Categorías" },
+    ],
+    search: {
+      value: search,
+      onChange: setSearch,
+      placeholder: "Buscar categorías...",
+    },
+    actions: (
+      <>
+        <Badge variant="secondary">{categories.length} categorías</Badge>
+        <Button size="sm" onClick={() => handleOpenDialog()}>
+          <Plus data-icon="inline-start" />
+          Nueva categoría
+        </Button>
+      </>
+    ),
+  }), [categories.length, handleOpenDialog, search]);
+
+  useSetSitePageHeader(currentSite ? headerState : null);
+
   if (loading) {
-    return <div className="p-8">Cargando categorías...</div>;
+    return (
+      <div className="flex-1 p-6">
+        <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-64 w-full" />
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6 max-w-5xl mx-auto w-full">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Categorías de Blog</h2>
-        <Button onClick={() => handleOpenDialog()}>
-          <Plus className="mr-2 h-4 w-4" />
-          Nueva Categoría
-        </Button>
-      </div>
-
-      <div className="rounded-md border bg-card">
-        <div className="w-full">
-          <div className="border-b px-4 py-3 flex items-center justify-between font-medium text-sm text-muted-foreground bg-muted/50">
-            <div className="w-1/3">Nombre</div>
-            <div className="w-1/3">Slug</div>
-            <div className="w-1/3 text-right">Acciones</div>
-          </div>
-          <div className="divide-y">
-            {categories.length === 0 ? (
-              <div className="p-8 text-center text-muted-foreground">
-                <Tag className="mx-auto h-12 w-12 opacity-20 mb-4" />
-                <p>No hay categorías creadas aún.</p>
+    <div className="flex-1 p-6">
+      <Card className="mx-auto w-full max-w-5xl">
+        <CardHeader>
+          <CardTitle>Categorías de blog</CardTitle>
+          <CardDescription>Organiza tus posts por temas y controla sus slugs públicos.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {filteredCategories.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed p-12 text-center">
+              <Tag className="size-12 text-muted-foreground" />
+              <div className="flex flex-col gap-1">
+                <p className="font-medium text-foreground">
+                  {categories.length === 0 ? "No hay categorías creadas" : "No hay categorías para esta búsqueda"}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {categories.length === 0 ? "Crea la primera categoría para clasificar tus posts." : "Prueba con otro nombre o slug."}
+                </p>
               </div>
-            ) : (
-              categories.map((category) => (
-                <div key={category.id} className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors">
-                  <div className="w-1/3 font-medium">{category.name}</div>
-                  <div className="w-1/3 text-muted-foreground text-sm">{category.slug}</div>
-                  <div className="w-1/3 flex justify-end gap-2">
-                    <Button variant="ghost" size="sm" onClick={() => handleOpenDialog(category)}>
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(category.id)} className="text-destructive hover:text-destructive hover:bg-destructive/10">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </div>
+              {categories.length === 0 && (
+                <Button variant="outline" onClick={() => handleOpenDialog()}>
+                  Crear una categoría
+                </Button>
+              )}
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Slug</TableHead>
+                  <TableHead>Fecha</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredCategories.map((category) => (
+                  <TableRow key={category.id}>
+                    <TableCell className="font-medium">{category.name}</TableCell>
+                    <TableCell className="text-muted-foreground">{category.slug}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {new Date(category.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="icon-sm" onClick={() => handleOpenDialog(category)} aria-label={`Editar ${category.name}`}>
+                          <Edit2 />
+                        </Button>
+                        <Button variant="destructive" size="icon-sm" onClick={() => handleDelete(category.id)} aria-label={`Eliminar ${category.name}`}>
+                          <Trash2 />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{editingId ? "Editar Categoría" : "Nueva Categoría"}</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSave} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nombre</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={handleNameChange}
-                placeholder="Ej: Tecnología"
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="slug">Slug</Label>
-              <Input
-                id="slug"
-                value={formData.slug}
-                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                placeholder="ej-tecnologia"
-                required
-              />
-            </div>
-            <div className="flex justify-end pt-4">
+          <form onSubmit={handleSave} className="flex flex-col gap-5">
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="name">Nombre</FieldLabel>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={handleNameChange}
+                  placeholder="Ej: Tecnología"
+                  required
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="slug">Slug</FieldLabel>
+                <Input
+                  id="slug"
+                  value={formData.slug}
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  placeholder="ej-tecnologia"
+                  required
+                />
+              </Field>
+            </FieldGroup>
+            <div className="flex justify-end">
               <Button type="submit">Guardar</Button>
             </div>
           </form>
