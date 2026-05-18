@@ -42,7 +42,10 @@ export default function PortfolioItemForm() {
     if (isEditing && currentSite?.id && itemId) {
       const fetchItem = async () => {
         try {
-          const res = await api.getPortfolioItem<{ portfolioItem: any }>(currentSite.id, itemId);
+          const res = await api.getPortfolioItem<{ portfolioItem: any }>(
+            currentSite.id,
+            itemId,
+          );
           if (res.success && res.data) {
             const item = res.data.portfolioItem;
             setFormData({
@@ -67,16 +70,18 @@ export default function PortfolioItemForm() {
     }
   }, [currentSite?.id, itemId, isEditing, navigate, itemsPath]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [name]: name === "sort_order" ? parseInt(value) || 0 : value,
     }));
   };
 
   const handleMediaSelect = useCallback((asset: { file_url: string }) => {
-    setFormData(prev => ({ ...prev, image_url: asset.file_url }));
+    setFormData((prev) => ({ ...prev, image_url: asset.file_url }));
     setIsMediaOpen(false);
   }, []);
 
@@ -88,17 +93,22 @@ export default function PortfolioItemForm() {
     formDataUpload.append("file", file);
 
     toast.promise(
-      api.uploadMediaAsset<any>(currentProject.id, formDataUpload).then((res) => {
-        if (!res.success) throw new Error(res.error || "Error al subir");
-        if (res.data?.asset?.file_url) {
-          setFormData(prev => ({ ...prev, image_url: res.data.asset.file_url }));
-        }
-      }),
+      api
+        .uploadMediaAsset<any>(currentProject.id, formDataUpload)
+        .then((res) => {
+          if (!res.success) throw new Error(res.error || "Error al subir");
+          if (res.data?.asset?.file_url) {
+            setFormData((prev) => ({
+              ...prev,
+              image_url: res.data.asset.file_url,
+            }));
+          }
+        }),
       {
         loading: "Subiendo imagen...",
         success: "Imagen subida",
         error: "Error al subir la imagen",
-      }
+      },
     );
 
     if (fileInputRef.current) fileInputRef.current.value = "";
@@ -142,19 +152,22 @@ export default function PortfolioItemForm() {
     }
   };
 
-  const headerState = useMemo(() => ({
-    breadcrumbs: [
-      { label: "Portfolio" },
-      { label: "Proyectos", onClick: () => navigate(itemsPath) },
-      { label: isEditing ? "Editar Proyecto" : "Nuevo Proyecto" }
-    ],
-    actions: (
-      <Button size="sm" onClick={handleSave} disabled={isSaving || isLoading}>
-        <Save className="h-4 w-4 mr-2" />
-        Guardar
-      </Button>
-    ),
-  }), [isEditing, navigate, handleSave, isSaving, isLoading, itemsPath]);
+  const headerState = useMemo(
+    () => ({
+      breadcrumbs: [
+        { label: "Portfolio" },
+        { label: "Proyectos", onClick: () => navigate(itemsPath) },
+        { label: isEditing ? "Editar Proyecto" : "Nuevo Proyecto" },
+      ],
+      actions: (
+        <Button size="sm" onClick={handleSave} disabled={isSaving || isLoading}>
+          <Save className="h-4 w-4 mr-2" />
+          Guardar
+        </Button>
+      ),
+    }),
+    [isEditing, navigate, handleSave, isSaving, isLoading, itemsPath],
+  );
 
   useSetSitePageHeader(headerState);
 
@@ -171,7 +184,12 @@ export default function PortfolioItemForm() {
     <>
       <div className="p-6 max-w-2xl">
         <div className="flex items-center mb-6">
-          <Button variant="ghost" size="sm" onClick={() => navigate(itemsPath)} className="mr-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(itemsPath)}
+            className="mr-4"
+          >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Volver
           </Button>
@@ -197,7 +215,7 @@ export default function PortfolioItemForm() {
             <textarea
               id="description"
               name="description"
-              className="flex min-h-[120px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex min-h-30 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               value={formData.description}
               onChange={handleChange}
               placeholder="Describe brevemente tu proyecto..."
@@ -225,7 +243,9 @@ export default function PortfolioItemForm() {
                     variant="destructive"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => setFormData(prev => ({ ...prev, image_url: "" }))}
+                    onClick={() =>
+                      setFormData((prev) => ({ ...prev, image_url: "" }))
+                    }
                   >
                     <X className="h-4 w-4" />
                   </Button>
