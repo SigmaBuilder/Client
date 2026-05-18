@@ -30,7 +30,10 @@ export interface Site {
   name: string;
   slug: string;
   template_type: string;
-  features?: any;
+  features?: {
+    modules?: Record<string, boolean>;
+    [key: string]: any;
+  };
   content?: any;
   created_at: string;
   updated_at: string;
