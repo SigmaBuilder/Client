@@ -145,10 +145,27 @@ export function SitesTab({ sites, isLoading, projectId, onSiteCreated }: SitesTa
             onClick={() => navigate(`/dashboard/site/${site.slug}`)}
           >
             <CardHeader>
-              <CardTitle className="truncate">{site.name || site.slug}</CardTitle>
-              <CardDescription className="truncate">{site.slug}</CardDescription>
+              <div className="flex min-w-0 items-center gap-3">
+                <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted text-muted-foreground ring-1 ring-foreground/10">
+                  {site.content?.favicon_url ? (
+                    <img
+                      src={site.content.favicon_url}
+                      alt={`Favicon de ${site.name || site.slug}`}
+                      className="size-full object-cover"
+                    />
+                  ) : (
+                    <Globe />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <CardTitle className="truncate">{site.name || site.slug}</CardTitle>
+                  <CardDescription className="truncate">{site.slug}</CardDescription>
+                </div>
+              </div>
               <CardAction>
-                <Badge variant="secondary">Activo</Badge>
+                <Badge variant={site.status === 'public' ? 'default' : 'secondary'}>
+                  {site.status === 'public' ? 'Publicado' : 'Borrador'}
+                </Badge>
               </CardAction>
             </CardHeader>
             <CardContent>
