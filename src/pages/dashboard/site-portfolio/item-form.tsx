@@ -232,7 +232,7 @@ export default function PortfolioItemForm() {
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid gap-3">
                 <button
                   type="button"
                   onClick={() => setIsMediaOpen(true)}
@@ -240,14 +240,6 @@ export default function PortfolioItemForm() {
                 >
                   <ImagePlus className="h-6 w-6" />
                   <span className="text-xs">Seleccionar de la librería</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="flex flex-col items-center justify-center h-32 rounded-md border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 hover:bg-accent/50 transition-colors gap-2 text-muted-foreground"
-                >
-                  <Upload className="h-6 w-6" />
-                  <span className="text-xs">Subir desde tu equipo</span>
                 </button>
               </div>
             )}
