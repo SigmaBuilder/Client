@@ -25,22 +25,25 @@ import {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { currentProject, currentSite } = useWorkspace();
+  const enabledModules = currentSite?.features?.modules ?? {};
+  const siteBaseUrl = `/dashboard/site/${currentSite?.slug}`;
+  const modulesUrl = `${siteBaseUrl}/modules`;
 
   const data = {
   navMain: [
     {
       title: "Inicio",
-      url: `/dashboard/site/${currentSite?.slug}`,
+      url: siteBaseUrl,
       icon: SquareTerminal,
     },
     {
       title: "Módulos",
-      url: `/dashboard/site/${currentSite?.slug}/modules`,
+      url: modulesUrl,
       icon: Bot,
     },
     {
       title: "Libreria de Medios",
-      url: `/dashboard/site/${currentSite?.slug}/media`,
+      url: `${siteBaseUrl}/media`,
       icon: Image,
     }
   ],
@@ -65,11 +68,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       items: [
         {
           title: "Posts",
-          url: `/dashboard/site/${currentSite?.slug}/blog/posts`,
+          url: `${siteBaseUrl}/blog/posts`,
         },
         {
           title: "Categorías",
-          url: `/dashboard/site/${currentSite?.slug}/blog/categories`,
+          url: `${siteBaseUrl}/blog/categories`,
         }
       ]
     },
@@ -81,19 +84,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       items: [
         {
           title: "Secciones",
-          url: `/dashboard/site/${currentSite?.slug}/portfolio/sections`,
+          url: `${siteBaseUrl}/portfolio/sections`,
         },
         {
           title: "Proyectos",
-          url: `/dashboard/site/${currentSite?.slug}/portfolio/items`,
+          url: `${siteBaseUrl}/portfolio/items`,
         },
         {
           title: "Stack",
-          url: `/dashboard/site/${currentSite?.slug}/portfolio/stack`,
+          url: `${siteBaseUrl}/portfolio/stack`,
         }
       ]
     }
-  ],
+  ].filter((module) => enabledModules[module.title.toLowerCase()] === true),
 };
   return (
     <Sidebar
@@ -118,7 +121,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavModules items={data.modules} />
+        <NavModules items={data.modules} manageUrl={modulesUrl} />
         
       </SidebarContent>
       <SidebarFooter>
