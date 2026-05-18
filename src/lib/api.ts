@@ -222,7 +222,13 @@ class ApiClient {
 
   async updateSite<T>(
     siteId: string,
-    body: { features?: Record<string, any> },
+    body: {
+      name?: string;
+      slug?: string;
+      status?: "draft" | "public";
+      features?: Record<string, any>;
+      content?: Record<string, any>;
+    },
   ): Promise<ApiResponse<T>> {
     return this.request<T>(`sites/${siteId}`, {
       method: "PATCH",

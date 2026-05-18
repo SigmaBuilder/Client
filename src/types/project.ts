@@ -30,11 +30,15 @@ export interface Site {
   name: string;
   slug: string;
   template_type: string;
+  status?: "draft" | "public" | string;
   features?: {
     modules?: Record<string, boolean>;
     [key: string]: any;
   };
-  content?: any;
+  content?: {
+    favicon_url?: string | null;
+    [key: string]: any;
+  };
   created_at: string;
   updated_at: string;
 }
