@@ -31,6 +31,8 @@ import SiteBlogCategoriesPage from "@/pages/dashboard/blog/site-blog-categories"
 import SiteBlogPostsPage from "@/pages/dashboard/blog/site-blog-posts";
 import SiteBlogPostEditorPage from "@/pages/dashboard/blog/site-blog-post-editor";
 import SiteModulesPage from "@/pages/dashboard/site-modules";
+import PagesList from "@/pages/dashboard/site-pages/pages-list";
+import PageEditor from "@/pages/dashboard/site-pages/page-editor";
 
 export const router = createBrowserRouter([
   {
@@ -100,6 +102,21 @@ export const router = createBrowserRouter([
             handle: { breadcrumb: ({ site }: any) => site?.name || site?.slug || "Sitio" },
             children: [
               { index: true, element: <SiteDashboard /> },
+              {
+                path: "pages",
+                element: <PagesList />,
+                handle: { breadcrumb: "Páginas" },
+              },
+              {
+                path: "pages/new",
+                element: <PageEditor />,
+                handle: { breadcrumb: "Nueva Página" },
+              },
+              {
+                path: "pages/:pageId/edit",
+                element: <PageEditor />,
+                handle: { breadcrumb: "Editar Página" },
+              },
               {
                 path: "modules",
                 element: <SiteModulesPage />,
