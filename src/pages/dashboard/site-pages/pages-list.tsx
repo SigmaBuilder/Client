@@ -5,7 +5,7 @@ import { api } from "@/lib/api";
 import { useSetSitePageHeader } from "@/components/site/SitePageHeader";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Home, MoreVertical } from "lucide-react";
 import { toast } from "sonner";
 import {
   Card,
@@ -22,6 +22,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,6 +47,7 @@ interface SitePage {
   title?: string;
   slug: string;
   status: "draft" | "public";
+  is_home: boolean;
 }
 
 export default function PagesList() {
@@ -74,6 +82,22 @@ export default function PagesList() {
     fetchPages();
   }, [currentSite?.id]);
 
+  const handleSetHome = async (pageId: string) => {
+    if (!currentSite?.id) return;
+    const loadingToast = toast.loading("Actualizando página principal...");
+    try {
+      const res = await api.setSitePageAsHome(currentSite.id, pageId);
+      if (res.success) {
+        toast.success("Página principal actualizada correctamente", { id: loadingToast });
+        fetchPages(); // Refrescar la lista para ver los cambios
+      } else {
+        toast.error(res.error || "Error al actualizar la página principal", { id: loadingToast });
+      }
+    } catch {
+      toast.error("Error de conexión", { id: loadingToast });
+    }
+  };
+
   const handleDelete = async () => {
     if (!currentSite?.id || !pageToDelete) return;
     try {
@@ -82,7 +106,7 @@ export default function PagesList() {
         toast.success("Página eliminada");
         fetchPages();
       } else {
-        toast.error("Error al eliminar la página");
+        toast.error(res.error || "Error al eliminar la página");
       }
     } catch {
       toast.error("Error de conexión");
@@ -161,29 +185,52 @@ export default function PagesList() {
                   filteredPages.map((page) => (
                     <TableRow key={page.id}>
                       <TableCell className="font-medium">
-                        {page.title || page.name}
+                        <div className="flex items-center gap-2">
+                          {page.title || page.name}
+                          {page.is_home && (
+                            <Badge variant="secondary" className="h-5 px-1.5 text-xs font-normal">
+                              <Home className="w-3 h-3 mr-1" /> Principal
+                            </Badge>
+                          )}
+                        </div>
                       </TableCell>
-                      <TableCell className="text-muted-foreground">/{page.slug}</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {page.is_home ? '/' : `/${page.slug}`}
+                      </TableCell>
                       <TableCell>
                         <Badge variant={page.status === "public" ? "default" : "secondary"}>
                           {page.status === "public" ? "Público" : "Borrador"}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => navigate(`${page.id}/edit`)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setPageToDelete(page)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => navigate(`${page.id}/edit`)}>
+                              <Pencil className="h-4 w-4 mr-2" />
+                              Editar
+                            </DropdownMenuItem>
+                            {!page.is_home && (
+                              <DropdownMenuItem onClick={() => handleSetHome(page.id)}>
+                                <Home className="h-4 w-4 mr-2" />
+                                Hacer página principal
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem 
+                              className="text-destructive focus:text-destructive"
+                              onClick={() => setPageToDelete(page)}
+                              disabled={page.is_home}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Eliminar
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   ))
