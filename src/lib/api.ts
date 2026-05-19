@@ -550,6 +550,35 @@ class ApiClient {
       method: "DELETE",
     });
   }
+
+  // Site Pages
+  async getSitePages<T>(siteId: string): Promise<ApiResponse<T>> {
+    return this.request<T>(`sites/${siteId}/pages`);
+  }
+
+  async getSitePage<T>(siteId: string, pageId: string): Promise<ApiResponse<T>> {
+    return this.request<T>(`sites/${siteId}/pages/${pageId}`);
+  }
+
+  async createSitePage<T>(siteId: string, data: any): Promise<ApiResponse<T>> {
+    return this.request<T>(`sites/${siteId}/pages`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateSitePage<T>(siteId: string, pageId: string, data: any): Promise<ApiResponse<T>> {
+    return this.request<T>(`sites/${siteId}/pages/${pageId}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteSitePage<T>(siteId: string, pageId: string): Promise<ApiResponse<T>> {
+    return this.request<T>(`sites/${siteId}/pages/${pageId}`, {
+      method: "DELETE",
+    });
+  }
 }
 
 export const api = new ApiClient(API_URL);
