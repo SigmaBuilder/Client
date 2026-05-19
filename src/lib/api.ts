@@ -574,6 +574,12 @@ class ApiClient {
     });
   }
 
+  async setSitePageAsHome<T>(siteId: string, pageId: string): Promise<ApiResponse<T>> {
+    return this.request<T>(`sites/${siteId}/pages/${pageId}/set-home`, {
+      method: "PATCH",
+    });
+  }
+
   async deleteSitePage<T>(siteId: string, pageId: string): Promise<ApiResponse<T>> {
     return this.request<T>(`sites/${siteId}/pages/${pageId}`, {
       method: "DELETE",
