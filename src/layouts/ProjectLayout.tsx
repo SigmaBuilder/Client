@@ -33,11 +33,11 @@ export default function ProjectLayout() {
 
   useEffect(() => {
     setCurrentSite(null);
-    if (id) fetchProjectSites(id);
+    if (id && id !== 'site') fetchProjectSites(id);
   }, [id, fetchProjectSites, setCurrentSite]);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id || id === 'site') return;
     setRolesLoading(true);
     api.getProjectRoles<{ roles: Role[] }>(id).then(res => {
       if (res.success && res.data) setRoles(res.data.roles);
