@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useDebouncedCallback } from "use-debounce";
 import {
   Card,
   CardContent,
@@ -42,22 +43,33 @@ interface PortfolioStackItem {
 export default function PortfolioStackList() {
   const { currentSite } = useWorkspace();
   const navigate = useNavigate();
-  const [items, setItems] = useState<PortfolioStackItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [itemToDelete, setItemToDelete] = useState<PortfolioStackItem | null>(
-    null,
-  );
+const [items, setItems] = useState<PortfolioStackItem[]>([]);
+const [meta, setMeta] = useState<any>(null);
+const [isLoading, setIsLoading] = useState(true);
+const [search, setSearch] = useState("");
+const [currentPage, setCurrentPage] = useState(1);
+const [limit] = useState(10);
+const [itemToDelete, setItemToDelete] = useState<PortfolioStackItem | null>(
+  null,
+);
 
-  const fetchItems = async () => {
+  const fetchItems = async (searchValue = search, page = currentPage, perPage = limit) => {
     if (!currentSite?.id) return;
     setIsLoading(true);
     try {
-      const res = await api.getPortfolioStack<{
-        portfolioStack: PortfolioStackItem[];
-      }>(currentSite.id);
+      const res = await api.getPortfolioStack<any>(currentSite.id, page, perPage, searchValue);
       if (res.success && res.data) {
-        setItems(res.data.portfolioStack);
+        if (res.meta) {
+          setMeta(res.meta);
+        } else if (res.data.meta) {
+          setMeta(res.data.meta);
+        }
+        const dataArray =
+          Array.isArray(res.data?.data) ? res.data.data :
+          Array.isArray(res.data?.stack) ? res.data.stack :
+          Array.isArray(res.data?.portfolioStack) ? res.data.portfolioStack :
+          Array.isArray(res.data) ? res.data : [];
+        setItems(dataArray);
       } else {
         toast.error("Error al cargar el stack");
       }
@@ -69,8 +81,12 @@ export default function PortfolioStackList() {
   };
 
   useEffect(() => {
-    fetchItems();
+    setCurrentPage(1);
   }, [currentSite?.id]);
+
+  useEffect(() => {
+    fetchItems(search, currentPage, limit);
+  }, [currentSite?.id, search, currentPage, limit]);
 
   const handleDelete = async () => {
     if (!currentSite?.id || !itemToDelete) return;
@@ -92,12 +108,14 @@ export default function PortfolioStackList() {
     }
   };
 
-  const headerState = useMemo(
+const debouncedSetSearch = useDebouncedCallback((val: string) => setSearch(val), 400);
+
+const headerState = useMemo(
     () => ({
       breadcrumbs: [{ label: "Portfolio" }, { label: "Stack" }],
       search: {
         value: search,
-        onChange: setSearch,
+        onChange: debouncedSetSearch,
         placeholder: "Buscar tecnologías...",
       },
       actions: (
@@ -113,9 +131,9 @@ export default function PortfolioStackList() {
 
   useSetSitePageHeader(headerState);
 
-  const filteredItems = items.filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase()),
-  );
+// Use the fetched data (server-side search):
+const filteredItems = items;
+
 
   if (isLoading) {
     return (
@@ -124,6 +142,15 @@ export default function PortfolioStackList() {
           <Skeleton className="h-20 w-full" />
           <Skeleton className="h-72 w-full" />
         </div>
+      </div>
+    );
+  }
+
+  // Empty state for paginated search
+  if (!isLoading && items.length === 0) {
+    return (
+      <div className="flex-1 p-6 flex flex-col items-center justify-center min-h-[40vh]">
+        <span className="text-muted-foreground">No hay tecnologías encontradas.</span>
       </div>
     );
   }
@@ -196,6 +223,19 @@ export default function PortfolioStackList() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Pagination Controls */}
+      {meta && meta.totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-4">
+          <Button size="sm" variant="secondary" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
+            &lt; Anterior
+          </Button>
+          <span>Página {currentPage} de {meta.totalPages}</span>
+          <Button size="sm" variant="secondary" onClick={() => setCurrentPage((p) => Math.min(meta.totalPages, p + 1))} disabled={currentPage === meta.totalPages}>
+            Siguiente &gt;
+          </Button>
+        </div>
+      )}
 
       <AlertDialog
         open={!!itemToDelete}

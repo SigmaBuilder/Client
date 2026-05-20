@@ -437,6 +437,24 @@ export default function PageEditor() {
                   Clave Pública (API Key): {currentSite?.slug}
                 </div>
 
+                <div className="bg-primary/5 p-4 rounded-md text-sm border border-primary/20">
+                  <h4 className="font-semibold text-primary mb-2 flex items-center gap-2">
+                    <AlignLeft className="h-4 w-4" /> Filtrado y Paginación
+                  </h4>
+                  <p className="text-muted-foreground text-xs leading-relaxed mb-2">
+                    Los endpoints que devuelven listas (como "Listar Posts" o "Listar Secciones") soportan los siguientes parámetros en la URL para que puedas filtrar la información:
+                  </p>
+                  <ul className="text-xs text-muted-foreground space-y-1.5 list-disc pl-4 mb-3">
+                    <li><code className="bg-background border px-1 py-0.5 rounded mr-1 font-mono">?page=1</code> Página a cargar (por defecto 1).</li>
+                    <li><code className="bg-background border px-1 py-0.5 rounded mr-1 font-mono">?limit=10</code> Elementos por página (por defecto 10). Para cargar todos, puedes usar un número alto como 100 o 1000.</li>
+                    <li><code className="bg-background border px-1 py-0.5 rounded mr-1 font-mono">?search=texto</code> Busca elementos que contengan el texto en su título.</li>
+                  </ul>
+                  <div className="text-xs text-muted-foreground bg-background border p-2 rounded break-all">
+                    <span className="font-semibold block mb-1">Ejemplo:</span> 
+                    <code className="font-mono text-[11px]">{baseUrl}/sites/slug/{currentSite?.slug}/portfolio/sections?page=1&limit=50&search=hola</code>
+                  </div>
+                </div>
+
                 <div className="space-y-6">
                   <div className="space-y-3">
                     <h4 className="text-sm font-semibold border-b pb-2">

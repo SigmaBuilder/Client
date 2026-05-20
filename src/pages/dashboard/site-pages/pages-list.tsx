@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil, Trash2, Home, MoreVertical } from "lucide-react";
 import { toast } from "sonner";
+import { useDebouncedCallback } from "use-debounce";
 import {
   Card,
   CardContent,
@@ -53,20 +54,30 @@ interface SitePage {
 export default function PagesList() {
   const { currentSite } = useWorkspace();
   const navigate = useNavigate();
-  const [pages, setPages] = useState<SitePage[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [pageToDelete, setPageToDelete] = useState<SitePage | null>(null);
+const [pages, setPages] = useState<SitePage[]>([]);
+const [meta, setMeta] = useState<any>(null);
+const [isLoading, setIsLoading] = useState(true);
+const [search, setSearch] = useState("");
+const [currentPage, setCurrentPage] = useState(1);
+const [limit] = useState(10);
+const [pageToDelete, setPageToDelete] = useState<SitePage | null>(null);
 
-  const fetchPages = async () => {
+
+  const fetchPages = async (searchValue = search, page = currentPage, perPage = limit) => {
     if (!currentSite?.id) return;
     setIsLoading(true);
     try {
-      const res = await api.getSitePages<any>(currentSite.id);
+      const res = await api.getSitePages<any>(currentSite.id, page, perPage, searchValue);
       if (res.success && res.data) {
-        // En el backend `res.json({ success: true, data: pages })`
-        // Por la implementación de lib/api.ts, `res.data` ES directamente el array (si es lo que devolvió el backend en 'data')
-        const dataArray = Array.isArray(res.data) ? res.data : (res.data.pages || []);
+        if (res.meta) {
+          setMeta(res.meta);
+        } else if (res.data.meta) {
+          setMeta(res.data.meta);
+        }
+        const dataArray =
+          Array.isArray(res.data?.data) ? res.data.data :
+          Array.isArray(res.data?.pages) ? res.data.pages :
+          Array.isArray(res.data) ? res.data : [];
         setPages(dataArray);
       } else {
         toast.error("Error al cargar las páginas");
@@ -78,9 +89,14 @@ export default function PagesList() {
     }
   };
 
+
   useEffect(() => {
-    fetchPages();
+    setCurrentPage(1);
   }, [currentSite?.id]);
+
+  useEffect(() => {
+    fetchPages(search, currentPage, limit);
+  }, [currentSite?.id, search, currentPage, limit]);
 
   const handleSetHome = async (pageId: string) => {
     if (!currentSite?.id) return;
@@ -115,12 +131,14 @@ export default function PagesList() {
     }
   };
 
-  const headerState = useMemo(
+const debouncedSetSearch = useDebouncedCallback((val: string) => setSearch(val), 400);
+
+const headerState = useMemo(
     () => ({
       breadcrumbs: [{ label: "Páginas" }],
       search: {
         value: search,
-        onChange: setSearch,
+        onChange: debouncedSetSearch,
         placeholder: "Buscar páginas...",
       },
       actions: (
@@ -136,9 +154,8 @@ export default function PagesList() {
 
   useSetSitePageHeader(headerState);
 
-  const filteredPages = pages.filter((page) =>
-    (page.title || page.name || "").toLowerCase().includes(search.toLowerCase()),
-  );
+  // Server-side search; just use the fetched data:
+const filteredPages = pages;
 
   if (isLoading) {
     return (
@@ -147,6 +164,15 @@ export default function PagesList() {
           <Skeleton className="h-20 w-full" />
           <Skeleton className="h-72 w-full" />
         </div>
+      </div>
+    );
+  }
+
+  // Empty State for paginated query
+  if (!isLoading && pages.length === 0) {
+    return (
+      <div className="flex-1 p-6 flex flex-col items-center justify-center min-h-[40vh]">
+        <span className="text-muted-foreground">No hay páginas encontradas.</span>
       </div>
     );
   }
@@ -240,6 +266,19 @@ export default function PagesList() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Pagination Controls */}
+      {meta && meta.totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-4">
+          <Button size="sm" variant="secondary" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
+            &lt; Anterior
+          </Button>
+          <span>Página {currentPage} de {meta.totalPages}</span>
+          <Button size="sm" variant="secondary" onClick={() => setCurrentPage((p) => Math.min(meta.totalPages, p + 1))} disabled={currentPage === meta.totalPages}>
+            Siguiente &gt;
+          </Button>
+        </div>
+      )}
 
       <AlertDialog
         open={!!pageToDelete}
