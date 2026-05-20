@@ -5,6 +5,7 @@ interface ApiResponse<T> {
   success: boolean;
   error?: string | null;
   data?: T | null;
+  meta?: any;
 }
 
 class ApiClient {
@@ -391,8 +392,9 @@ class ApiClient {
     });
   }
   // Portfolio Sections
-  async getPortfolioSections<T>(siteId: string): Promise<ApiResponse<T>> {
-    return this.request<T>(`sites/${siteId}/modules/portfolio/sections`);
+  async getPortfolioSections<T>(siteId: string, page = 1, limit = 10, search = ""): Promise<ApiResponse<T>> {
+    const searchParam = search ? `&search=${encodeURIComponent(search)}` : "";
+    return this.request<T>(`sites/${siteId}/modules/portfolio/sections?page=${page}&limit=${limit}${searchParam}`);
   }
 
   async getPortfolioSection<T>(siteId: string, sectionId: string): Promise<ApiResponse<T>> {
@@ -427,8 +429,9 @@ class ApiClient {
   }
 
   // Portfolio Stack
-  async getPortfolioStack<T>(siteId: string): Promise<ApiResponse<T>> {
-    return this.request<T>(`sites/${siteId}/modules/portfolio/stack`);
+  async getPortfolioStack<T>(siteId: string, page = 1, limit = 20, search = ""): Promise<ApiResponse<T>> {
+    const searchParam = search ? `&search=${encodeURIComponent(search)}` : "";
+    return this.request<T>(`sites/${siteId}/modules/portfolio/stack?page=${page}&limit=${limit}${searchParam}`);
   }
 
   async getPortfolioStackItem<T>(siteId: string, stackId: string): Promise<ApiResponse<T>> {
@@ -552,8 +555,9 @@ class ApiClient {
   }
 
   // Site Pages
-  async getSitePages<T>(siteId: string): Promise<ApiResponse<T>> {
-    return this.request<T>(`sites/${siteId}/pages`);
+  async getSitePages<T>(siteId: string, page = 1, limit = 10, search = ""): Promise<ApiResponse<T>> {
+    const searchParam = search ? `&search=${encodeURIComponent(search)}` : "";
+    return this.request<T>(`sites/${siteId}/pages?page=${page}&limit=${limit}${searchParam}`);
   }
 
   async getSitePage<T>(siteId: string, pageId: string): Promise<ApiResponse<T>> {
