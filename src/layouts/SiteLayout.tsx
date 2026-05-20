@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Outlet, useParams } from 'react-router-dom';
 import { Globe } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
 import { useWorkspace } from '@/hooks/use-workspace';
 import { SitePageHeaderProvider } from '@/components/site/SitePageHeader';
 import DashboardNotFound from '../pages/dashboard/not-found';
@@ -48,8 +49,16 @@ export default function SiteLayout() {
               </h1>
             </div>
 
-            {/* Page header injected by child pages (breadcrumbs, search, actions) */}
-            {header}
+            <div className="flex flex-1 items-center justify-end gap-4 min-w-0">
+              {/* Page header injected by child pages (breadcrumbs, search, actions) */}
+              {header}
+              
+              <Button variant="outline" size="sm" asChild>
+                <a href="https://example.com" target="_blank" rel="noopener noreferrer">
+                  Abrir sitio
+                </a>
+              </Button>
+            </div>
           </div>
 
           {/* Content */}

@@ -7,6 +7,7 @@ import {
   Newspaper,
   Send,
   SquareTerminal,
+  Settings,
   Image,
 } from "lucide-react";
 
@@ -35,6 +36,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         title: "Inicio",
         url: siteBaseUrl,
         icon: SquareTerminal,
+      },
+      {
+        title: "Ajustes del sitio",
+        url: `${siteBaseUrl}/settings`,
+        icon: Settings,
       },
       {
         title: "Módulos",
