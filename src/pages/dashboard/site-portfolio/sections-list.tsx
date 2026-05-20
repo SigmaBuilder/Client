@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useDebouncedCallback } from "use-debounce";
 import {
   Card,
   CardContent,
@@ -43,20 +44,31 @@ export default function PortfolioSectionsList() {
   const { currentSite } = useWorkspace();
   const navigate = useNavigate();
   const [sections, setSections] = useState<PortfolioSection[]>([]);
+  const [meta, setMeta] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit] = useState(15);
   const [sectionToDelete, setSectionToDelete] =
-    useState<PortfolioSection | null>(null);
+  useState<PortfolioSection | null>(null);
 
-  const fetchSections = async () => {
+  const fetchSections = async (searchValue = search, page = currentPage, perPage = limit) => {
     if (!currentSite?.id) return;
     setIsLoading(true);
     try {
-      const res = await api.getPortfolioSections<{
-        portfolioSections: PortfolioSection[];
-      }>(currentSite.id);
+      const res = await api.getPortfolioSections<any>(currentSite.id, page, perPage, searchValue);
       if (res.success && res.data) {
-        setSections(res.data.portfolioSections);
+        if (res.meta) {
+          setMeta(res.meta);
+        } else if (res.data.meta) {
+          setMeta(res.data.meta);
+        }
+        const dataArray =
+          Array.isArray(res.data?.data) ? res.data.data :
+          Array.isArray(res.data?.sections) ? res.data.sections :
+          Array.isArray(res.data?.portfolioSections) ? res.data.portfolioSections :
+          Array.isArray(res.data) ? res.data : [];
+        setSections(dataArray);
       } else {
         toast.error("Error al cargar las secciones");
       }
@@ -68,8 +80,12 @@ export default function PortfolioSectionsList() {
   };
 
   useEffect(() => {
-    fetchSections();
+    setCurrentPage(1);
   }, [currentSite?.id]);
+
+  useEffect(() => {
+    fetchSections(search, currentPage, limit);
+  }, [currentSite?.id, search, currentPage, limit]);
 
   const handleDelete = async () => {
     if (!currentSite?.id || !sectionToDelete) return;
@@ -91,12 +107,14 @@ export default function PortfolioSectionsList() {
     }
   };
 
+  const debouncedSetSearch = useDebouncedCallback((val: string) => setSearch(val), 400);
+
   const headerState = useMemo(
     () => ({
       breadcrumbs: [{ label: "Portfolio" }, { label: "Secciones" }],
       search: {
         value: search,
-        onChange: setSearch,
+        onChange: debouncedSetSearch,
         placeholder: "Buscar secciones...",
       },
       actions: (
@@ -112,9 +130,9 @@ export default function PortfolioSectionsList() {
 
   useSetSitePageHeader(headerState);
 
-  const filteredSections = sections.filter((sec) =>
-    sec.title.toLowerCase().includes(search.toLowerCase()),
-  );
+// Just use the fetched data (server-side filter):
+const filteredSections = sections;
+
 
   if (isLoading) {
     return (
@@ -123,6 +141,15 @@ export default function PortfolioSectionsList() {
           <Skeleton className="h-20 w-full" />
           <Skeleton className="h-72 w-full" />
         </div>
+      </div>
+    );
+  }
+
+  // Empty state for paginated result
+  if (!isLoading && sections.length === 0) {
+    return (
+      <div className="flex-1 p-6 flex flex-col items-center justify-center min-h-[40vh]">
+        <span className="text-muted-foreground">No hay secciones encontradas.</span>
       </div>
     );
   }
@@ -187,6 +214,19 @@ export default function PortfolioSectionsList() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Pagination Controls */}
+      {meta && meta.totalPages > 1 && (
+        <div className="flex justify-center items-center gap-4 mt-4">
+          <Button size="sm" variant="secondary" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
+            &lt; Anterior
+          </Button>
+          <span>Página {currentPage} de {meta.totalPages}</span>
+          <Button size="sm" variant="secondary" onClick={() => setCurrentPage((p) => Math.min(meta.totalPages, p + 1))} disabled={currentPage === meta.totalPages}>
+            Siguiente &gt;
+          </Button>
+        </div>
+      )}
 
       <AlertDialog
         open={!!sectionToDelete}
