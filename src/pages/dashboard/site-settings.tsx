@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { ArrowLeft, Globe, Image as ImageIcon, Loader2 } from "lucide-react";
+import { Globe, Image as ImageIcon, Loader2 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useWorkspace } from "@/hooks/use-workspace";
 import type { Site } from "@/types/project";
