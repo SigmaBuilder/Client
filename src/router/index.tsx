@@ -13,7 +13,7 @@ import ProjectsList from "../pages/dashboard";
 import ProjectSitesPage from "../pages/dashboard/project-sites";
 import ProjectMembersPage from "../pages/dashboard/project-members";
 import ProjectRolesPage from "../pages/dashboard/project-roles";
-import SiteDashboard from "../pages/dashboard/site-dashboard";
+import SiteSettings from "../pages/dashboard/site-settings";
 import { InvitePage } from "../pages/invite";
 import AccountPage from "../pages/dashboard/account";
 import { ResetPasswordPage } from "../pages/reset-password";
@@ -33,6 +33,7 @@ import SiteBlogPostEditorPage from "@/pages/dashboard/blog/site-blog-post-editor
 import SiteModulesPage from "@/pages/dashboard/site-modules";
 import PagesList from "@/pages/dashboard/site-pages/pages-list";
 import PageEditor from "@/pages/dashboard/site-pages/page-editor";
+import SiteHomePage from "@/pages/dashboard/site-home";
 
 export const router = createBrowserRouter([
   {
@@ -80,9 +81,15 @@ export const router = createBrowserRouter([
           {
             path: ":id",
             element: <ProjectLayout />,
-            handle: { breadcrumb: ({ project }: any) => project?.name || "Proyecto" },
+            handle: {
+              breadcrumb: ({ project }: any) => project?.name || "Proyecto",
+            },
             children: [
-              { index: true, element: <ProjectSitesPage />, handle: { breadcrumb: "Sitios" } },
+              {
+                index: true,
+                element: <ProjectSitesPage />,
+                handle: { breadcrumb: "Sitios" },
+              },
               {
                 path: "members",
                 element: <ProjectMembersPage />,
@@ -99,9 +106,17 @@ export const router = createBrowserRouter([
           {
             path: "site/:slug",
             element: <SiteLayout />,
-            handle: { breadcrumb: ({ site }: any) => site?.name || site?.slug || "Sitio" },
+            handle: {
+              breadcrumb: ({ site }: any) =>
+                site?.name || site?.slug || "Sitio",
+            },
             children: [
-              { index: true, element: <SiteDashboard /> },
+              {
+                index: true,
+                element: <SiteHomePage />,
+                handle: { breadcrumb: "Inicio" },
+              },
+              { path: "settings", element: <SiteSettings /> },
               {
                 path: "pages",
                 element: <PagesList />,
@@ -177,10 +192,26 @@ export const router = createBrowserRouter([
                 handle: { breadcrumb: "Blog" },
                 children: [
                   { index: true, element: <Navigate to="posts" replace /> },
-                  { path: "categories", element: <SiteBlogCategoriesPage />, handle: { breadcrumb: "Categorías" } },
-                  { path: "posts", element: <SiteBlogPostsPage />, handle: { breadcrumb: "Posts" } },
-                  { path: "posts/new", element: <SiteBlogPostEditorPage />, handle: { breadcrumb: "Nuevo Post" } },
-                  { path: "posts/:postId", element: <SiteBlogPostEditorPage />, handle: { breadcrumb: "Editar Post" } },
+                  {
+                    path: "categories",
+                    element: <SiteBlogCategoriesPage />,
+                    handle: { breadcrumb: "Categorías" },
+                  },
+                  {
+                    path: "posts",
+                    element: <SiteBlogPostsPage />,
+                    handle: { breadcrumb: "Posts" },
+                  },
+                  {
+                    path: "posts/new",
+                    element: <SiteBlogPostEditorPage />,
+                    handle: { breadcrumb: "Nuevo Post" },
+                  },
+                  {
+                    path: "posts/:postId",
+                    element: <SiteBlogPostEditorPage />,
+                    handle: { breadcrumb: "Editar Post" },
+                  },
                 ],
               },
             ],
