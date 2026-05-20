@@ -49,8 +49,9 @@ function formatDate(value: string) {
   });
 }
 
-export default function SiteDashboard() {
-  const { currentSite, currentProject, isLoading, setCurrentSite } = useWorkspace();
+export default function SiteSettings() {
+  const { currentSite, currentProject, isLoading, setCurrentSite } =
+    useWorkspace();
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
@@ -63,33 +64,44 @@ export default function SiteDashboard() {
   const originalFaviconUrl = currentSite?.content?.favicon_url ?? "";
   const hasChanges = Boolean(
     currentSite &&
-      (name.trim() !== currentSite.name ||
-        slug.trim() !== currentSite.slug ||
-        status !== (currentSite.status ?? "draft") ||
-        faviconUrl !== originalFaviconUrl),
+    (name.trim() !== currentSite.name ||
+      slug.trim() !== currentSite.slug ||
+      status !== (currentSite.status ?? "draft") ||
+      faviconUrl !== originalFaviconUrl),
   );
 
-  const headerState = useMemo(() => ({
-    actions: (
-      <>
-        <Badge variant={isPublic ? "default" : "secondary"}>
-          {isPublic ? "Publicado" : "Borrador"}
-        </Badge>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate(`/dashboard/site/${currentSite?.slug}/media`)}
-        >
-          <ImageIcon data-icon="inline-start" />
-          Medios
-        </Button>
-        <Button size="sm" disabled={!hasChanges || saving} onClick={() => void handleSave()}>
-          {saving && <Loader2 data-icon="inline-start" className="animate-spin" />}
-          Guardar cambios
-        </Button>
-      </>
-    ),
-  }), [currentSite?.slug, hasChanges, isPublic, navigate, saving]);
+  const headerState = useMemo(
+    () => ({
+      actions: (
+        <>
+          <Badge variant={isPublic ? "default" : "secondary"}>
+            {isPublic ? "Publicado" : "Borrador"}
+          </Badge>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              navigate(`/dashboard/site/${currentSite?.slug}/media`)
+            }
+          >
+            <ImageIcon data-icon="inline-start" />
+            Medios
+          </Button>
+          <Button
+            size="sm"
+            disabled={!hasChanges || saving}
+            onClick={() => void handleSave()}
+          >
+            {saving && (
+              <Loader2 data-icon="inline-start" className="animate-spin" />
+            )}
+            Guardar cambios
+          </Button>
+        </>
+      ),
+    }),
+    [currentSite?.slug, hasChanges, isPublic, navigate, saving],
+  );
 
   useSetSitePageHeader(headerState);
 
@@ -176,30 +188,28 @@ export default function SiteDashboard() {
   return (
     <div className="flex flex-col gap-6 p-4 sm:p-6">
       <div className="flex flex-col gap-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate(`/dashboard/${currentSite.project_id}`)}
-          className="w-fit px-0"
-        >
-          <ArrowLeft data-icon="inline-start" />
-          Volver al proyecto
-        </Button>
-
         <Card>
           <CardHeader>
             <div className="flex items-start gap-4">
               <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted text-muted-foreground ring-1 ring-foreground/10">
                 {faviconUrl ? (
-                  <img src={faviconUrl} alt="Favicon del sitio" className="size-full object-cover" />
+                  <img
+                    src={faviconUrl}
+                    alt="Favicon del sitio"
+                    className="size-full object-cover"
+                  />
                 ) : (
                   <Globe />
                 )}
               </div>
               <div className="flex min-w-0 flex-1 flex-col gap-1">
-                <CardTitle className="text-2xl">{currentSite.name || currentSite.slug}</CardTitle>
+                <CardTitle className="text-2xl">
+                  {currentSite.name || currentSite.slug}
+                </CardTitle>
                 <CardDescription>
-                  Inicio del sitio dentro de {currentProject?.name || "este proyecto"}. Revisa su información pública y ajustes principales.
+                  Inicio del sitio dentro de{" "}
+                  {currentProject?.name || "este proyecto"}. Revisa su
+                  información pública y ajustes principales.
                 </CardDescription>
               </div>
             </div>
@@ -216,7 +226,10 @@ export default function SiteDashboard() {
         <InfoCard title="Template" value={currentSite.template_type} />
         <InfoCard title="Slug público" value={`/${currentSite.slug}`} />
         <InfoCard title="Creado" value={formatDate(currentSite.created_at)} />
-        <InfoCard title="Actualizado" value={formatDate(currentSite.updated_at)} />
+        <InfoCard
+          title="Actualizado"
+          value={formatDate(currentSite.updated_at)}
+        />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
@@ -224,7 +237,8 @@ export default function SiteDashboard() {
           <CardHeader>
             <CardTitle>Información del sitio</CardTitle>
             <CardDescription>
-              Cambia el nombre, la URL pública y el estado de publicación del site.
+              Cambia el nombre, la URL pública y el estado de publicación del
+              site.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -250,7 +264,8 @@ export default function SiteDashboard() {
                   placeholder="mi-sitio"
                 />
                 <FieldDescription>
-                  Solo letras minúsculas, números y guiones. Se usará en /dashboard/site/{slug || "mi-sitio"}.
+                  Solo letras minúsculas, números y guiones. Se usará en
+                  /dashboard/site/{slug || "mi-sitio"}.
                 </FieldDescription>
               </Field>
 
@@ -259,10 +274,14 @@ export default function SiteDashboard() {
                   checked={isPublic}
                   disabled={saving}
                   aria-label="Cambiar estado de publicación"
-                  onCheckedChange={(checked) => setStatus(checked ? "public" : "draft")}
+                  onCheckedChange={(checked) =>
+                    setStatus(checked ? "public" : "draft")
+                  }
                 />
                 <FieldContent>
-                  <FieldTitle>{isPublic ? "Sitio publicado" : "Sitio en borrador"}</FieldTitle>
+                  <FieldTitle>
+                    {isPublic ? "Sitio publicado" : "Sitio en borrador"}
+                  </FieldTitle>
                   <FieldDescription>
                     {isPublic
                       ? "El sitio está marcado como público."
@@ -273,16 +292,27 @@ export default function SiteDashboard() {
             </FieldGroup>
           </CardContent>
           <CardFooter className="justify-end gap-2">
-            <Button variant="outline" disabled={!hasChanges || saving} onClick={() => {
-              setName(currentSite.name ?? "");
-              setSlug(currentSite.slug ?? "");
-              setStatus((currentSite.status as "draft" | "public") ?? "draft");
-              setFaviconUrl(currentSite.content?.favicon_url ?? "");
-            }}>
+            <Button
+              variant="outline"
+              disabled={!hasChanges || saving}
+              onClick={() => {
+                setName(currentSite.name ?? "");
+                setSlug(currentSite.slug ?? "");
+                setStatus(
+                  (currentSite.status as "draft" | "public") ?? "draft",
+                );
+                setFaviconUrl(currentSite.content?.favicon_url ?? "");
+              }}
+            >
               Descartar
             </Button>
-            <Button disabled={!hasChanges || saving} onClick={() => void handleSave()}>
-              {saving && <Loader2 data-icon="inline-start" className="animate-spin" />}
+            <Button
+              disabled={!hasChanges || saving}
+              onClick={() => void handleSave()}
+            >
+              {saving && (
+                <Loader2 data-icon="inline-start" className="animate-spin" />
+              )}
               Guardar cambios
             </Button>
           </CardFooter>
@@ -292,21 +322,31 @@ export default function SiteDashboard() {
           <CardHeader>
             <CardTitle>Favicon</CardTitle>
             <CardDescription>
-              El icono aparecerá en la lista de sitios del proyecto y en las vistas que usen la metadata del site.
+              El icono aparecerá en la lista de sitios del proyecto y en las
+              vistas que usen la metadata del site.
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <div className="flex items-center gap-4 rounded-lg border bg-muted/30 p-4">
               <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-background text-muted-foreground ring-1 ring-foreground/10">
                 {faviconUrl ? (
-                  <img src={faviconUrl} alt="Favicon seleccionado" className="size-full object-cover" />
+                  <img
+                    src={faviconUrl}
+                    alt="Favicon seleccionado"
+                    className="size-full object-cover"
+                  />
                 ) : (
                   <ImageIcon />
                 )}
               </div>
               <div className="min-w-0">
-                <p className="text-sm font-medium">{faviconUrl ? "Icono seleccionado" : "Sin favicon"}</p>
-                <p className="truncate text-sm text-muted-foreground">{faviconUrl || "Selecciona una imagen desde la media library."}</p>
+                <p className="text-sm font-medium">
+                  {faviconUrl ? "Icono seleccionado" : "Sin favicon"}
+                </p>
+                <p className="truncate text-sm text-muted-foreground">
+                  {faviconUrl ||
+                    "Selecciona una imagen desde la media library."}
+                </p>
               </div>
             </div>
 
@@ -314,16 +354,25 @@ export default function SiteDashboard() {
               projectId={currentSite.project_id || currentProject?.id || ""}
               siteId={currentSite.id}
               onSelect={(asset) => setFaviconUrl(asset.file_url)}
-              trigger={(
-                <Button variant="outline" disabled={saving || !(currentSite.project_id || currentProject?.id)}>
+              trigger={
+                <Button
+                  variant="outline"
+                  disabled={
+                    saving || !(currentSite.project_id || currentProject?.id)
+                  }
+                >
                   <ImageIcon data-icon="inline-start" />
                   Cambiar favicon
                 </Button>
-              )}
+              }
             />
 
             {faviconUrl && (
-              <Button variant="ghost" disabled={saving} onClick={() => setFaviconUrl("")}>
+              <Button
+                variant="ghost"
+                disabled={saving}
+                onClick={() => setFaviconUrl("")}
+              >
                 Quitar favicon
               </Button>
             )}
