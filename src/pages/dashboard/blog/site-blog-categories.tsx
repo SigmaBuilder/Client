@@ -18,6 +18,7 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useSetSitePageHeader } from "@/components/site/SitePageHeader";
+import { useTranslation } from "react-i18next";
 
 interface Category {
   id: string;
@@ -35,6 +36,7 @@ export default function SiteBlogCategoriesPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ name: "", slug: "" });
+  const { t } = useTranslation();
 
   const fetchCategories = async () => {
     if (!currentSite?.id) return;
@@ -45,7 +47,7 @@ export default function SiteBlogCategoriesPage() {
         setCategories(res.data.blogCategories);
       }
     } catch (err) {
-      toast.error("Error al cargar categorías");
+      toast.error(t("siteBlogCategories.toastLoadError"));
     } finally {
       setLoading(false);
     }
@@ -74,27 +76,27 @@ export default function SiteBlogCategoriesPage() {
     try {
       if (editingId) {
         await api.updateBlogCategory(currentSite.id, editingId, formData);
-        toast.success("Categoría actualizada");
+        toast.success(t("siteBlogCategories.toastUpdated"));
       } else {
         await api.createBlogCategory(currentSite.id, formData);
-        toast.success("Categoría creada");
+        toast.success(t("siteBlogCategories.toastCreated"));
       }
       setIsOpen(false);
       fetchCategories();
     } catch (err: any) {
-      toast.error("Error al guardar categoría");
+      toast.error(t("siteBlogCategories.toastSaveError"));
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!currentSite?.id) return;
-    if (!confirm("¿Seguro que deseas eliminar esta categoría?")) return;
+    if (!confirm(t("siteBlogCategories.confirmDelete"))) return;
     try {
       await api.deleteBlogCategory(currentSite.id, id);
-      toast.success("Categoría eliminada");
+      toast.success(t("siteBlogCategories.toastDeleteSuccess"));
       fetchCategories();
     } catch (err) {
-      toast.error("Error al eliminar categoría");
+      toast.error(t("siteBlogCategories.toastDeleteError"));
     }
   };
 
@@ -118,24 +120,24 @@ export default function SiteBlogCategoriesPage() {
 
   const headerState = useMemo(() => ({
     breadcrumbs: [
-      { label: "Blog" },
-      { label: "Categorías" },
+      { label: t("siteBlogCategories.breadcrumbBlog") },
+      { label: t("siteBlogCategories.breadcrumbCategories") },
     ],
     search: {
       value: search,
       onChange: setSearch,
-      placeholder: "Buscar categorías...",
+      placeholder: t("siteBlogCategories.searchPlaceholder"),
     },
     actions: (
       <>
-        <Badge variant="secondary">{categories.length} categorías</Badge>
+        <Badge variant="secondary">{t("siteBlogCategories.countCategories", { count: categories.length })}</Badge>
         <Button size="sm" onClick={() => handleOpenDialog()}>
           <Plus data-icon="inline-start" />
-          Nueva categoría
+          {t("siteBlogCategories.newCategoryBtn")}
         </Button>
       </>
     ),
-  }), [categories.length, handleOpenDialog, search]);
+  }), [categories.length, handleOpenDialog, search, t]);
 
   useSetSitePageHeader(currentSite ? headerState : null);
 
@@ -154,8 +156,8 @@ export default function SiteBlogCategoriesPage() {
     <div className="flex-1 p-6">
       <Card className="mx-auto w-full max-w-5xl">
         <CardHeader>
-          <CardTitle>Categorías de blog</CardTitle>
-          <CardDescription>Organiza tus posts por temas y controla sus slugs públicos.</CardDescription>
+          <CardTitle>{t("siteBlogCategories.pageTitle")}</CardTitle>
+          <CardDescription>{t("siteBlogCategories.pageDesc")}</CardDescription>
         </CardHeader>
         <CardContent>
           {filteredCategories.length === 0 ? (
@@ -163,15 +165,15 @@ export default function SiteBlogCategoriesPage() {
               <Tag className="size-12 text-muted-foreground" />
               <div className="flex flex-col gap-1">
                 <p className="font-medium text-foreground">
-                  {categories.length === 0 ? "No hay categorías creadas" : "No hay categorías para esta búsqueda"}
+                  {categories.length === 0 ? t("siteBlogCategories.emptyTitle") : t("siteBlogCategories.emptyTitleSearch")}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {categories.length === 0 ? "Crea la primera categoría para clasificar tus posts." : "Prueba con otro nombre o slug."}
+                  {categories.length === 0 ? t("siteBlogCategories.emptyDesc") : t("siteBlogCategories.emptyDescSearch")}
                 </p>
               </div>
               {categories.length === 0 && (
                 <Button variant="outline" onClick={() => handleOpenDialog()}>
-                  Crear una categoría
+                  {t("siteBlogCategories.createBtn")}
                 </Button>
               )}
             </div>
@@ -179,10 +181,10 @@ export default function SiteBlogCategoriesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead>Slug</TableHead>
-                  <TableHead>Fecha</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
+                  <TableHead>{t("siteBlogCategories.colName")}</TableHead>
+                  <TableHead>{t("siteBlogCategories.colSlug")}</TableHead>
+                  <TableHead>{t("siteBlogCategories.colDate")}</TableHead>
+                  <TableHead className="text-right">{t("siteBlogCategories.colActions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -214,33 +216,33 @@ export default function SiteBlogCategoriesPage() {
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingId ? "Editar Categoría" : "Nueva Categoría"}</DialogTitle>
+            <DialogTitle>{editingId ? t("siteBlogCategories.dialogEditTitle") : t("siteBlogCategories.dialogNewTitle")}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSave} className="flex flex-col gap-5">
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="name">Nombre</FieldLabel>
+                <FieldLabel htmlFor="name">{t("siteBlogCategories.nameLabel")}</FieldLabel>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={handleNameChange}
-                  placeholder="Ej: Tecnología"
+                  placeholder={t("siteBlogCategories.namePlaceholder")}
                   required
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="slug">Slug</FieldLabel>
+                <FieldLabel htmlFor="slug">{t("siteBlogCategories.slugLabel")}</FieldLabel>
                 <Input
                   id="slug"
                   value={formData.slug}
                   onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  placeholder="ej-tecnologia"
+                  placeholder={t("siteBlogCategories.slugPlaceholder")}
                   required
                 />
               </Field>
             </FieldGroup>
             <div className="flex justify-end">
-              <Button type="submit">Guardar</Button>
+              <Button type="submit">{t("siteBlogCategories.saveBtn")}</Button>
             </div>
           </form>
         </DialogContent>

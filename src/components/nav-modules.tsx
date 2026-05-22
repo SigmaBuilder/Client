@@ -16,6 +16,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { useTranslation } from "react-i18next";
 
 export function NavModules({
   items,
@@ -33,16 +34,17 @@ export function NavModules({
   }[];
   manageUrl: string;
 }) {
+  const { t } = useTranslation();
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Módulos</SidebarGroupLabel>
+      <SidebarGroupLabel>{t("sidebar.modules")}</SidebarGroupLabel>
       <SidebarMenu>
         {items.length === 0 ? (
           <SidebarMenuItem>
             <div className="flex flex-col gap-2 rounded-md px-2 py-3 text-sm text-muted-foreground">
-              <span>No hay módulos activos</span>
+              <span>{t("sidebar.noActiveModules")}</span>
               <SidebarMenuButton asChild size="sm" variant="outline">
-                <Link to={manageUrl}>Activar módulos</Link>
+                <Link to={manageUrl}>{t("sidebar.activateModules")}</Link>
               </SidebarMenuButton>
             </div>
           </SidebarMenuItem>

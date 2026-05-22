@@ -11,6 +11,7 @@ import { TiptapEditor } from "@/components/shared/TiptapEditor";
 import { MediaLibraryManager } from "@/components/shared/MediaLibrary/MediaLibraryManager";
 import { MediaAsset } from "@/components/shared/MediaLibrary/MediaLibraryView";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslation } from "react-i18next";
 
 interface Category {
   id: string;
@@ -25,6 +26,7 @@ export default function SiteBlogPostEditorPage() {
 
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -71,7 +73,7 @@ export default function SiteBlogPostEditorPage() {
           }
           setLoading(false);
         }).catch(() => {
-           toast.error("Error al cargar post");
+           toast.error(t("siteBlogPostEditor.toastLoadError"));
            setLoading(false);
         });
       }
@@ -90,7 +92,7 @@ export default function SiteBlogPostEditorPage() {
   const handleSave = async () => {
     if (!currentSite?.id) return;
     if (!formData.title || !formData.slug) {
-      toast.error("El título y el slug son obligatorios");
+      toast.error(t("siteBlogPostEditor.toastTitleSlugRequired"));
       return;
     }
 
@@ -104,11 +106,11 @@ export default function SiteBlogPostEditorPage() {
     try {
       if (isEditing) {
         await api.updateBlogPost(currentSite.id, postId!, payload);
-        toast.success("Post actualizado");
+        toast.success(t("siteBlogPostEditor.toastUpdated"));
       } else {
         const res = await api.createBlogPost<any>(currentSite.id, payload);
         if (res.success && res.data?.blogPost) {
-           toast.success("Post creado");
+           toast.success(t("siteBlogPostEditor.toastCreated"));
            navigate(`/dashboard/site/${currentSite.slug}/blog/posts/${res.data.blogPost.id}`);
         }
       }
@@ -120,7 +122,7 @@ export default function SiteBlogPostEditorPage() {
   };
 
   if (loading && isEditing) {
-    return <div className="p-8">Cargando editor...</div>;
+    return <div className="p-8">{t("siteBlogPostEditor.loadingEditor")}</div>;
   }
 
   return (
@@ -138,19 +140,19 @@ export default function SiteBlogPostEditorPage() {
               </Button>
             </Link>
             <div className="flex flex-col">
-              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Blog</span>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t("siteBlogPostEditor.breadcrumbBlog")}</span>
               <span className="text-sm font-semibold truncate max-w-[200px] sm:max-w-[400px]">
-                {formData.title || "Sin título"}
+                {formData.title || t("siteBlogPostEditor.untitled")}
               </span>
             </div>
           </div>
           <div className="flex items-center gap-2">
              <Button variant="secondary" size="sm" onClick={() => setFormData({...formData, status: formData.status === 'published' ? 'draft' : 'published'})}>
-              {formData.status === 'published' ? 'Cambiar a Borrador' : 'Publicar'}
+              {formData.status === 'published' ? t("siteBlogPostEditor.changeToDraft") : t("siteBlogPostEditor.publish")}
             </Button>
             <Button size="sm" onClick={handleSave} disabled={loading}>
               <Save className="mr-2 h-4 w-4" />
-              {loading ? "Guardando..." : "Guardar"}
+              {loading ? t("siteBlogPostEditor.saving") : t("siteBlogPostEditor.save")}
             </Button>
           </div>
         </div>
@@ -164,7 +166,7 @@ export default function SiteBlogPostEditorPage() {
               id="title"
               value={formData.title}
               onChange={handleTitleChange}
-              placeholder="Título del post..."
+              placeholder={t("siteBlogPostEditor.titlePlaceholder")}
               className="text-4xl md:text-5xl font-extrabold tracking-tight bg-transparent border-none outline-none w-full placeholder:text-muted-foreground/30 resize-none mb-6"
             />
 
@@ -186,48 +188,48 @@ export default function SiteBlogPostEditorPage() {
       <div className="w-80 shrink-0 bg-muted/10 overflow-y-auto hidden lg:block">
         <div className="p-6 space-y-8">
           <div>
-            <h3 className="font-semibold text-sm mb-4 text-foreground/80">Propiedades del post</h3>
+            <h3 className="font-semibold text-sm mb-4 text-foreground/80">{t("siteBlogPostEditor.propertiesTitle")}</h3>
             <div className="space-y-6">
               
               <div className="space-y-2">
-                <Label htmlFor="status" className="text-xs font-semibold text-muted-foreground uppercase">Estado</Label>
+                <Label htmlFor="status" className="text-xs font-semibold text-muted-foreground uppercase">{t("siteBlogPostEditor.statusLabel")}</Label>
                 <Select
                   value={formData.status}
                   onValueChange={(val) => setFormData({ ...formData, status: val })}
                 >
                   <SelectTrigger id="status" className="w-full bg-background">
-                    <SelectValue placeholder="Selecciona un estado" />
+                    <SelectValue placeholder={t("siteBlogPostEditor.statusLabel")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="draft">Borrador</SelectItem>
-                    <SelectItem value="published">Publicado</SelectItem>
-                    <SelectItem value="archived">Archivado</SelectItem>
+                    <SelectItem value="draft">{t("siteBlogPostEditor.statusDraft")}</SelectItem>
+                    <SelectItem value="published">{t("siteBlogPostEditor.statusPublished")}</SelectItem>
+                    <SelectItem value="archived">{t("siteBlogPostEditor.statusArchived")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="slug" className="text-xs font-semibold text-muted-foreground uppercase">Slug (URL)</Label>
+                <Label htmlFor="slug" className="text-xs font-semibold text-muted-foreground uppercase">{t("siteBlogPostEditor.slugLabel")}</Label>
                 <Input
                   id="slug"
                   value={formData.slug}
                   onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  placeholder="ej-tendencias-2024"
+                  placeholder={t("siteBlogPostEditor.slugPlaceholder")}
                   className="bg-background"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="category" className="text-xs font-semibold text-muted-foreground uppercase">Categoría</Label>
+                <Label htmlFor="category" className="text-xs font-semibold text-muted-foreground uppercase">{t("siteBlogPostEditor.categoryLabel")}</Label>
                 <Select
                   value={formData.category_id || "none"}
                   onValueChange={(val) => setFormData({ ...formData, category_id: val === "none" ? "" : val })}
                 >
                   <SelectTrigger id="category" className="w-full bg-background">
-                    <SelectValue placeholder="Ninguna" />
+                    <SelectValue placeholder={t("siteBlogPostEditor.categoryNone")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">Ninguna</SelectItem>
+                    <SelectItem value="none">{t("siteBlogPostEditor.categoryNone")}</SelectItem>
                     {categories.map((cat) => (
                       <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
                     ))}
@@ -236,7 +238,7 @@ export default function SiteBlogPostEditorPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-semibold text-muted-foreground uppercase">Imagen de Portada</Label>
+                <Label className="text-xs font-semibold text-muted-foreground uppercase">{t("siteBlogPostEditor.coverLabel")}</Label>
                 {formData.cover_image ? (
                   <div className="relative rounded-lg overflow-hidden border shadow-sm group">
                      <img src={formData.cover_image} alt="Cover" className="w-full aspect-video object-cover transition-transform group-hover:scale-105" />
@@ -247,7 +249,7 @@ export default function SiteBlogPostEditorPage() {
                           className="h-8 shadow-md"
                           onClick={() => setFormData({...formData, cover_image: ''})}
                         >
-                          <X className="h-4 w-4 mr-2" /> Quitar
+                          <X className="h-4 w-4 mr-2" /> {t("siteBlogPostEditor.coverRemove")}
                         </Button>
                      </div>
                   </div>
@@ -262,7 +264,7 @@ export default function SiteBlogPostEditorPage() {
                        }}
                        trigger={
                           <Button variant="secondary" size="sm" className="shadow-sm">
-                            Añadir Portada
+                            {t("siteBlogPostEditor.coverAdd")}
                           </Button>
                        }
                      />
@@ -271,12 +273,12 @@ export default function SiteBlogPostEditorPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="excerpt" className="text-xs font-semibold text-muted-foreground uppercase">Extracto</Label>
+                <Label htmlFor="excerpt" className="text-xs font-semibold text-muted-foreground uppercase">{t("siteBlogPostEditor.excerptLabel")}</Label>
                 <textarea
                   id="excerpt"
                   value={formData.excerpt}
                   onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                  placeholder="Breve descripción para SEO..."
+                  placeholder={t("siteBlogPostEditor.excerptPlaceholder")}
                   className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
                 />
               </div>

@@ -5,6 +5,7 @@ import { getAccessToken } from "@/lib/auth";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import ReactMarkdown from 'react-markdown';
+import { useTranslation } from "react-i18next";
 import {
   ArrowUp,
   Sparkles,
@@ -27,89 +28,89 @@ import {
 } from "lucide-react";
 
 /* ─── Tool metadata for pretty rendering ─────────────────────────────────── */
-const TOOL_META: Record<
+const getToolMeta = (t: any): Record<
   string,
   { icon: typeof Zap; label: string; activeLabel: string; doneLabel: string }
-> = {
+> => ({
   get_pages: {
     icon: FolderOpen,
-    label: "Páginas del sitio",
-    activeLabel: "Leyendo páginas del sitio…",
-    doneLabel: "Páginas obtenidas",
+    label: t("siteHome.toolGetPages"),
+    activeLabel: t("siteHome.toolGetPagesActive"),
+    doneLabel: t("siteHome.toolGetPagesDone"),
   },
   search_page_content: {
     icon: Search,
-    label: "Búsqueda de contenido",
-    activeLabel: "Buscando en el contenido…",
-    doneLabel: "Búsqueda completada",
+    label: t("siteHome.toolSearch"),
+    activeLabel: t("siteHome.toolSearchActive"),
+    doneLabel: t("siteHome.toolSearchDone"),
   },
   set_home_page: {
     icon: CheckCircle2,
-    label: "Marcar como principal",
-    activeLabel: "Marcando página principal…",
-    doneLabel: "Página principal marcada",
+    label: t("siteHome.toolSetHome"),
+    activeLabel: t("siteHome.toolSetHomeActive"),
+    doneLabel: t("siteHome.toolSetHomeDone"),
   },
   publish_page: {
     icon: Zap,
-    label: "Publicar página",
-    activeLabel: "Publicando página…",
-    doneLabel: "Página publicada",
+    label: t("siteHome.toolPublishPage"),
+    activeLabel: t("siteHome.toolPublishPageActive"),
+    doneLabel: t("siteHome.toolPublishPageDone"),
   },
   publish_all_pages: {
     icon: Zap,
-    label: "Publicar todas las páginas",
-    activeLabel: "Publicando todas las páginas…",
-    doneLabel: "Todas las páginas publicadas",
+    label: t("siteHome.toolPublishAll"),
+    activeLabel: t("siteHome.toolPublishAllActive"),
+    doneLabel: t("siteHome.toolPublishAllDone"),
   },
   get_page_content: {
     icon: FileText,
-    label: "Consultar página",
-    activeLabel: "Consultando contenido de la página…",
-    doneLabel: "Página consultada",
+    label: t("siteHome.toolGetPage"),
+    activeLabel: t("siteHome.toolGetPageActive"),
+    doneLabel: t("siteHome.toolGetPageDone"),
   },
   create_page: {
     icon: FilePlus,
-    label: "Crear página",
-    activeLabel: "Creando página…",
-    doneLabel: "Página creada",
+    label: t("siteHome.toolCreatePage"),
+    activeLabel: t("siteHome.toolCreatePageActive"),
+    doneLabel: t("siteHome.toolCreatePageDone"),
   },
   get_site_modules: {
     icon: Package,
-    label: "Módulos del sitio",
-    activeLabel: "Obteniendo módulos…",
-    doneLabel: "Módulos obtenidos",
+    label: t("siteHome.toolGetModules"),
+    activeLabel: t("siteHome.toolGetModulesActive"),
+    doneLabel: t("siteHome.toolGetModulesDone"),
   },
-};
+});
 
-const getToolInfo = (name: string) =>
-  TOOL_META[name] ?? {
+const getToolInfo = (name: string, t: any) =>
+  getToolMeta(t)[name] ?? {
     icon: Zap,
     label: name,
-    activeLabel: `Ejecutando ${name}…`,
-    doneLabel: `${name} completado`,
+    activeLabel: t("siteHome.executing", { name }),
+    doneLabel: t("siteHome.completed", { name }),
   };
 
 /* ─── Suggestions ─────────────────────────────────────────────────────────── */
-const suggestions = [
+const getSuggestions = (t: any) => [
   {
     icon: Palette,
-    label: "Cambiar colores del sitio",
-    description: "Ajustar la paleta de colores y el tema visual",
+    label: t("siteHome.sugColors"),
+    description: t("siteHome.sugColorsDesc"),
   },
   {
     icon: FileText,
-    label: "Crear una nueva página",
-    description: "Generar una página con contenido y estructura",
+    label: t("siteHome.sugNewPage"),
+    description: t("siteHome.sugNewPageDesc"),
   },
   {
     icon: ImageIcon,
-    label: "Optimizar imágenes",
-    description: "Comprimir y ajustar las imágenes del sitio",
+    label: t("siteHome.sugImages"),
+    description: t("siteHome.sugImagesDesc"),
   },
   {
     icon: LayoutTemplate,
-    label: "Modificar el layout",
-    description: "Reorganizar secciones y estructura visual",
+    label: t("siteHome.sugLayout"),
+    description: t("siteHome.sugLayoutDesc"),
   },
 ];
 
@@ -129,11 +130,12 @@ export default function SiteHomePage() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   const firstName = user?.first_name || "usuario";
   const hour = new Date().getHours();
   const greeting =
-    hour < 12 ? "Buenos días" : hour < 19 ? "Buenas tardes" : "Buenas noches";
+    hour < 12 ? t("siteHome.greetingMorning") : hour < 19 ? t("siteHome.greetingAfternoon") : t("siteHome.greetingEvening");
 
   const { messages, sendMessage, status, setMessages } = useChat({
     transport: new DefaultChatTransport({
@@ -146,10 +148,10 @@ export default function SiteHomePage() {
       console.error("[AI Chat Error]", err);
       setError(
         err.message?.includes("model")
-          ? "El modelo de IA no está disponible o no soporta esta funcionalidad. Contacta al administrador."
+          ? t("siteHome.errModel")
           : err.message?.includes("fetch")
-            ? "No se pudo conectar con el servidor de IA. Verifica tu conexión."
-            : err.message || "Ocurrió un error inesperado. Inténtalo de nuevo.",
+            ? t("siteHome.errNetwork")
+            : err.message || t("siteHome.errUnexpected"),
       );
     },
   });
@@ -244,16 +246,16 @@ export default function SiteHomePage() {
                 </span>
               </h1>
               <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
-                ¿Qué quieres hacer en{" "}
+                {t("siteHome.whatDoYouWant")}{" "}
                 <span className="font-semibold text-foreground">
-                  {currentSite?.name || currentSite?.slug || "tu sitio"}
+                  {currentSite?.name || currentSite?.slug || t("siteHome.yourSite")}
                 </span>
-                ?
+                {t("siteHome.questionMark")}
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-170">
-              {suggestions.map((item) => (
+              {getSuggestions(t).map((item) => (
                 <button
                   key={item.label}
                   type="button"
@@ -337,7 +339,7 @@ export default function SiteHomePage() {
                       const isCompleted =
                         state === "result" || (!isLoading && state !== "error");
                       const isFailed = state === "error";
-                      const info = getToolInfo(toolName);
+                      const info = getToolInfo(toolName, t);
                       const ToolIcon = info.icon;
 
                       return (
@@ -373,7 +375,7 @@ export default function SiteHomePage() {
                               {isCompleted
                                 ? info.doneLabel
                                 : isFailed
-                                  ? `Error: ${info.label}`
+                                  ? `${t("siteHome.errPrefix")} ${info.label}`
                                   : info.activeLabel}
                             </span>
                             {!isCompleted && !isFailed && (
@@ -424,7 +426,7 @@ export default function SiteHomePage() {
                         style={{ color: "oklch(0.55 0.25 265)" }}
                       />
                       <span className="text-sm text-muted-foreground">
-                        Pensando
+                        {t("siteHome.thinking")}
                       </span>
                       <div className="flex gap-0.5 ml-0.5">
                         {[0, 1, 2].map((dot) => (
@@ -463,7 +465,7 @@ export default function SiteHomePage() {
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-red-500/10 hover:bg-red-500/20 text-red-700 dark:text-red-400 transition-colors cursor-pointer border-none"
               >
                 <RotateCcw className="size-3" />
-                Reintentar
+                {t("siteHome.retryBtn")}
               </button>
               <button
                 type="button"
@@ -512,7 +514,7 @@ export default function SiteHomePage() {
                 name="prompt"
                 type="text"
                 className="flex-1 min-w-0 border-none outline-none bg-transparent text-[0.9375rem] text-foreground placeholder:text-muted-foreground font-[inherit]"
-                placeholder="Pregúntale a la IA sobre tu sitio o pídele cambios..."
+                placeholder={t("siteHome.inputPlaceholder")}
                 value={input}
                 onChange={handleInputChange}
                 onFocus={() => setIsFocused(true)}
@@ -536,7 +538,7 @@ export default function SiteHomePage() {
           </form>
           <p className="flex items-center gap-1.5 text-xs text-muted-foreground opacity-70 bg-background/50 backdrop-blur-sm px-2 py-0.5 rounded-full">
             <Zap className="size-3" />
-            Powered by IA — Describe cambios en lenguaje natural
+            {t("siteHome.poweredBy")}
           </p>
         </div>
       </div>

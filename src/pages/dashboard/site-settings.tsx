@@ -9,6 +9,7 @@ import { MediaLibraryManager } from "@/components/shared/MediaLibrary/MediaLibra
 import { useSetSitePageHeader } from "@/components/site/SitePageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Card,
   CardAction,
@@ -27,9 +28,9 @@ import {
   FieldTitle,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import DashboardNotFound from "./not-found";
+import { useTranslation } from "react-i18next";
 
 function toSlug(value: string) {
   return value
@@ -53,6 +54,7 @@ export default function SiteSettings() {
   const { currentSite, currentProject, isLoading, setCurrentSite } =
     useWorkspace();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
@@ -75,7 +77,7 @@ export default function SiteSettings() {
       actions: (
         <>
           <Badge variant={isPublic ? "default" : "secondary"}>
-            {isPublic ? "Publicado" : "Borrador"}
+            {isPublic ? t("siteSettings.published") : t("siteSettings.draft")}
           </Badge>
           <Button
             variant="outline"
@@ -85,7 +87,7 @@ export default function SiteSettings() {
             }
           >
             <ImageIcon data-icon="inline-start" />
-            Medios
+            {t("siteSettings.mediaBtn")}
           </Button>
           <Button
             size="sm"
@@ -95,7 +97,7 @@ export default function SiteSettings() {
             {saving && (
               <Loader2 data-icon="inline-start" className="animate-spin" />
             )}
-            Guardar cambios
+            {t("siteSettings.saveBtn")}
           </Button>
         </>
       ),
@@ -125,11 +127,11 @@ export default function SiteSettings() {
   const handleSave = async () => {
     if (!currentSite) return;
     if (!name.trim()) {
-      toast.error("El nombre del sitio es obligatorio");
+      toast.error(t("siteSettings.toastNameRequired"));
       return;
     }
     if (!slug.trim()) {
-      toast.error("El slug público es obligatorio");
+      toast.error(t("siteSettings.toastSlugRequired"));
       return;
     }
 
@@ -150,16 +152,16 @@ export default function SiteSettings() {
 
       if (res.success && res.data?.site) {
         setCurrentSite(res.data.site);
-        toast.success("Sitio actualizado correctamente");
+        toast.success(t("siteSettings.toastUpdateSuccess"));
 
         if (res.data.site.slug !== previousSlug) {
           navigate(`/dashboard/site/${res.data.site.slug}`, { replace: true });
         }
       } else {
-        toast.error(res.error || "No se pudo actualizar el sitio");
+        toast.error(res.error || t("siteSettings.toastUpdateError"));
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error(t("siteSettings.toastErrorConnect"));
     } finally {
       setSaving(false);
     }
@@ -195,7 +197,7 @@ export default function SiteSettings() {
                 {faviconUrl ? (
                   <img
                     src={faviconUrl}
-                    alt="Favicon del sitio"
+                    alt={t("siteSettings.faviconAlt")}
                     className="size-full object-cover"
                   />
                 ) : (
@@ -207,15 +209,13 @@ export default function SiteSettings() {
                   {currentSite.name || currentSite.slug}
                 </CardTitle>
                 <CardDescription>
-                  Inicio del sitio dentro de{" "}
-                  {currentProject?.name || "este proyecto"}. Revisa su
-                  información pública y ajustes principales.
+                  {t("siteSettings.cardDesc", { project: currentProject?.name || t("siteSettings.thisProject") })}
                 </CardDescription>
               </div>
             </div>
             <CardAction>
               <Badge variant={isPublic ? "default" : "secondary"}>
-                {isPublic ? "Publicado" : "Borrador"}
+                {isPublic ? t("siteSettings.published") : t("siteSettings.draft")}
               </Badge>
             </CardAction>
           </CardHeader>
@@ -223,11 +223,11 @@ export default function SiteSettings() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <InfoCard title="Template" value={currentSite.template_type} />
-        <InfoCard title="Slug público" value={`/${currentSite.slug}`} />
-        <InfoCard title="Creado" value={formatDate(currentSite.created_at)} />
+        <InfoCard title={t("siteSettings.infoTemplate")} value={currentSite.template_type} />
+        <InfoCard title={t("siteSettings.infoSlug")} value={`/${currentSite.slug}`} />
+        <InfoCard title={t("siteSettings.infoCreated")} value={formatDate(currentSite.created_at)} />
         <InfoCard
-          title="Actualizado"
+          title={t("siteSettings.infoUpdated")}
           value={formatDate(currentSite.updated_at)}
         />
       </div>
@@ -235,37 +235,35 @@ export default function SiteSettings() {
       <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
         <Card>
           <CardHeader>
-            <CardTitle>Información del sitio</CardTitle>
+            <CardTitle>{t("siteSettings.siteInfoTitle")}</CardTitle>
             <CardDescription>
-              Cambia el nombre, la URL pública y el estado de publicación del
-              site.
+              {t("siteSettings.siteInfoDesc")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="site-name">Nombre</FieldLabel>
+                <FieldLabel htmlFor="site-name">{t("siteSettings.nameLabel")}</FieldLabel>
                 <Input
                   id="site-name"
                   value={name}
                   onChange={(event) => handleNameChange(event.target.value)}
                   disabled={saving}
-                  placeholder="Nombre del sitio"
+                  placeholder={t("siteSettings.namePlaceholder")}
                 />
               </Field>
 
               <Field>
-                <FieldLabel htmlFor="site-slug">Slug público</FieldLabel>
+                <FieldLabel htmlFor="site-slug">{t("siteSettings.slugLabel")}</FieldLabel>
                 <Input
                   id="site-slug"
                   value={slug}
                   onChange={(event) => handleSlugChange(event.target.value)}
                   disabled={saving}
-                  placeholder="mi-sitio"
+                  placeholder={t("siteSettings.slugPlaceholder")}
                 />
                 <FieldDescription>
-                  Solo letras minúsculas, números y guiones. Se usará en
-                  /dashboard/site/{slug || "mi-sitio"}.
+                  {t("siteSettings.slugHelp", { slug: slug || t("siteSettings.slugPlaceholder") })}
                 </FieldDescription>
               </Field>
 
@@ -273,19 +271,19 @@ export default function SiteSettings() {
                 <Switch
                   checked={isPublic}
                   disabled={saving}
-                  aria-label="Cambiar estado de publicación"
+                  aria-label={t("siteSettings.statusAria")}
                   onCheckedChange={(checked) =>
                     setStatus(checked ? "public" : "draft")
                   }
                 />
                 <FieldContent>
                   <FieldTitle>
-                    {isPublic ? "Sitio publicado" : "Sitio en borrador"}
+                    {isPublic ? t("siteSettings.statusPublishedTitle") : t("siteSettings.statusDraftTitle")}
                   </FieldTitle>
                   <FieldDescription>
                     {isPublic
-                      ? "El sitio está marcado como público."
-                      : "El sitio no está publicado todavía."}
+                      ? t("siteSettings.statusPublishedDesc")
+                      : t("siteSettings.statusDraftDesc")}
                   </FieldDescription>
                 </FieldContent>
               </Field>
@@ -304,7 +302,7 @@ export default function SiteSettings() {
                 setFaviconUrl(currentSite.content?.favicon_url ?? "");
               }}
             >
-              Descartar
+              {t("siteSettings.discardBtn")}
             </Button>
             <Button
               disabled={!hasChanges || saving}
@@ -313,17 +311,16 @@ export default function SiteSettings() {
               {saving && (
                 <Loader2 data-icon="inline-start" className="animate-spin" />
               )}
-              Guardar cambios
+              {t("siteSettings.saveBtn")}
             </Button>
           </CardFooter>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Favicon</CardTitle>
+            <CardTitle>{t("siteSettings.faviconTitle")}</CardTitle>
             <CardDescription>
-              El icono aparecerá en la lista de sitios del proyecto y en las
-              vistas que usen la metadata del site.
+              {t("siteSettings.faviconDesc")}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
@@ -332,7 +329,7 @@ export default function SiteSettings() {
                 {faviconUrl ? (
                   <img
                     src={faviconUrl}
-                    alt="Favicon seleccionado"
+                    alt={t("siteSettings.faviconSelected")}
                     className="size-full object-cover"
                   />
                 ) : (
@@ -341,11 +338,10 @@ export default function SiteSettings() {
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-medium">
-                  {faviconUrl ? "Icono seleccionado" : "Sin favicon"}
+                  {faviconUrl ? t("siteSettings.faviconSelected") : t("siteSettings.faviconNone")}
                 </p>
                 <p className="truncate text-sm text-muted-foreground">
-                  {faviconUrl ||
-                    "Selecciona una imagen desde la media library."}
+                  {faviconUrl || t("siteSettings.faviconHelp")}
                 </p>
               </div>
             </div>
@@ -362,7 +358,7 @@ export default function SiteSettings() {
                   }
                 >
                   <ImageIcon data-icon="inline-start" />
-                  Cambiar favicon
+                  {t("siteSettings.changeFaviconBtn")}
                 </Button>
               }
             />
@@ -373,7 +369,7 @@ export default function SiteSettings() {
                 disabled={saving}
                 onClick={() => setFaviconUrl("")}
               >
-                Quitar favicon
+                {t("siteSettings.removeFaviconBtn")}
               </Button>
             )}
           </CardContent>

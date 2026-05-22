@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface ProfileFieldProps {
   label: string;
@@ -9,7 +10,7 @@ interface ProfileFieldProps {
 }
 
 export default function ProfileField({ label, value, type = "text", onEdit }: ProfileFieldProps) {
-
+  const { t } = useTranslation();
   const displayValue = type === "password" ? "••••••••" : value;
 
   return (
@@ -22,7 +23,7 @@ export default function ProfileField({ label, value, type = "text", onEdit }: Pr
           variant="ghost" 
           size="icon" 
           onClick={onEdit} 
-          aria-label={`Editar ${label}`}
+          aria-label={t("profileField.editAria", { label })}
           className="opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100 shrink-0"
         >
           <Pencil className="h-4 w-4 text-muted-foreground" />

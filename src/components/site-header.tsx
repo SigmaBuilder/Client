@@ -13,6 +13,7 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { PanelLeftIcon } from "lucide-react";
 import { NavUser } from "@/components/nav-user";
 import { useWorkspace } from "@/hooks/use-workspace";
+import { useTranslation } from "react-i18next";
 
 interface RouteHandle {
   breadcrumb?: string | ((data: unknown) => string);
@@ -55,6 +56,7 @@ export function SiteHeader() {
   const { toggleSidebar } = useSidebar();
   const { currentSite } = useWorkspace();
   const crumbs = useBreadcrumbs();
+  const { t } = useTranslation();
 
   return (
     <header className="sticky top-0 z-50 flex w-full items-center border-b bg-background">
@@ -95,10 +97,10 @@ export function SiteHeader() {
                 {i > 0 && <BreadcrumbSeparator />}
                 <BreadcrumbItem>
                   {crumb.isPage ? (
-                    <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                    <BreadcrumbPage>{t(crumb.label)}</BreadcrumbPage>
                   ) : (
                     <BreadcrumbLink asChild>
-                      <Link to={crumb.to}>{crumb.label}</Link>
+                      <Link to={crumb.to}>{t(crumb.label)}</Link>
                     </BreadcrumbLink>
                   )}
                 </BreadcrumbItem>

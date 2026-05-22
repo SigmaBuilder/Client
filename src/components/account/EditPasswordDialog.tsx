@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface EditPasswordDialogProps {
   open: boolean;
@@ -13,6 +14,7 @@ interface EditPasswordDialogProps {
 
 export default function EditPasswordDialog({ open, onOpenChange }: EditPasswordDialogProps) {
   const { updatePassword } = useAuth();
+  const { t } = useTranslation();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +32,7 @@ export default function EditPasswordDialog({ open, onOpenChange }: EditPasswordD
     if (!currentPassword.trim() || !newPassword.trim()) return;
     
     if (newPassword.length < 8) {
-      toast.error("La nueva contraseña debe tener al menos 8 caracteres");
+      toast.error(t("editPasswordDialog.toastShort"));
       return;
     }
 
@@ -38,13 +40,13 @@ export default function EditPasswordDialog({ open, onOpenChange }: EditPasswordD
     try {
       const res = await updatePassword(currentPassword, newPassword);
       if (res.success) {
-        toast.success("Contraseña actualizada correctamente");
+        toast.success(t("editPasswordDialog.toastSuccess"));
         onOpenChange(false);
       } else {
-        toast.error(res.error || "Error al actualizar la contraseña");
+        toast.error(res.error || t("editPasswordDialog.toastError"));
       }
     } catch (error) {
-      toast.error("Ocurrió un error inesperado");
+      toast.error(t("editPasswordDialog.toastUnexpected"));
     } finally {
       setIsLoading(false);
     }
@@ -55,14 +57,14 @@ export default function EditPasswordDialog({ open, onOpenChange }: EditPasswordD
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Actualizar contraseña</DialogTitle>
+            <DialogTitle>{t("editPasswordDialog.title")}</DialogTitle>
             <DialogDescription>
-              Introduce tu contraseña actual y la nueva contraseña para asegurar tu cuenta.
+              {t("editPasswordDialog.desc")}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="currentPassword">Contraseña actual</Label>
+              <Label htmlFor="currentPassword">{t("editPasswordDialog.labelCurrent")}</Label>
               <Input
                 id="currentPassword"
                 type="password"
@@ -73,7 +75,7 @@ export default function EditPasswordDialog({ open, onOpenChange }: EditPasswordD
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="newPassword">Nueva contraseña</Label>
+              <Label htmlFor="newPassword">{t("editPasswordDialog.labelNew")}</Label>
               <Input
                 id="newPassword"
                 type="password"
@@ -86,10 +88,10 @@ export default function EditPasswordDialog({ open, onOpenChange }: EditPasswordD
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
-              Cancelar
+              {t("editPasswordDialog.cancelBtn")}
             </Button>
             <Button type="submit" disabled={isLoading || !currentPassword.trim() || !newPassword.trim()}>
-              {isLoading ? "Guardando..." : "Guardar cambios"}
+              {isLoading ? t("editPasswordDialog.savingBtn") : t("editPasswordDialog.saveBtn")}
             </Button>
           </DialogFooter>
         </form>

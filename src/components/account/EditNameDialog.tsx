@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface EditNameDialogProps {
   open: boolean;
@@ -13,6 +14,7 @@ interface EditNameDialogProps {
 
 export default function EditNameDialog({ open, onOpenChange }: EditNameDialogProps) {
   const { user, updateProfile } = useAuth();
+  const { t } = useTranslation();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -33,13 +35,13 @@ export default function EditNameDialog({ open, onOpenChange }: EditNameDialogPro
     try {
       const res = await updateProfile({ first_name: firstName, last_name: lastName });
       if (res.success) {
-        toast.success("Perfil actualizado correctamente");
+        toast.success(t("editNameDialog.toastSuccess"));
         onOpenChange(false);
       } else {
-        toast.error(res.error || "Error al actualizar el perfil");
+        toast.error(res.error || t("editNameDialog.toastError"));
       }
     } catch (error) {
-      toast.error("Ocurrió un error inesperado");
+      toast.error(t("editNameDialog.toastUnexpected"));
     } finally {
       setIsLoading(false);
     }
@@ -50,39 +52,39 @@ export default function EditNameDialog({ open, onOpenChange }: EditNameDialogPro
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Actualizar nombre</DialogTitle>
+            <DialogTitle>{t("editNameDialog.title")}</DialogTitle>
             <DialogDescription>
-              Introduce tu nombre y apellidos. Esto es lo que verán otros miembros de tu equipo.
+              {t("editNameDialog.desc")}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="firstName">Nombre</Label>
+              <Label htmlFor="firstName">{t("editNameDialog.labelFirstName")}</Label>
               <Input
                 id="firstName"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                placeholder="Ej. Jane"
+                placeholder={t("editNameDialog.placeholderFirstName")}
                 disabled={isLoading}
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="lastName">Apellidos</Label>
+              <Label htmlFor="lastName">{t("editNameDialog.labelLastName")}</Label>
               <Input
                 id="lastName"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                placeholder="Ej. Doe"
+                placeholder={t("editNameDialog.placeholderLastName")}
                 disabled={isLoading}
               />
             </div>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
-              Cancelar
+              {t("editNameDialog.cancelBtn")}
             </Button>
             <Button type="submit" disabled={isLoading || !firstName.trim() || !lastName.trim()}>
-              {isLoading ? "Guardando..." : "Guardar cambios"}
+              {isLoading ? t("editNameDialog.savingBtn") : t("editNameDialog.saveBtn")}
             </Button>
           </DialogFooter>
         </form>

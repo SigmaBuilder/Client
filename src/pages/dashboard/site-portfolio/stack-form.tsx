@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Save, ArrowLeft, Search, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "react-i18next";
 
 interface SvglIcon {
   id: number;
@@ -29,6 +30,7 @@ export default function PortfolioStackForm() {
     name: "",
     icon_url: "",
   });
+  const { t } = useTranslation();
 
   // State para la busqueda en SVGL
   const [svglQuery, setSvglQuery] = useState("");
@@ -51,11 +53,11 @@ export default function PortfolioStackForm() {
               icon_url: res.data.portfolioStack.icon_url || "",
             });
           } else {
-            toast.error("Error al cargar la tecnología");
+            toast.error(t("sitePortfolioStackForm.toastLoadError"));
             navigate(sectionsPath);
           }
         } catch {
-          toast.error("Error de conexión");
+          toast.error(t("sitePortfolioStackForm.toastConnectError"));
         } finally {
           setIsLoading(false);
         }
@@ -121,7 +123,7 @@ export default function PortfolioStackForm() {
   const handleSave = async () => {
     if (!currentSite?.id) return;
     if (!formData.name.trim()) {
-      toast.error("El nombre es obligatorio");
+      toast.error(t("sitePortfolioStackForm.toastNameRequired"));
       return;
     }
 
@@ -140,13 +142,13 @@ export default function PortfolioStackForm() {
       }
 
       if (res.success) {
-        toast.success(isEditing ? "Tecnología actualizada" : "Tecnología añadida");
+        toast.success(isEditing ? t("sitePortfolioStackForm.toastSaveSuccessEdit") : t("sitePortfolioStackForm.toastSaveSuccessNew"));
         navigate(sectionsPath);
       } else {
-        toast.error(res.error || "Error al guardar");
+        toast.error(res.error || t("sitePortfolioStackForm.toastSaveError"));
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error(t("sitePortfolioStackForm.toastConnectError"));
     } finally {
       setIsSaving(false);
     }
@@ -154,17 +156,17 @@ export default function PortfolioStackForm() {
 
   const headerState = useMemo(() => ({
     breadcrumbs: [
-      { label: "Portfolio" },
-      { label: "Stack", onClick: () => navigate(sectionsPath) },
-      { label: isEditing ? "Editar Tecnología" : "Nueva Tecnología" }
+      { label: t("sitePortfolioStackForm.breadcrumbPortfolio") },
+      { label: t("sitePortfolioStackForm.breadcrumbStack"), onClick: () => navigate(sectionsPath) },
+      { label: isEditing ? t("sitePortfolioStackForm.breadcrumbEdit") : t("sitePortfolioStackForm.breadcrumbNew") }
     ],
     actions: (
       <Button size="sm" onClick={handleSave} disabled={isSaving || isLoading}>
         <Save className="h-4 w-4 mr-2" />
-        Guardar
+        {t("sitePortfolioStackForm.saveBtn")}
       </Button>
     ),
-  }), [isEditing, navigate, handleSave, isSaving, isLoading, sectionsPath]);
+  }), [isEditing, navigate, handleSave, isSaving, isLoading, sectionsPath, t]);
 
   useSetSitePageHeader(headerState);
 
@@ -182,23 +184,23 @@ export default function PortfolioStackForm() {
       <div className="flex items-center mb-6">
         <Button variant="ghost" size="sm" onClick={() => navigate(sectionsPath)} className="mr-4">
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Volver
+          {t("sitePortfolioStackForm.backBtn")}
         </Button>
         <h2 className="text-xl font-semibold tracking-tight">
-          {isEditing ? "Editar Tecnología" : "Añadir Tecnología"}
+          {isEditing ? t("sitePortfolioStackForm.titleEdit") : t("sitePortfolioStackForm.titleNew")}
         </h2>
       </div>
 
       <div className="space-y-6 bg-card border rounded-md p-6">
         <div className="space-y-2" ref={dropdownRef}>
-          <Label>Buscar icono en SVGL</Label>
+          <Label>{t("sitePortfolioStackForm.labelSearch")}</Label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               value={svglQuery}
               onChange={handleSvglQueryChange}
               onFocus={() => svglResults.length > 0 && setShowSvglDropdown(true)}
-              placeholder="Buscar React, TypeScript, Node..."
+              placeholder={t("sitePortfolioStackForm.placeholderSearch")}
               className="pl-9"
             />
             {isSearching && (
@@ -239,7 +241,7 @@ export default function PortfolioStackForm() {
               alt="Preview"
               className="h-10 w-10 object-contain"
             />
-            <span className="text-sm font-medium truncate flex-1">{formData.name || "Sin nombre"}</span>
+            <span className="text-sm font-medium truncate flex-1">{formData.name || t("sitePortfolioStackForm.noName")}</span>
             <Button
               variant="ghost"
               size="icon"
@@ -252,27 +254,27 @@ export default function PortfolioStackForm() {
         )}
 
         <div className="space-y-2">
-          <Label htmlFor="name">Nombre de la tecnología</Label>
+          <Label htmlFor="name">{t("sitePortfolioStackForm.labelName")}</Label>
           <Input
             id="name"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            placeholder="Ej. React, TypeScript, Node.js"
+            placeholder={t("sitePortfolioStackForm.placeholderName")}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="icon_url">URL del icono (opcional)</Label>
+          <Label htmlFor="icon_url">{t("sitePortfolioStackForm.labelIconUrl")}</Label>
           <Input
             id="icon_url"
             name="icon_url"
             value={formData.icon_url}
             onChange={handleChange}
-            placeholder="https://svgl.app/library/react.svg"
+            placeholder={t("sitePortfolioStackForm.placeholderIconUrl")}
           />
           <p className="text-xs text-muted-foreground">
-            Puedes usar el buscador de SVGL arriba o pegar una URL directa.
+            {t("sitePortfolioStackForm.descIconUrl")}
           </p>
         </div>
       </div>

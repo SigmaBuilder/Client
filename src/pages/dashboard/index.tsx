@@ -23,9 +23,11 @@ import {
   DialogFooter,
 } from "../../components/ui/dialog";
 import api from "../../lib/api";
+import { useTranslation } from "react-i18next";
 
 export default function ProjectsList() {
   const { projects, isLoading, fetchProjects, clearWorkspace } = useWorkspace();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
 
   // New project dialog
@@ -47,7 +49,7 @@ export default function ProjectsList() {
 
   const handleCreateProject = async () => {
     if (!projectName.trim()) {
-      toast.error("El nombre del proyecto es obligatorio");
+      toast.error(t("dashboard.toastNameRequired"));
       return;
     }
     setCreating(true);
@@ -56,11 +58,11 @@ export default function ProjectsList() {
       description: projectDescription.trim() || undefined,
     });
     if (res.success && res.data) {
-      toast.success(`Proyecto "${res.data.project.name}" creado correctamente`);
+      toast.success(t("dashboard.toastCreated", { name: res.data.project.name }));
       setCreateOpen(false);
       await fetchProjects();
     } else {
-      toast.error(res.error ?? "Error creando el proyecto");
+      toast.error(res.error ?? t("dashboard.toastErrorCreate"));
     }
     setCreating(false);
   };
@@ -68,10 +70,10 @@ export default function ProjectsList() {
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-3xl font-bold tracking-tight">Proyectos</h2>
+        <h2 className="text-3xl font-bold tracking-tight">{t("dashboard.projectsTitle")}</h2>
         <div className="flex items-center space-x-2">
           <Button onClick={openCreateDialog}>
-            <Plus className="mr-2 h-4 w-4" /> Nuevo Proyecto
+            <Plus className="mr-2 h-4 w-4" /> {t("dashboard.newProjectBtn")}
           </Button>
         </div>
       </div>
@@ -92,12 +94,12 @@ export default function ProjectsList() {
         ) : projects !== null && projects.length === 0 ? (
           <div className="col-span-3 flex flex-col items-center justify-center p-8 text-center bg-muted/20 rounded-lg border border-dashed">
             <Briefcase className="h-10 w-10 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium">No tienes proyectos</h3>
+            <h3 className="text-lg font-medium">{t("dashboard.noProjectsTitle")}</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Crea tu primer proyecto para empezar a construir sitios.
+              {t("dashboard.noProjectsDesc")}
             </p>
             <Button onClick={openCreateDialog}>
-              <Plus className="mr-2 h-4 w-4" /> Crear Proyecto
+              <Plus className="mr-2 h-4 w-4" /> {t("dashboard.createProjectBtn")}
             </Button>
           </div>
         ) : (
@@ -112,13 +114,13 @@ export default function ProjectsList() {
                   {item.project.name}
                 </CardTitle>
                 <CardDescription>
-                  {item.project.description || "Sin descripción"}
+                  {item.project.description || t("dashboard.noDescription")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-xs text-muted-foreground">
-                  Creado el:{" "}
-                  {new Date(item.project.created_at).toLocaleDateString()}
+                  {t("dashboard.createdAt")}{" "}
+                  {new Date(item.project.created_at).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'es-ES')}
                 </p>
               </CardContent>
             </Card>
@@ -130,24 +132,24 @@ export default function ProjectsList() {
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Nuevo proyecto</DialogTitle>
+            <DialogTitle>{t("dashboard.newProjectModalTitle")}</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-4 py-2">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="proj-name">Nombre</Label>
+              <Label htmlFor="proj-name">{t("dashboard.nameLabel")}</Label>
               <Input
                 id="proj-name"
                 value={projectName}
                 onChange={(e) => setProjectName(e.target.value)}
                 disabled={creating}
-                placeholder="Nombre del proyecto"
+                placeholder={t("dashboard.namePlaceholder")}
               />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="proj-desc">
-                Descripción{" "}
+                {t("dashboard.descLabel")}{" "}
                 <span className="text-muted-foreground font-normal">
-                  (opcional)
+                  {t("dashboard.optional")}
                 </span>
               </Label>
               <Input
@@ -155,14 +157,14 @@ export default function ProjectsList() {
                 value={projectDescription}
                 onChange={(e) => setProjectDescription(e.target.value)}
                 disabled={creating}
-                placeholder="Descripción del proyecto"
+                placeholder={t("dashboard.descPlaceholder")}
               />
             </div>
           </div>
           <DialogFooter showCloseButton>
             <Button onClick={handleCreateProject} disabled={creating}>
               {creating && <Loader2 className="size-3.5 animate-spin" />}
-              Crear proyecto
+              {t("dashboard.createBtn")}
             </Button>
           </DialogFooter>
         </DialogContent>

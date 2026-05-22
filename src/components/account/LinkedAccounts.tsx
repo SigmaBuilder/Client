@@ -17,18 +17,21 @@ const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+import { useTranslation } from "react-i18next";
+
 export default function LinkedAccounts() {
+  const { t } = useTranslation();
   return (
     <Card className="w-full border shadow-sm">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <CardTitle className="text-xl">Cuentas Vinculadas</CardTitle>
+            <CardTitle className="text-xl">{t("linkedAccounts.title")}</CardTitle>
             <CardDescription>
-              Conecta otras cuentas para iniciar sesión más rápido.
+              {t("linkedAccounts.desc")}
             </CardDescription>
           </div>
-          <Badge variant="secondary" className="font-normal">En construcción</Badge>
+          <Badge variant="secondary" className="font-normal">{t("linkedAccounts.underConstruction")}</Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-4 opacity-60 pointer-events-none">
@@ -37,20 +40,20 @@ export default function LinkedAccounts() {
             <GithubIcon className="h-6 w-6 text-foreground shrink-0" />
             <div className="space-y-0.5">
               <p className="text-sm font-medium leading-none">GitHub</p>
-              <p className="text-sm text-muted-foreground">No conectado</p>
+              <p className="text-sm text-muted-foreground">{t("linkedAccounts.notConnected")}</p>
             </div>
           </div>
-          <Button variant="outline" size="sm">Conectar</Button>
+          <Button variant="outline" size="sm">{t("linkedAccounts.connectBtn")}</Button>
         </div>
         <div className="flex items-center justify-between p-4 border rounded-lg">
           <div className="flex items-center space-x-4">
             <GoogleIcon className="h-6 w-6 shrink-0" />
             <div className="space-y-0.5">
               <p className="text-sm font-medium leading-none">Google</p>
-              <p className="text-sm text-muted-foreground">No conectado</p>
+              <p className="text-sm text-muted-foreground">{t("linkedAccounts.notConnected")}</p>
             </div>
           </div>
-          <Button variant="outline" size="sm">Conectar</Button>
+          <Button variant="outline" size="sm">{t("linkedAccounts.connectBtn")}</Button>
         </div>
       </CardContent>
     </Card>

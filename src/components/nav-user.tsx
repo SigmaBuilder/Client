@@ -26,13 +26,16 @@ import {
   Palette,
   Sun,
   UserRound,
+  Languages,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/components/theme-provider";
+import { useTranslation } from "react-i18next";
 
 export function NavUser() {
   const { logout, user } = useAuth();
   const { theme, setTheme } = useTheme();
+  const { t, i18n } = useTranslation();
 
   const initials = user
     ? `${user.first_name?.charAt(0) ?? ""}${user.last_name?.charAt(0) ?? ""}`.toUpperCase()
@@ -49,10 +52,10 @@ export function NavUser() {
             >
               <div className="grid flex-1 text-right text-sm leading-tight">
                 <span className="truncate font-medium">
-                  {user ? `${user.first_name} ${user.last_name}` : "Usuario"}
+                  {user ? `${user.first_name} ${user.last_name}` : t("navUser.fallbackName")}
                 </span>
                 <span className="truncate text-xs">
-                  {user?.email ?? "Sin sesión"}
+                  {user?.email ?? t("navUser.noSession")}
                 </span>
               </div>
               <Avatar className="h-8 w-8 rounded-lg">
@@ -75,7 +78,7 @@ export function NavUser() {
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
                   <Palette />
-                  Cambiar tema
+                  {t("navUser.changeTheme")}
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent>
@@ -86,15 +89,39 @@ export function NavUser() {
                       >
                         <DropdownMenuRadioItem value="dark">
                           <Moon />
-                          Oscuro
+                          {t("navUser.themeDark")}
                         </DropdownMenuRadioItem>
                         <DropdownMenuRadioItem value="light">
                           <Sun />
-                          Claro
+                          {t("navUser.themeLight")}
                         </DropdownMenuRadioItem>
                         <DropdownMenuRadioItem value="system">
                           <MonitorSmartphone />
-                          Sistema
+                          {t("navUser.themeSystem")}
+                        </DropdownMenuRadioItem>
+                      </DropdownMenuRadioGroup>
+                    </DropdownMenuGroup>
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Languages />
+                  Idioma / Language
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuGroup>
+                      <DropdownMenuRadioGroup
+                        value={i18n.resolvedLanguage || i18n.language}
+                        onValueChange={(val) => i18n.changeLanguage(val)}
+                      >
+                        <DropdownMenuRadioItem value="es">
+                          Español
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="en">
+                          English
                         </DropdownMenuRadioItem>
                       </DropdownMenuRadioGroup>
                     </DropdownMenuGroup>
@@ -105,14 +132,14 @@ export function NavUser() {
               <DropdownMenuItem asChild>
                 <Link to="/dashboard/account">
                   <UserRound />
-                  Mi Cuenta
+                  {t("navUser.myAccount")}
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={logout}>
               <LogOutIcon />
-              Cerrar sesión
+              {t("navUser.logout")}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

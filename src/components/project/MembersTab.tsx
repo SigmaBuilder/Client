@@ -21,6 +21,7 @@ import {
 import api from '@/lib/api';
 import type { Member, Role } from '@/types/project';
 import { InviteMemberDialog } from './invite-member-dialog';
+import { useTranslation } from 'react-i18next';
 
 interface MembersTabProps {
   projectId: string;
@@ -55,6 +56,7 @@ export function MembersTab({ projectId, roles }: MembersTabProps) {
 
   // Invite dialog state
   const [inviteOpen, setInviteOpen] = useState(false);
+  const { t } = useTranslation();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -62,7 +64,7 @@ export function MembersTab({ projectId, roles }: MembersTabProps) {
     if (res.success && res.data) {
       setMembers(res.data.members);
     } else {
-      toast.error(res.error ?? 'Error cargando miembros');
+      toast.error(res.error ?? t('projectMembers.toastErrorLoad'));
     }
     setLoading(false);
   }, [projectId]);
@@ -74,9 +76,9 @@ export function MembersTab({ projectId, roles }: MembersTabProps) {
     const res = await api.updateProjectMemberRole(projectId, userId, roleId);
     if (res.success) {
       await load();
-      toast.success('Rol actualizado correctamente');
+      toast.success(t('projectMembers.toastRoleSuccess'));
     } else {
-      toast.error(res.error ?? 'Error actualizando rol');
+      toast.error(res.error ?? t('projectMembers.toastRoleError'));
     }
     setUpdatingId(null);
   };
@@ -92,9 +94,9 @@ export function MembersTab({ projectId, roles }: MembersTabProps) {
     const res = await api.removeProjectMember(projectId, removingMember.profile.id);
     if (res.success) {
       setMembers(prev => prev?.filter(m => m.profile.id !== removingMember.profile.id) ?? null);
-      toast.success(`${removingMember.profile.first_name} eliminado del proyecto`);
+      toast.success(t('projectMembers.toastRemoveSuccess', { name: removingMember.profile.first_name }));
     } else {
-      toast.error(res.error ?? 'Error eliminando miembro');
+      toast.error(res.error ?? t('projectMembers.toastRemoveError'));
     }
     setRemoving(false);
     setRemoveDialogOpen(false);
@@ -108,11 +110,11 @@ export function MembersTab({ projectId, roles }: MembersTabProps) {
         <div className="text-sm text-muted-foreground">
           {loading
             ? <Skeleton className="inline-block h-4 w-24" />
-            : `${members?.length ?? 0} miembro(s)`}
+            : t('projectMembers.membersCount', { count: members?.length ?? 0 })}
         </div>
         <Button size="sm" onClick={() => setInviteOpen(true)}>
           <Mail data-icon="inline-start" />
-          Invitar miembro
+          {t('projectMembers.inviteBtn')}
         </Button>
       </div>
 
@@ -121,9 +123,9 @@ export function MembersTab({ projectId, roles }: MembersTabProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Miembro</TableHead>
-              <TableHead>Rol</TableHead>
-              <TableHead>Unido el</TableHead>
+              <TableHead>{t('projectMembers.colMember')}</TableHead>
+              <TableHead>{t('projectMembers.colRole')}</TableHead>
+              <TableHead>{t('projectMembers.colJoined')}</TableHead>
               <TableHead className="w-10" />
             </TableRow>
           </TableHeader>
@@ -184,7 +186,7 @@ export function MembersTab({ projectId, roles }: MembersTabProps) {
                               onClick={() => openRemoveDialog(member)}
                             >
                               <Trash2 />
-                              Eliminar del proyecto
+                              {t('projectMembers.removeAction')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -200,25 +202,22 @@ export function MembersTab({ projectId, roles }: MembersTabProps) {
       <AlertDialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
         <AlertDialogContent size="sm">
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar miembro?</AlertDialogTitle>
+            <AlertDialogTitle>{t('projectMembers.removeDialogTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
               {removingMember && (
-                <>
-                  Se eliminará a <strong>{removingMember.profile.first_name} {removingMember.profile.last_name}</strong> del proyecto.
-                  Esta acción no se puede deshacer.
-                </>
+                <span dangerouslySetInnerHTML={{ __html: t('projectMembers.removeDialogDesc', { name: `${removingMember.profile.first_name} ${removingMember.profile.last_name}` }) }} />
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={removing}>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel disabled={removing}>{t('projectMembers.cancelBtn')}</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={handleConfirmRemove}
               disabled={removing}
             >
               {removing && <Loader2 className="size-3.5 animate-spin" />}
-              Eliminar
+              {t('projectMembers.removeBtn')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -22,12 +22,14 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import api from "@/lib/api";
+import { useTranslation } from "react-i18next";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const { login } = useAuth();
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get('redirect') || undefined;
   const [email, setEmail] = useState("");
@@ -45,7 +47,7 @@ export function LoginForm({
     try {
       await login(email, password, redirectTo);
     } catch (err: any) {
-      toast.error(err.message || "Credenciales incorrectas o error en el servidor.");
+      toast.error(err.message || t("login.toastErrorLogin"));
     } finally {
       setLoading(false);
     }
@@ -59,14 +61,14 @@ export function LoginForm({
     try {
       const response = await api.forgotPassword(forgotPasswordEmail);
       if (response.success) {
-        toast.success("Si el correo existe, recibirás un enlace para recuperar tu contraseña.");
+        toast.success(t("login.toastSuccessRecover"));
         setIsForgotDialogOpen(false);
         setForgotPasswordEmail("");
       } else {
-        toast.error(response.error || "Ocurrió un error al intentar recuperar la contraseña.");
+        toast.error(response.error || t("login.toastErrorRecover"));
       }
     } catch (err: any) {
-      toast.error(err.message || "Error al conectar con el servidor.");
+      toast.error(err.message || t("login.toastErrorConnect"));
     } finally {
       setForgotPasswordLoading(false);
     }
@@ -79,13 +81,13 @@ export function LoginForm({
           <form className="p-6 md:p-8" onSubmit={handleSubmit}>
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
-                <h1 className="text-2xl font-bold">Inicia sesión</h1>
+                <h1 className="text-2xl font-bold">{t("login.title")}</h1>
                 <p className="text-balance text-muted-foreground">
-                  Inicia sesión con tu cuenta de SigmaBuilder
+                  {t("login.subtitle")}
                 </p>
               </div>
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="email">{t("login.email")}</FieldLabel>
                 <Input
                   id="email"
                   type="email"
@@ -98,26 +100,26 @@ export function LoginForm({
               </Field>
               <Field>
                 <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Contraseña</FieldLabel>
+                  <FieldLabel htmlFor="password">{t("login.password")}</FieldLabel>
                   <Dialog open={isForgotDialogOpen} onOpenChange={setIsForgotDialogOpen}>
                     <DialogTrigger asChild>
                       <button
                         type="button"
                         className="ml-auto text-sm underline-offset-2 hover:underline bg-transparent border-0 cursor-pointer"
                       >
-                        ¿Olvidaste tu contraseña?
+                        {t("login.forgotPassword")}
                       </button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Recuperar Contraseña</DialogTitle>
+                        <DialogTitle>{t("login.recoverTitle")}</DialogTitle>
                         <DialogDescription>
-                          Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
+                          {t("login.recoverDesc")}
                         </DialogDescription>
                       </DialogHeader>
                       <form onSubmit={handleForgotPassword} className="flex flex-col gap-4 py-4">
                         <Field>
-                          <FieldLabel htmlFor="forgot-email">Email</FieldLabel>
+                          <FieldLabel htmlFor="forgot-email">{t("login.email")}</FieldLabel>
                           <Input
                             id="forgot-email"
                             type="email"
@@ -129,7 +131,7 @@ export function LoginForm({
                           />
                         </Field>
                         <Button type="submit" disabled={forgotPasswordLoading}>
-                          {forgotPasswordLoading ? "Enviando..." : "Enviar enlace"}
+                          {forgotPasswordLoading ? t("login.sending") : t("login.sendLink")}
                         </Button>
                       </form>
                     </DialogContent>
@@ -146,11 +148,11 @@ export function LoginForm({
               </Field>
               <Field>
                 <Button type="submit" disabled={loading} className="w-full">
-                  {loading ? "Iniciando sesión..." : "Iniciar sesión"}
+                  {loading ? t("login.loggingIn") : t("login.loginBtn")}
                 </Button>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                O continúa con
+                {t("login.continueWith")}
               </FieldSeparator>
               {/*TODO: Implement social login buttons functionality and correct provider icons */}
               <Field className="grid grid-cols-2 gap-4">
@@ -161,7 +163,7 @@ export function LoginForm({
                       fill="currentColor"
                     />
                   </svg>
-                  <span className="sr-only">Inicia sesión con Google</span>
+                  <span className="sr-only">{t("login.loginGoogle")}</span>
                 </Button>
                 <Button variant="outline" type="button">
                   <svg
@@ -172,11 +174,11 @@ export function LoginForm({
                     <title>GitHub</title>
                     <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
                   </svg>
-                  <span className="sr-only">Inicia sesión con Github</span>
+                  <span className="sr-only">{t("login.loginGithub")}</span>
                 </Button>
               </Field>
               <FieldDescription className="text-center">
-                ¿No tienes una cuenta? <Link to={redirectTo ? `/signup?redirect=${encodeURIComponent(redirectTo)}` : "/signup"} className="underline underline-offset-4 hover:text-primary">Crea tu cuenta</Link>
+                {t("login.noAccount")} <Link to={redirectTo ? `/signup?redirect=${encodeURIComponent(redirectTo)}` : "/signup"} className="underline underline-offset-4 hover:text-primary">{t("login.createAccount")}</Link>
               </FieldDescription>
             </FieldGroup>
           </form>
@@ -190,9 +192,7 @@ export function LoginForm({
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        Al hacer clic en continuar, aceptas nuestros{" "}
-        <a href="#">Términos de Servicio</a> y{" "}
-        <a href="#">Política de Privacidad</a>.
+        {t("login.terms")} <a href="#">{t("login.termsLink")}</a> {t("login.and")} <a href="#">{t("login.privacyLink")}</a>.
       </FieldDescription>
     </div>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Outlet, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Globe, Users, Shield } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -8,12 +8,7 @@ import { useWorkspace } from '@/hooks/use-workspace';
 import api from '@/lib/api';
 import type { Role } from '@/types/project';
 import DashboardNotFound from '../pages/dashboard/not-found';
-
-const TABS = [
-  { key: 'sites',   label: 'Sitios',           icon: Globe,   path: '' },
-  { key: 'members', label: 'Miembros',          icon: Users,   path: '/members' },
-  { key: 'roles',   label: 'Roles y Permisos',  icon: Shield,  path: '/roles' },
-] as const;
+import { useTranslation } from 'react-i18next';
 
 /** Context passed down to child pages via Outlet context */
 export interface ProjectOutletContext {
@@ -27,6 +22,13 @@ export default function ProjectLayout() {
   const { sites, currentProject, isLoading, error, fetchProjectSites, setCurrentSite } = useWorkspace();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
+
+  const TABS = useMemo(() => [
+    { key: 'sites',   label: t('projectLayout.tabSites'),           icon: Globe,   path: '' },
+    { key: 'members', label: t('projectLayout.tabMembers'),         icon: Users,   path: '/members' },
+    { key: 'roles',   label: t('projectLayout.tabRoles'),           icon: Shield,  path: '/roles' },
+  ], [t]);
 
   const [roles, setRoles] = useState<Role[]>([]);
   const [rolesLoading, setRolesLoading] = useState(true);
@@ -75,7 +77,7 @@ export default function ProjectLayout() {
           ) : (
             <>
               <h1 className="text-2xl font-bold tracking-tight truncate">
-                {currentProject?.name ?? 'Proyecto'}
+                {currentProject?.name ?? t('projectLayout.defaultProjectName')}
               </h1>
               {currentProject?.description && (
                 <p className="text-sm text-muted-foreground truncate">
@@ -88,7 +90,7 @@ export default function ProjectLayout() {
         <div className="shrink-0 flex items-center gap-2">
           <Badge variant="outline">
             <span className="size-1.5 rounded-full bg-emerald-500 inline-block" />
-            Activo
+            {t('projectLayout.statusActive')}
           </Badge>
         </div>
       </div>

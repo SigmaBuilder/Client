@@ -19,6 +19,7 @@ import {
 import { cn } from '@/lib/utils';
 import api from '@/lib/api';
 import type { Permission, Role } from '@/types/project';
+import { useTranslation } from 'react-i18next';
 
 interface RolesTabProps {
   projectId: string;
@@ -37,12 +38,12 @@ function groupPermissions(permissions: Permission[]): Map<string, Permission[]> 
 }
 
 const VERB_LABELS: Record<string, string> = {
-  read: 'Ver', create: 'Crear', update: 'Editar', delete: 'Eliminar',
-  invite: 'Invitar', remove: 'Eliminar miembro', manage: 'Gestionar',
+  read: 'projectRoles.verbRead', create: 'projectRoles.verbCreate', update: 'projectRoles.verbUpdate', delete: 'projectRoles.verbDelete',
+  invite: 'projectRoles.verbInvite', remove: 'projectRoles.verbRemove', manage: 'projectRoles.verbManage',
 };
-function verbLabel(action: string) {
+function verbLabel(action: string, t: any) {
   const verb = action.split(':')[1] ?? action;
-  return VERB_LABELS[verb] ?? verb.charAt(0).toUpperCase() + verb.slice(1);
+  return VERB_LABELS[verb] ? t(VERB_LABELS[verb]) : verb.charAt(0).toUpperCase() + verb.slice(1);
 }
 
 function SidebarSkeleton() {
@@ -68,6 +69,7 @@ export function RolesTab({ projectId }: RolesTabProps) {
   const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const { t } = useTranslation();
 
   // Edit role dialog
   const [editOpen, setEditOpen] = useState(false);
@@ -95,7 +97,7 @@ export function RolesTab({ projectId }: RolesTabProps) {
       setRoles(rolesRes.data.roles);
       setSelectedRoleId(prev => prev ?? rolesRes.data!.roles[0]?.id ?? null);
     } else {
-      toast.error(rolesRes.error ?? 'Error cargando roles');
+      toast.error(rolesRes.error ?? t('projectRoles.toastErrorLoad'));
     }
     if (permsRes.success && permsRes.data) {
       setAllPermissions(permsRes.data.permissions);
@@ -120,7 +122,7 @@ export function RolesTab({ projectId }: RolesTabProps) {
     if (res.success && res.data) {
       setRoles(prev => prev?.map(r => r.id === selectedRole.id ? res.data!.role : r) ?? null);
     } else {
-      toast.error(res.error ?? 'Error guardando permisos');
+      toast.error(res.error ?? t('projectRoles.toastErrorPerms'));
     }
     setSaving(false);
   };
@@ -135,7 +137,7 @@ export function RolesTab({ projectId }: RolesTabProps) {
 
   const handleEditSave = async () => {
     if (!selectedRole || !editName.trim()) {
-      toast.error('El nombre del rol es obligatorio');
+      toast.error(t('projectRoles.toastNameRequired'));
       return;
     }
     setEditSaving(true);
@@ -145,10 +147,10 @@ export function RolesTab({ projectId }: RolesTabProps) {
     });
     if (res.success && res.data) {
       setRoles(prev => prev?.map(r => r.id === selectedRole.id ? res.data!.role : r) ?? null);
-      toast.success('Rol actualizado correctamente');
+      toast.success(t('projectRoles.toastUpdateSuccess'));
       setEditOpen(false);
     } else {
-      toast.error(res.error ?? 'Error actualizando rol');
+      toast.error(res.error ?? t('projectRoles.toastUpdateError'));
     }
     setEditSaving(false);
   };
@@ -161,17 +163,17 @@ export function RolesTab({ projectId }: RolesTabProps) {
       const remaining = (roles ?? []).filter(r => r.id !== selectedRole.id);
       setRoles(remaining);
       setSelectedRoleId(remaining[0]?.id ?? null);
-      toast.success(`Rol "${selectedRole.name}" eliminado`);
+      toast.success(t('projectRoles.toastDeleteSuccess', { name: selectedRole.name }));
       setDeleteOpen(false);
     } else {
-      toast.error(res.error ?? 'Error eliminando rol');
+      toast.error(res.error ?? t('projectRoles.toastDeleteError'));
     }
     setDeleting(false);
   };
 
   const handleCreateRole = async () => {
     if (!newRoleName.trim()) {
-      toast.error('El nombre del rol es obligatorio');
+      toast.error(t('projectRoles.toastNameRequired'));
       return;
     }
     setCreatingRole(true);
@@ -182,12 +184,12 @@ export function RolesTab({ projectId }: RolesTabProps) {
     if (res.success && res.data) {
       setRoles(prev => [...(prev ?? []), res.data!.role]);
       setSelectedRoleId(res.data.role.id);
-      toast.success(`Rol "${res.data.role.name}" creado`);
+      toast.success(t('projectRoles.toastCreateSuccess', { name: res.data.role.name }));
       setNewRoleName('');
       setNewRoleDescription('');
       setNewRoleOpen(false);
     } else {
-      toast.error(res.error ?? 'Error creando rol');
+      toast.error(res.error ?? t('projectRoles.toastCreateError'));
     }
     setCreatingRole(false);
   };
@@ -196,7 +198,7 @@ export function RolesTab({ projectId }: RolesTabProps) {
     <div className="grid grid-cols-[200px_1fr] gap-6 items-start">
       {/* Role sidebar */}
       <div className="flex flex-col gap-1">
-        <p className="text-xs font-medium text-muted-foreground px-2 mb-1">Roles</p>
+        <p className="text-xs font-medium text-muted-foreground px-2 mb-1">{t('projectRoles.rolesLabel')}</p>
         {loading ? <SidebarSkeleton /> : (roles ?? []).map(role => (
           <button
             key={role.id}
@@ -220,7 +222,7 @@ export function RolesTab({ projectId }: RolesTabProps) {
           onClick={() => setNewRoleOpen(true)}
         >
           <Plus data-icon="inline-start" />
-          Nuevo rol
+          {t('projectRoles.newRoleBtn')}
         </Button>
       </div>
 
@@ -237,13 +239,13 @@ export function RolesTab({ projectId }: RolesTabProps) {
                   {saving && <Loader2 className="size-3.5 animate-spin text-muted-foreground" />}
                 </CardTitle>
                 <CardDescription>
-                  {selectedRole.description ?? 'Sin descripción'}
+                  {selectedRole.description ?? t('projectRoles.noDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex items-center gap-2">
                 <Button variant="outline" size="sm" onClick={openEditDialog}>
                   <Pencil data-icon="inline-start" />
-                  Editar
+                  {t('projectRoles.editBtn')}
                 </Button>
                 <Button
                   variant="outline"
@@ -252,7 +254,7 @@ export function RolesTab({ projectId }: RolesTabProps) {
                   onClick={() => setDeleteOpen(true)}
                 >
                   <Trash2 data-icon="inline-start" />
-                  Eliminar
+                  {t('projectRoles.deleteBtn')}
                 </Button>
               </CardContent>
             </Card>
@@ -269,7 +271,7 @@ export function RolesTab({ projectId }: RolesTabProps) {
                       {i > 0 && <Separator className="my-3" />}
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium">{verbLabel(perm.action)}</p>
+                          <p className="text-sm font-medium">{verbLabel(perm.action, t)}</p>
                           <p className="text-xs text-muted-foreground font-mono">{perm.action}</p>
                         </div>
                         <Switch
@@ -291,34 +293,34 @@ export function RolesTab({ projectId }: RolesTabProps) {
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Editar rol</DialogTitle>
+            <DialogTitle>{t('projectRoles.editRoleTitle')}</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-4 py-2">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="edit-role-name">Nombre</Label>
+              <Label htmlFor="edit-role-name">{t('projectRoles.nameLabel')}</Label>
               <Input
                 id="edit-role-name"
                 value={editName}
                 onChange={e => setEditName(e.target.value)}
                 disabled={editSaving}
-                placeholder="Nombre del rol"
+                placeholder={t('projectRoles.namePlaceholder')}
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="edit-role-desc">Descripción <span className="text-muted-foreground font-normal">(opcional)</span></Label>
+              <Label htmlFor="edit-role-desc">{t('projectRoles.descLabel')} <span className="text-muted-foreground font-normal">{t('projectRoles.optional')}</span></Label>
               <Input
                 id="edit-role-desc"
                 value={editDescription}
                 onChange={e => setEditDescription(e.target.value)}
                 disabled={editSaving}
-                placeholder="Descripción del rol"
+                placeholder={t('projectRoles.descPlaceholder')}
               />
             </div>
           </div>
           <DialogFooter showCloseButton>
             <Button onClick={handleEditSave} disabled={editSaving}>
               {editSaving && <Loader2 className="size-3.5 animate-spin" />}
-              Guardar cambios
+              {t('projectRoles.saveChangesBtn')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -328,25 +330,22 @@ export function RolesTab({ projectId }: RolesTabProps) {
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent size="sm">
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar rol?</AlertDialogTitle>
+            <AlertDialogTitle>{t('projectRoles.deleteDialogTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
               {selectedRole && (
-                <>
-                  Se eliminará el rol <strong>{selectedRole.name}</strong>.
-                  Los miembros con este rol perderán sus permisos. Esta acción no se puede deshacer.
-                </>
+                <span dangerouslySetInnerHTML={{ __html: t('projectRoles.deleteDialogDesc', { name: selectedRole.name }) }} />
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleting}>{t('projectRoles.cancelBtn')}</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               onClick={handleDeleteConfirm}
               disabled={deleting}
             >
               {deleting && <Loader2 className="size-3.5 animate-spin" />}
-              Eliminar
+              {t('projectRoles.deleteBtn')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -356,34 +355,34 @@ export function RolesTab({ projectId }: RolesTabProps) {
       <Dialog open={newRoleOpen} onOpenChange={setNewRoleOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Nuevo rol</DialogTitle>
+            <DialogTitle>{t('projectRoles.createRoleTitle')}</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-4 py-2">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="new-role-name">Nombre</Label>
+              <Label htmlFor="new-role-name">{t('projectRoles.nameLabel')}</Label>
               <Input
                 id="new-role-name"
                 value={newRoleName}
                 onChange={e => setNewRoleName(e.target.value)}
                 disabled={creatingRole}
-                placeholder="Nombre del rol"
+                placeholder={t('projectRoles.namePlaceholder')}
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="new-role-desc">Descripción <span className="text-muted-foreground font-normal">(opcional)</span></Label>
+              <Label htmlFor="new-role-desc">{t('projectRoles.descLabel')} <span className="text-muted-foreground font-normal">{t('projectRoles.optional')}</span></Label>
               <Input
                 id="new-role-desc"
                 value={newRoleDescription}
                 onChange={e => setNewRoleDescription(e.target.value)}
                 disabled={creatingRole}
-                placeholder="Descripción del rol"
+                placeholder={t('projectRoles.descPlaceholder')}
               />
             </div>
           </div>
           <DialogFooter showCloseButton>
             <Button onClick={handleCreateRole} disabled={creatingRole}>
               {creatingRole && <Loader2 className="size-3.5 animate-spin" />}
-              Crear rol
+              {t('projectRoles.createRoleBtn')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -24,6 +24,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useTranslation } from "react-i18next";
 
 interface PortfolioItem {
   id: string;
@@ -42,6 +43,7 @@ export default function PortfolioItemsList() {
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [itemToDelete, setItemToDelete] = useState<PortfolioItem | null>(null);
+  const { t } = useTranslation();
 
   const fetchItems = async () => {
     if (!currentSite?.id) return;
@@ -53,10 +55,10 @@ export default function PortfolioItemsList() {
       if (res.success && res.data) {
         setItems(res.data.portfolioItems);
       } else {
-        toast.error("Error al cargar los proyectos");
+        toast.error(t("sitePortfolioItems.toastLoadError"));
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error(t("sitePortfolioItems.toastConnectError"));
     } finally {
       setIsLoading(false);
     }
@@ -74,13 +76,13 @@ export default function PortfolioItemsList() {
         itemToDelete.id,
       );
       if (res.success) {
-        toast.success("Proyecto eliminado");
+        toast.success(t("sitePortfolioItems.toastDeleteSuccess"));
         fetchItems();
       } else {
-        toast.error("Error al eliminar");
+        toast.error(t("sitePortfolioItems.toastDeleteError"));
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error(t("sitePortfolioItems.toastConnectError"));
     } finally {
       setItemToDelete(null);
     }
@@ -88,21 +90,21 @@ export default function PortfolioItemsList() {
 
   const headerState = useMemo(
     () => ({
-      breadcrumbs: [{ label: "Portfolio" }, { label: "Proyectos" }],
+      breadcrumbs: [{ label: t("sitePortfolioItems.breadcrumbPortfolio") }, { label: t("sitePortfolioItems.breadcrumbProjects") }],
       search: {
         value: search,
         onChange: setSearch,
-        placeholder: "Buscar proyectos...",
+        placeholder: t("sitePortfolioItems.searchPlaceholder"),
       },
       actions: (
         <Button size="sm" onClick={() => navigate("new")}>
           <Plus className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">Añadir Proyecto</span>
-          <span className="sm:hidden">Añadir</span>
+          <span className="hidden sm:inline">{t("sitePortfolioItems.addBtnLg")}</span>
+          <span className="sm:hidden">{t("sitePortfolioItems.addBtnSm")}</span>
         </Button>
       ),
     }),
-    [search, navigate],
+    [search, navigate, t],
   );
 
   useSetSitePageHeader(headerState);
@@ -126,15 +128,15 @@ export default function PortfolioItemsList() {
     <div className="flex-1 p-6">
       <Card className="mx-auto w-full max-w-6xl">
         <CardHeader>
-          <CardTitle>Proyectos del portafolio</CardTitle>
+          <CardTitle>{t("sitePortfolioItems.pageTitle")}</CardTitle>
           <CardDescription>
-            Administra y visualiza los proyectos de tu portafolio.
+            {t("sitePortfolioItems.pageDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {filteredItems.length === 0 ? (
             <div className="rounded-lg border bg-card p-8 text-center text-muted-foreground">
-              No hay proyectos encontrados.
+              {t("sitePortfolioItems.emptyList")}
             </div>
           ) : (
             <div className="grid gap-3">
@@ -154,7 +156,7 @@ export default function PortfolioItemsList() {
                       ) : (
                         <div className="w-full h-40 sm:h-full bg-muted flex items-center justify-center">
                           <span className="text-muted-foreground/40 text-xs uppercase tracking-wider">
-                            Sin imagen
+                            {t("sitePortfolioItems.noImage")}
                           </span>
                         </div>
                       )}
@@ -187,7 +189,7 @@ export default function PortfolioItemsList() {
                               className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
                             >
                               <ExternalLink className="h-3.5 w-3.5" />
-                              <span className="hidden sm:inline">Demo</span>
+                              <span className="hidden sm:inline">{t("sitePortfolioItems.linkDemo")}</span>
                             </a>
                           )}
                           {item.repository_url && (
@@ -198,7 +200,7 @@ export default function PortfolioItemsList() {
                               className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
                             >
                               <Code className="h-3.5 w-3.5" />
-                              <span className="hidden sm:inline">Repo</span>
+                              <span className="hidden sm:inline">{t("sitePortfolioItems.linkRepo")}</span>
                             </a>
                           )}
                         </div>
@@ -236,19 +238,18 @@ export default function PortfolioItemsList() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar proyecto?</AlertDialogTitle>
+            <AlertDialogTitle>{t("sitePortfolioItems.deleteTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. Se eliminará el proyecto "
-              {itemToDelete?.title}".
+              {t("sitePortfolioItems.deleteDesc", { name: itemToDelete?.title })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t("sitePortfolioItems.cancelBtn")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Eliminar
+              {t("sitePortfolioItems.deleteBtn")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -9,12 +9,14 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Save, ArrowLeft } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTranslation } from "react-i18next";
 
 export default function PortfolioSectionForm() {
   const { currentSite } = useWorkspace();
   const navigate = useNavigate();
   const { sectionId } = useParams();
   const isEditing = !!sectionId;
+  const { t } = useTranslation();
 
   const [isLoading, setIsLoading] = useState(isEditing);
   const [isSaving, setIsSaving] = useState(false);
@@ -39,11 +41,11 @@ export default function PortfolioSectionForm() {
               description: content.description || "",
             });
           } else {
-            toast.error("Error al cargar la sección");
+            toast.error(t("sitePortfolioSectionForm.toastLoadError"));
             navigate(`/dashboard/site/${currentSite.slug}/portfolio/sections`);
           }
         } catch {
-          toast.error("Error de conexión");
+          toast.error(t("sitePortfolioSectionForm.toastConnectError"));
         } finally {
           setIsLoading(false);
         }
@@ -63,7 +65,7 @@ export default function PortfolioSectionForm() {
   const handleSave = async () => {
     if (!currentSite?.id) return;
     if (!formData.title.trim()) {
-      toast.error("El título es obligatorio");
+      toast.error(t("sitePortfolioSectionForm.toastTitleRequired"));
       return;
     }
 
@@ -86,13 +88,13 @@ export default function PortfolioSectionForm() {
       }
 
       if (res.success) {
-        toast.success(isEditing ? "Sección actualizada" : "Sección creada");
+        toast.success(isEditing ? t("sitePortfolioSectionForm.toastSaveSuccessEdit") : t("sitePortfolioSectionForm.toastSaveSuccessNew"));
         navigate(`/dashboard/site/${currentSite.slug}/portfolio/sections`);
       } else {
-        toast.error(res.error || "Error al guardar la sección");
+        toast.error(res.error || t("sitePortfolioSectionForm.toastSaveError"));
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error(t("sitePortfolioSectionForm.toastConnectError"));
     } finally {
       setIsSaving(false);
     }
@@ -100,17 +102,17 @@ export default function PortfolioSectionForm() {
 
   const headerState = useMemo(() => ({
     breadcrumbs: [
-      { label: "Portfolio" },
-      { label: "Secciones", onClick: () => navigate(`/dashboard/site/${currentSite?.slug}/portfolio/sections`) },
-      { label: isEditing ? "Editar Sección" : "Nueva Sección" }
+      { label: t("sitePortfolioSectionForm.breadcrumbPortfolio") },
+      { label: t("sitePortfolioSectionForm.breadcrumbSections"), onClick: () => navigate(`/dashboard/site/${currentSite?.slug}/portfolio/sections`) },
+      { label: isEditing ? t("sitePortfolioSectionForm.breadcrumbEdit") : t("sitePortfolioSectionForm.breadcrumbNew") }
     ],
     actions: (
       <Button size="sm" onClick={handleSave} disabled={isSaving || isLoading}>
         <Save className="h-4 w-4 mr-2" />
-        Guardar
+        {t("sitePortfolioSectionForm.saveBtn")}
       </Button>
     ),
-  }), [isEditing, navigate, handleSave, isSaving, isLoading]);
+  }), [isEditing, navigate, handleSave, isSaving, isLoading, currentSite?.slug, t]);
 
   useSetSitePageHeader(headerState);
 
@@ -128,27 +130,27 @@ export default function PortfolioSectionForm() {
       <div className="flex items-center mb-6">
         <Button variant="ghost" size="sm" onClick={() => navigate(`/dashboard/site/${currentSite?.slug}/portfolio/sections`)} className="mr-4">
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Volver
+          {t("sitePortfolioSectionForm.backBtn")}
         </Button>
         <h2 className="text-xl font-semibold tracking-tight">
-          {isEditing ? "Editar Sección" : "Crear Nueva Sección"}
+          {isEditing ? t("sitePortfolioSectionForm.titleEdit") : t("sitePortfolioSectionForm.titleNew")}
         </h2>
       </div>
 
       <div className="space-y-6 bg-card border rounded-md p-6">
         <div className="space-y-2">
-          <Label htmlFor="title">Título de la sección</Label>
+          <Label htmlFor="title">{t("sitePortfolioSectionForm.labelTitle")}</Label>
           <Input
             id="title"
             name="title"
             value={formData.title}
             onChange={handleChange}
-            placeholder="Ej. Sobre Mi"
+            placeholder={t("sitePortfolioSectionForm.placeholderTitle")}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="sort_order">Orden de aparición</Label>
+          <Label htmlFor="sort_order">{t("sitePortfolioSectionForm.labelSort")}</Label>
           <Input
             id="sort_order"
             name="sort_order"
@@ -159,25 +161,25 @@ export default function PortfolioSectionForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="subtitle">Subtítulo (Opcional)</Label>
+          <Label htmlFor="subtitle">{t("sitePortfolioSectionForm.labelSubtitle")}</Label>
           <Input
             id="subtitle"
             name="subtitle"
             value={formData.subtitle}
             onChange={handleChange}
-            placeholder="Ej. Conoce un poco más sobre mi trayectoria"
+            placeholder={t("sitePortfolioSectionForm.placeholderSubtitle")}
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="description">Descripción</Label>
+          <Label htmlFor="description">{t("sitePortfolioSectionForm.labelDesc")}</Label>
           <textarea
             id="description"
             name="description"
             className="flex min-h-[150px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
             value={formData.description}
             onChange={handleChange}
-            placeholder="Escribe el contenido principal de la sección aquí..."
+            placeholder={t("sitePortfolioSectionForm.placeholderDesc")}
           />
         </div>
       </div>

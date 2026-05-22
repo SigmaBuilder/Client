@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 interface EditEmailDialogProps {
   open: boolean;
@@ -13,6 +14,7 @@ interface EditEmailDialogProps {
 
 export default function EditEmailDialog({ open, onOpenChange }: EditEmailDialogProps) {
   const { user, updateEmail } = useAuth();
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -31,13 +33,13 @@ export default function EditEmailDialog({ open, onOpenChange }: EditEmailDialogP
     try {
       const res = await updateEmail(email);
       if (res.success) {
-        toast.success("Correo electrónico actualizado correctamente");
+        toast.success(t("editEmailDialog.toastSuccess"));
         onOpenChange(false);
       } else {
-        toast.error(res.error || "Error al actualizar el correo electrónico");
+        toast.error(res.error || t("editEmailDialog.toastError"));
       }
     } catch (error) {
-      toast.error("Ocurrió un error inesperado");
+      toast.error(t("editEmailDialog.toastUnexpected"));
     } finally {
       setIsLoading(false);
     }
@@ -48,30 +50,30 @@ export default function EditEmailDialog({ open, onOpenChange }: EditEmailDialogP
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Actualizar correo electrónico</DialogTitle>
+            <DialogTitle>{t("editEmailDialog.title")}</DialogTitle>
             <DialogDescription>
-              Introduce tu nuevo correo electrónico. Lo utilizarás para iniciar sesión y para recibir notificaciones.
+              {t("editEmailDialog.desc")}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="email">Correo electrónico</Label>
+              <Label htmlFor="email">{t("editEmailDialog.labelEmail")}</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu@email.com"
+                placeholder={t("editEmailDialog.placeholderEmail")}
                 disabled={isLoading}
               />
             </div>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
-              Cancelar
+              {t("editEmailDialog.cancelBtn")}
             </Button>
             <Button type="submit" disabled={isLoading || !email.trim() || email === user?.email}>
-              {isLoading ? "Guardando..." : "Guardar cambios"}
+              {isLoading ? t("editEmailDialog.savingBtn") : t("editEmailDialog.saveBtn")}
             </Button>
           </DialogFooter>
         </form>
