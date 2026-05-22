@@ -23,9 +23,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useTranslation } from "react-i18next";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { currentProject, currentSite } = useWorkspace();
+  const { t } = useTranslation();
   const enabledModules = currentSite?.features?.modules ?? {};
   const siteBaseUrl = `/dashboard/site/${currentSite?.slug}`;
   const modulesUrl = `${siteBaseUrl}/modules`;
@@ -33,81 +35,85 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const data = {
     navMain: [
       {
-        title: "Inicio",
+        title: t("sidebar.home"),
         url: siteBaseUrl,
         icon: SquareTerminal,
       },
       {
-        title: "Ajustes del sitio",
+        title: t("sidebar.settings"),
         url: `${siteBaseUrl}/settings`,
         icon: Settings,
       },
       {
-        title: "Módulos",
+        title: t("sidebar.modules"),
         url: modulesUrl,
         icon: Bot,
       },
       {
-        title: "Libreria de Medios",
+        title: t("sidebar.media"),
         url: `${siteBaseUrl}/media`,
         icon: Image,
       },
       {
-        title: "Editor de páginas",
+        title: t("sidebar.pages"),
         url: `${siteBaseUrl}/pages`,
         icon: SquareTerminal,
       },
     ],
     navSecondary: [
       {
-        title: "Documentación API",
+        title: t("sidebar.apiDocs"),
         url: `${siteBaseUrl}/docs`,
         icon: Book,
       },
       {
-        title: "Ir al proyecto",
+        title: t("sidebar.goToProject"),
         url: `/dashboard/${currentProject?.id}`,
         icon: Bot,
       },
     ],
     modules: [
       {
-        title: "Blog",
+        title: t("sidebar.blog"),
         url: "#",
         icon: Newspaper,
         isActive: true,
         items: [
           {
-            title: "Posts",
+            title: t("sidebar.posts"),
             url: `${siteBaseUrl}/blog/posts`,
           },
           {
-            title: "Categorías",
+            title: t("sidebar.categories"),
             url: `${siteBaseUrl}/blog/categories`,
           },
         ],
       },
       {
-        title: "Portfolio",
+        title: t("sidebar.portfolio"),
         url: "#",
         icon: Briefcase,
         isActive: true,
         items: [
           {
-            title: "Secciones",
+            title: t("sidebar.sections"),
             url: `${siteBaseUrl}/portfolio/sections`,
           },
           {
-            title: "Proyectos",
+            title: t("sidebar.projects"),
             url: `${siteBaseUrl}/portfolio/items`,
           },
           {
-            title: "Stack",
+            title: t("sidebar.stack"),
             url: `${siteBaseUrl}/portfolio/stack`,
           },
         ],
       },
-    ].filter((module) => enabledModules[module.title.toLowerCase()] === true),
+    ].filter((module) => {
+      // Find the original english/spanish keys in enabledModules using module mapping
+      const key = module.title === t("sidebar.blog") ? "blog" : "portfolio";
+      return enabledModules[key] === true;
+    }),
   };
   return (
     <Sidebar
@@ -130,8 +136,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   className="hidden dark:flex aspect-square size-8 items-center justify-center text-sidebar-primary-foreground"
                 />
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">SigmaBuilder</span>
-                  <span className="truncate text-xs">Panel de control</span>
+                  <span className="truncate font-medium">{t("sidebar.title")}</span>
+                  <span className="truncate text-xs">{t("sidebar.subtitle")}</span>
                 </div>
               </Link>
             </SidebarMenuButton>
