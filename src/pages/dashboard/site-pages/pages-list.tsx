@@ -41,6 +41,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
 
 interface SitePage {
   id: string;
@@ -61,7 +62,7 @@ const [search, setSearch] = useState("");
 const [currentPage, setCurrentPage] = useState(1);
 const [limit] = useState(10);
 const [pageToDelete, setPageToDelete] = useState<SitePage | null>(null);
-
+const { t } = useTranslation();
 
   const fetchPages = async (searchValue = search, page = currentPage, perPage = limit) => {
     if (!currentSite?.id) return;
@@ -80,10 +81,10 @@ const [pageToDelete, setPageToDelete] = useState<SitePage | null>(null);
           Array.isArray(res.data) ? res.data : [];
         setPages(dataArray);
       } else {
-        toast.error("Error al cargar las páginas");
+        toast.error(t("sitePagesList.toastLoadError"));
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error(t("sitePagesList.toastConnectError"));
     } finally {
       setIsLoading(false);
     }
@@ -100,17 +101,17 @@ const [pageToDelete, setPageToDelete] = useState<SitePage | null>(null);
 
   const handleSetHome = async (pageId: string) => {
     if (!currentSite?.id) return;
-    const loadingToast = toast.loading("Actualizando página principal...");
+    const loadingToast = toast.loading(t("sitePagesList.toastSetHomeLoading"));
     try {
       const res = await api.setSitePageAsHome(currentSite.id, pageId);
       if (res.success) {
-        toast.success("Página principal actualizada correctamente", { id: loadingToast });
+        toast.success(t("sitePagesList.toastSetHomeSuccess"), { id: loadingToast });
         fetchPages(); // Refrescar la lista para ver los cambios
       } else {
-        toast.error(res.error || "Error al actualizar la página principal", { id: loadingToast });
+        toast.error(res.error || t("sitePagesList.toastSetHomeError"), { id: loadingToast });
       }
     } catch {
-      toast.error("Error de conexión", { id: loadingToast });
+      toast.error(t("sitePagesList.toastConnectError"), { id: loadingToast });
     }
   };
 
@@ -119,13 +120,13 @@ const [pageToDelete, setPageToDelete] = useState<SitePage | null>(null);
     try {
       const res = await api.deleteSitePage(currentSite.id, pageToDelete.id);
       if (res.success) {
-        toast.success("Página eliminada");
+        toast.success(t("sitePagesList.toastDeleteSuccess"));
         fetchPages();
       } else {
-        toast.error(res.error || "Error al eliminar la página");
+        toast.error(res.error || t("sitePagesList.toastDeleteError"));
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error(t("sitePagesList.toastConnectError"));
     } finally {
       setPageToDelete(null);
     }
@@ -135,17 +136,17 @@ const debouncedSetSearch = useDebouncedCallback((val: string) => setSearch(val),
 
 const headerState = useMemo(
     () => ({
-      breadcrumbs: [{ label: "Páginas" }],
+      breadcrumbs: [{ label: t("sitePagesList.breadcrumb") }],
       search: {
         value: search,
         onChange: debouncedSetSearch,
-        placeholder: "Buscar páginas...",
+        placeholder: t("sitePagesList.searchPlaceholder"),
       },
       actions: (
         <Button size="sm" onClick={() => navigate("new")}>
           <Plus className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">Añadir Página</span>
-          <span className="sm:hidden">Añadir</span>
+          <span className="hidden sm:inline">{t("sitePagesList.addPageLg")}</span>
+          <span className="sm:hidden">{t("sitePagesList.addPageSm")}</span>
         </Button>
       ),
     }),
@@ -172,7 +173,7 @@ const filteredPages = pages;
   if (!isLoading && pages.length === 0) {
     return (
       <div className="flex-1 p-6 flex flex-col items-center justify-center min-h-[40vh]">
-        <span className="text-muted-foreground">No hay páginas encontradas.</span>
+        <span className="text-muted-foreground">{t("sitePagesList.noPages")}</span>
       </div>
     );
   }
@@ -181,9 +182,9 @@ const filteredPages = pages;
     <div className="flex-1 p-6">
       <Card className="mx-auto w-full max-w-6xl">
         <CardHeader>
-          <CardTitle>Páginas del sitio</CardTitle>
+          <CardTitle>{t("sitePagesList.title")}</CardTitle>
           <CardDescription>
-            Crea y administra las páginas visuales de tu sitio web.
+            {t("sitePagesList.desc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -191,10 +192,10 @@ const filteredPages = pages;
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead>Ruta</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
+                  <TableHead>{t("sitePagesList.colName")}</TableHead>
+                  <TableHead>{t("sitePagesList.colPath")}</TableHead>
+                  <TableHead>{t("sitePagesList.colStatus")}</TableHead>
+                  <TableHead className="text-right">{t("sitePagesList.colActions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -204,7 +205,7 @@ const filteredPages = pages;
                       colSpan={4}
                       className="text-center py-6 text-muted-foreground"
                     >
-                      No hay páginas encontradas.
+                      {t("sitePagesList.noPages")}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -215,7 +216,7 @@ const filteredPages = pages;
                           {page.title || page.name}
                           {page.is_home && (
                             <Badge variant="secondary" className="h-5 px-1.5 text-xs font-normal">
-                              <Home className="w-3 h-3 mr-1" /> Principal
+                              <Home className="w-3 h-3 mr-1" /> {t("sitePagesList.badgeHome")}
                             </Badge>
                           )}
                         </div>
@@ -225,7 +226,7 @@ const filteredPages = pages;
                       </TableCell>
                       <TableCell>
                         <Badge variant={page.status === "public" ? "default" : "secondary"}>
-                          {page.status === "public" ? "Público" : "Borrador"}
+                          {page.status === "public" ? t("sitePagesList.badgePublic") : t("sitePagesList.badgeDraft")}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
@@ -238,12 +239,12 @@ const filteredPages = pages;
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => navigate(`${page.id}/edit`)}>
                               <Pencil className="h-4 w-4 mr-2" />
-                              Editar
+                              {t("sitePagesList.actionEdit")}
                             </DropdownMenuItem>
                             {!page.is_home && (
                               <DropdownMenuItem onClick={() => handleSetHome(page.id)}>
                                 <Home className="h-4 w-4 mr-2" />
-                                Hacer página principal
+                                {t("sitePagesList.actionSetHome")}
                               </DropdownMenuItem>
                             )}
                             <DropdownMenuSeparator />
@@ -253,7 +254,7 @@ const filteredPages = pages;
                               disabled={page.is_home}
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
-                              Eliminar
+                              {t("sitePagesList.actionDelete")}
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -271,11 +272,11 @@ const filteredPages = pages;
       {meta && meta.totalPages > 1 && (
         <div className="flex justify-center items-center gap-4 mt-4">
           <Button size="sm" variant="secondary" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
-            &lt; Anterior
+            {t("sitePagesList.btnPrev")}
           </Button>
-          <span>Página {currentPage} de {meta.totalPages}</span>
+          <span>{t("sitePagesList.paginationInfo", { page: currentPage, total: meta.totalPages })}</span>
           <Button size="sm" variant="secondary" onClick={() => setCurrentPage((p) => Math.min(meta.totalPages, p + 1))} disabled={currentPage === meta.totalPages}>
-            Siguiente &gt;
+            {t("sitePagesList.btnNext")}
           </Button>
         </div>
       )}
@@ -286,14 +287,13 @@ const filteredPages = pages;
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar página?</AlertDialogTitle>
+            <AlertDialogTitle>{t("sitePagesList.deleteTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta accin no se puede deshacer. Se eliminarǭ la pǭgina "
-              {pageToDelete?.title || pageToDelete?.name}".
+              {t("sitePagesList.deleteDesc", { name: pageToDelete?.title || pageToDelete?.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t("sitePagesList.deleteCancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
