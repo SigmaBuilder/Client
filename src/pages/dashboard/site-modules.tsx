@@ -9,32 +9,33 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
+import { useTranslation } from "react-i18next";
 
-const AVAILABLE_MODULES = [
+const getAvailableModules = (t: any) => [
   {
     key: "blog",
-    title: "Blog",
-    subtitle: "Publicación y contenido editorial",
-    description: "Crea un blog completo para publicar artículos, organizarlos por categorías y mantener un flujo editorial dentro del sitio.",
+    title: t("siteModules.blogTitle"),
+    subtitle: t("siteModules.blogSubtitle"),
+    description: t("siteModules.blogDesc"),
     icon: Newspaper,
     functions: [
-      "Gestión de posts con creación, edición y eliminación.",
-      "Organización por categorías para estructurar el contenido.",
-      "Accesos directos en la sidebar a Posts y Categorías.",
-      "Preparado para contenido editorial asociado al sitio actual.",
+      t("siteModules.blogFn1"),
+      t("siteModules.blogFn2"),
+      t("siteModules.blogFn3"),
+      t("siteModules.blogFn4"),
     ],
   },
   {
     key: "portfolio",
-    title: "Portfolio",
-    subtitle: "Proyectos, secciones y tecnologías",
-    description: "Activa las herramientas para construir un portfolio profesional con proyectos, secciones personalizadas y stack tecnológico.",
+    title: t("siteModules.portfolioTitle"),
+    subtitle: t("siteModules.portfolioSubtitle"),
+    description: t("siteModules.portfolioDesc"),
     icon: Briefcase,
     functions: [
-      "Gestión de secciones para ordenar el contenido del portfolio.",
-      "Listado de proyectos con creación, edición y eliminación.",
-      "Administración del stack tecnológico usado en cada sitio.",
-      "Accesos directos en la sidebar a Secciones, Proyectos y Stack.",
+      t("siteModules.portfolioFn1"),
+      t("siteModules.portfolioFn2"),
+      t("siteModules.portfolioFn3"),
+      t("siteModules.portfolioFn4"),
     ],
   },
 ];
@@ -42,18 +43,20 @@ const AVAILABLE_MODULES = [
 export default function SiteModulesPage() {
   const { currentSite, isLoading, setCurrentSite } = useWorkspace();
   const [savingModule, setSavingModule] = useState<string | null>(null);
+  const { t } = useTranslation();
+  const modulesAvailable = useMemo(() => getAvailableModules(t), [t]);
 
   const modules = currentSite?.features?.modules ?? {};
-  const activeCount = AVAILABLE_MODULES.filter((module) => modules[module.key] === true).length;
+  const activeCount = modulesAvailable.filter((module) => modules[module.key] === true).length;
 
   const headerState = useMemo(() => ({
-    breadcrumbs: [{ label: "Módulos" }],
+    breadcrumbs: [{ label: t("siteModules.breadcrumb") }],
     actions: (
       <Badge variant="outline">
-        {activeCount} activos
+        {t("siteModules.activeModules", { count: activeCount })}
       </Badge>
     ),
-  }), [activeCount]);
+  }), [activeCount, t]);
 
   useSetSitePageHeader(headerState);
 
@@ -77,12 +80,12 @@ export default function SiteModulesPage() {
 
       if (res.success && res.data?.site) {
         setCurrentSite(res.data.site);
-        toast.success(checked ? "Módulo activado" : "Módulo desactivado");
+        toast.success(checked ? t("siteModules.toastActivated") : t("siteModules.toastDeactivated"));
       } else {
-        toast.error(res.error || "No se pudo actualizar el módulo");
+        toast.error(res.error || t("siteModules.toastErrorUpdate"));
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error(t("siteModules.toastErrorConnect"));
     } finally {
       setSavingModule(null);
     }
@@ -101,15 +104,15 @@ export default function SiteModulesPage() {
     <div className="flex flex-col gap-6 p-4 sm:p-6">
       <Card>
         <CardHeader>
-          <CardTitle>Módulos del sitio</CardTitle>
+          <CardTitle>{t("siteModules.pageTitle")}</CardTitle>
           <CardDescription>
-            Controla qué funciones están disponibles para este sitio. Solo los módulos activos aparecen en la sidebar.
+            {t("siteModules.pageDesc")}
           </CardDescription>
         </CardHeader>
       </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        {AVAILABLE_MODULES.map((module) => {
+        {modulesAvailable.map((module) => {
           const Icon = module.icon;
           const checked = modules[module.key] === true;
           const isSaving = savingModule === module.key;
@@ -133,7 +136,7 @@ export default function SiteModulesPage() {
                     ) : (
                       <CircleDashed data-icon="inline-start" />
                     )}
-                    {checked ? "Activo" : "Inactivo"}
+                    {checked ? t("siteModules.active") : t("siteModules.inactive")}
                   </Badge>
                 </CardAction>
               </CardHeader>
@@ -144,7 +147,7 @@ export default function SiteModulesPage() {
                 </p>
 
                 <div className="flex flex-col gap-2">
-                  <p className="text-sm font-medium">Funciones incluidas</p>
+                  <p className="text-sm font-medium">{t("siteModules.includedFunctions")}</p>
                   <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
                     {module.functions.map((item) => (
                       <li key={item} className="flex gap-2">
@@ -159,16 +162,16 @@ export default function SiteModulesPage() {
               <CardFooter className="justify-between gap-4">
                 <div className="flex flex-col gap-0.5">
                   <p className="text-sm font-medium">
-                    {checked ? "Módulo disponible" : "Módulo oculto"}
+                    {checked ? t("siteModules.moduleAvailable") : t("siteModules.moduleHidden")}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {checked ? "Se muestra en la navegación del sitio." : "No aparece en la sidebar del sitio."}
+                    {checked ? t("siteModules.moduleAvailableDesc") : t("siteModules.moduleHiddenDesc")}
                   </p>
                 </div>
                 <Switch
                   checked={checked}
                   disabled={isSaving}
-                  aria-label={`${checked ? "Desactivar" : "Activar"} ${module.title}`}
+                  aria-label={checked ? t("siteModules.deactivateLabel", { module: module.title }) : t("siteModules.activateLabel", { module: module.title })}
                   onCheckedChange={(value) => handleModuleChange(module.key, value)}
                 />
               </CardFooter>
