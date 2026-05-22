@@ -7,9 +7,11 @@ import AvatarProfileField from "./AvatarProfileField";
 import EditNameDialog from "./EditNameDialog";
 import EditEmailDialog from "./EditEmailDialog";
 import EditPasswordDialog from "./EditPasswordDialog";
+import { useTranslation } from "react-i18next";
 
 export default function ProfileSection() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [isNameModalOpen, setIsNameModalOpen] = useState(false);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -32,9 +34,9 @@ export default function ProfileSection() {
     <>
       <Card className="w-full border shadow-sm">
         <CardHeader>
-          <CardTitle className="text-xl">Información Personal</CardTitle>
+          <CardTitle className="text-xl">{t("profileSection.title")}</CardTitle>
           <CardDescription>
-            Administra tus datos personales y credenciales de acceso.
+            {t("profileSection.desc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -42,19 +44,19 @@ export default function ProfileSection() {
             <AvatarProfileField />
             <Separator />
             <ProfileField 
-              label="Nombre completo" 
+              label={t("profileSection.nameLabel")} 
               value={user ? `${user.first_name} ${user.last_name}` : ""} 
               onEdit={() => handleEdit("nombre")}
             />
             <Separator />
             <ProfileField 
-              label="Correo electrónico" 
+              label={t("profileSection.emailLabel")} 
               value={user?.email || ""} 
               onEdit={() => handleEdit("email")}
             />
             <Separator />
             <ProfileField 
-              label="Contraseña" 
+              label={t("profileSection.passwordLabel")} 
               value="dummy" 
               type="password"
               onEdit={() => handleEdit("password")}
