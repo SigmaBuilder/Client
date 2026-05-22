@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import ThemeToggle from "../shared/ThemeToggle"
+import LanguageToggle from "../shared/LanguageToggle"
 import { useAuth } from "@/hooks/use-auth"
+import { useTranslation } from "react-i18next"
 
 export default function Navbar() {
   const { isAuthenticated, isLoading } = useAuth()
+  const { t } = useTranslation()
 
   return (
     <header className="sticky top-0 z-50 bg-background/30 backdrop-blur-xl border-b border-border/20">
@@ -22,19 +25,20 @@ export default function Navbar() {
           {!isLoading && (
             isAuthenticated ? (
               <Button variant="default" size="sm" asChild className="rounded-lg">
-                <Link to="/dashboard">Ir al Dashboard</Link>
+                <Link to="/dashboard">{t("navbar.dashboard")}</Link>
               </Button>
             ) : (
               <>
                 <Button variant="ghost" size="sm" asChild>
-                  <Link to="/login">Iniciar sesión</Link>
+                  <Link to="/login">{t("navbar.login")}</Link>
                 </Button>
                 <Button variant="default" size="sm" asChild className="rounded-lg">
-                  <Link to="/signup">Crear cuenta</Link>
+                  <Link to="/signup">{t("navbar.signup")}</Link>
                 </Button>
               </>
             )
           )}
+          <LanguageToggle />
           <ThemeToggle />
         </div>
       </div>
