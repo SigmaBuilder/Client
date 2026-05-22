@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
+import { useTranslation } from "react-i18next";
 
 export interface MediaAsset {
   id: string;
@@ -76,11 +77,12 @@ export function MediaLibraryView({
   refreshKey,
   onPathChange,
 }: MediaLibraryViewProps) {
+  const { t } = useTranslation();
   const [folders, setFolders] = useState<MediaFolder[]>([]);
   const [assets, setAssets] = useState<MediaAsset[]>([]);
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [path, setPath] = useState<MediaLibraryPathItem[]>([
-    { id: null, name: "Proyecto" },
+    { id: null, name: t("mediaLibrary.projectRoot") },
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [internalSearch, setInternalSearch] = useState("");
@@ -125,7 +127,7 @@ export function MediaLibraryView({
           setFolders(folderData.folders || []);
           setCurrentFolderId(folderData.rootFolder.id);
           setPath([
-            { id: null, name: "Proyecto" },
+            { id: null, name: t("mediaLibrary.projectRoot") },
             { id: folderData.rootFolder.id, name: folderData.rootFolder.name },
           ]);
           setHasAutoNavigated(true);
@@ -135,7 +137,7 @@ export function MediaLibraryView({
         setAssets(assetData);
         setSelectedItem(null); // Clear selection on folder change
       } catch (err) {
-        toast.error("Error al cargar la librería de medios");
+        toast.error(t("mediaLibrary.toastLoadError"));
       } finally {
         setIsLoading(false);
       }
@@ -169,9 +171,9 @@ export function MediaLibraryView({
             fetchContent(currentFolderId);
           }),
         {
-          loading: "Subiendo archivo...",
-          success: "Archivo subido",
-          error: "Error al subir",
+          loading: t("mediaLibrary.toastUploadLoading"),
+          success: t("mediaLibrary.toastUploadSuccess"),
+          error: t("mediaLibrary.toastUploadError"),
         },
       );
     },
@@ -216,16 +218,16 @@ export function MediaLibraryView({
       if (deleteConfirm.type === "folder") {
         const res = await api.deleteMediaFolder(projectId, deleteConfirm.id);
         if (!res.success) throw new Error(res.error || "Error deleting folder");
-        toast.success("Carpeta eliminada");
+        toast.success(t("mediaLibrary.toastFolderDeleted"));
       } else {
         const res = await api.deleteMediaAsset(projectId, deleteConfirm.id);
         if (!res.success) throw new Error(res.error || "Error deleting asset");
-        toast.success("Archivo eliminado");
+        toast.success(t("mediaLibrary.toastAssetDeleted"));
       }
       if (selectedItem?.data.id === deleteConfirm.id) setSelectedItem(null);
       fetchContent(currentFolderId);
     } catch {
-      toast.error("Error al eliminar");
+      toast.error(t("mediaLibrary.toastDeleteError"));
     } finally {
       setDeleteConfirm(null);
     }
@@ -240,12 +242,12 @@ export function MediaLibraryView({
         link.download = filename;
         link.click();
       })
-      .catch(() => toast.error("Error al descargar archivo"));
+      .catch(() => toast.error(t("mediaLibrary.toastDownloadError")));
   };
 
   const copyToClipboard = (url: string) => {
     navigator.clipboard.writeText(url);
-    toast.success("URL copiada al portapapeles");
+    toast.success(t("mediaLibrary.toastUrlCopied"));
   };
 
   const handleDragStart = (
@@ -260,7 +262,7 @@ export function MediaLibraryView({
     const icon = type === "asset"
       ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>'
       : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>';
-    preview.innerHTML = `${icon}<span>${type === "asset" ? "Mover archivo" : "Mover carpeta"}</span>`;
+    preview.innerHTML = `${icon}<span>${type === "asset" ? t("mediaLibrary.moveAsset") : t("mediaLibrary.moveFolder")}</span>`;
     preview.style.position = "fixed";
     preview.style.top = "-1000px";
     preview.style.left = "-1000px";
@@ -299,11 +301,11 @@ export function MediaLibraryView({
           targetFolderId,
         );
         if (!res.success) throw new Error();
-        toast.success("Archivo movido");
+        toast.success(t("mediaLibrary.toastAssetMoved"));
         fetchContent(currentFolderId);
       }
     } catch {
-      toast.error("Error al mover elemento");
+      toast.error(t("mediaLibrary.toastMoveError"));
     }
   };
 
@@ -364,10 +366,10 @@ export function MediaLibraryView({
 
             <div className="flex items-center gap-3">
               <Button onClick={openFileDialog} variant="default" size="sm" className="h-9">
-                <Upload className="mr-2 h-4 w-4" /> Subir archivo
+                <Upload className="mr-2 h-4 w-4" /> {t("mediaLibrary.uploadBtn")}
               </Button>
               <Input
-                placeholder="Buscar archivos..."
+                placeholder={t("mediaLibrary.searchPlaceholder")}
                 value={search}
                 onChange={(e) => setInternalSearch(e.target.value)}
                 className="w-56 bg-background hidden sm:block h-9"
@@ -391,7 +393,7 @@ export function MediaLibraryView({
             <div className="flex items-center justify-center h-full w-full min-h-[300px]">
               <div className="flex flex-col items-center gap-4 text-muted-foreground">
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary/30 border-t-primary" />
-                <p className="text-sm font-medium animate-pulse">Cargando medios...</p>
+                <p className="text-sm font-medium animate-pulse">{t("mediaLibrary.loadingMedia")}</p>
               </div>
             </div>
           ) : folders.length === 0 && assets.length === 0 ? (
@@ -400,13 +402,13 @@ export function MediaLibraryView({
                 <Upload className="h-8 w-8 text-muted-foreground/50" />
               </div>
               <p className="font-medium text-foreground">
-                Esta carpeta está vacía
+                {t("mediaLibrary.emptyFolder")}
               </p>
               <p className="text-sm opacity-80 mt-1 mb-4">
-                Arrastra archivos aquí o haz clic para subir.
+                {t("mediaLibrary.emptyFolderDesc")}
               </p>
               <Button onClick={openFileDialog} variant="outline" size="sm">
-                <Upload className="mr-2 h-4 w-4" /> Seleccionar archivo
+                <Upload className="mr-2 h-4 w-4" /> {t("mediaLibrary.selectFileBtn")}
               </Button>
             </div>
           ) : (
@@ -464,7 +466,7 @@ export function MediaLibraryView({
                         }
                         className="text-destructive"
                       >
-                        <Trash2 className="mr-2 h-4 w-4" /> Eliminar
+                        <Trash2 className="mr-2 h-4 w-4" /> {t("mediaLibrary.ctxDelete")}
                       </ContextMenuItem>
                     </ContextMenuContent>
                   </ContextMenu>
@@ -522,14 +524,14 @@ export function MediaLibraryView({
                       <ContextMenuItem
                         onClick={() => copyToClipboard(asset.file_url)}
                       >
-                        <Copy className="mr-2 h-4 w-4" /> Copiar URL
+                        <Copy className="mr-2 h-4 w-4" /> {t("mediaLibrary.ctxCopyUrl")}
                       </ContextMenuItem>
                       <ContextMenuItem
                         onClick={() =>
                           downloadAsset(asset.file_url, asset.file_name)
                         }
                       >
-                        <Download className="mr-2 h-4 w-4" /> Descargar
+                        <Download className="mr-2 h-4 w-4" /> {t("mediaLibrary.ctxDownload")}
                       </ContextMenuItem>
                       <ContextMenuSeparator />
                       <ContextMenuItem
@@ -542,7 +544,7 @@ export function MediaLibraryView({
                         }
                         className="text-destructive"
                       >
-                        <Trash2 className="mr-2 h-4 w-4" /> Eliminar
+                        <Trash2 className="mr-2 h-4 w-4" /> {t("mediaLibrary.ctxDelete")}
                       </ContextMenuItem>
                     </ContextMenuContent>
                   </ContextMenu>
@@ -557,7 +559,7 @@ export function MediaLibraryView({
       {selectedItem && (
         <div className="absolute right-3 top-3 bottom-3 z-20 w-80 rounded-xl border bg-card/95 backdrop-blur flex flex-col shadow-xl">
           <div className="flex items-center justify-between px-4 py-3 border-b">
-            <h3 className="font-semibold text-sm">Propiedades</h3>
+            <h3 className="font-semibold text-sm">{t("mediaLibrary.propTitle")}</h3>
             <Button
               variant="ghost"
               size="icon"
@@ -578,7 +580,7 @@ export function MediaLibraryView({
                   <h4 className="font-semibold break-words">
                     {selectedItem.data.name}
                   </h4>
-                  <p className="text-xs text-muted-foreground">Carpeta</p>
+                  <p className="text-xs text-muted-foreground">{t("mediaLibrary.propFolder")}</p>
                 </div>
 
                 <div className="w-full pt-4 border-t space-y-2">
@@ -587,7 +589,7 @@ export function MediaLibraryView({
                     className="w-full justify-start"
                     onClick={() => navigateToFolder(selectedItem.data)}
                   >
-                    <Folder className="mr-2 h-4 w-4" /> Abrir carpeta
+                    <Folder className="mr-2 h-4 w-4" /> {t("mediaLibrary.propOpenFolder")}
                   </Button>
                   <Button
                     variant="destructive"
@@ -600,7 +602,7 @@ export function MediaLibraryView({
                       })
                     }
                   >
-                    <Trash2 className="mr-2 h-4 w-4" /> Eliminar carpeta
+                    <Trash2 className="mr-2 h-4 w-4" /> {t("mediaLibrary.propDeleteFolder")}
                   </Button>
                 </div>
               </div>
@@ -625,14 +627,14 @@ export function MediaLibraryView({
                     {selectedItem.data.file_name}
                   </h4>
                   <p className="text-xs text-muted-foreground uppercase tracking-wider">
-                    {selectedItem.data.mime_type.split("/")[1] || "Archivo"}
+                    {selectedItem.data.mime_type.split("/")[1] || t("mediaLibrary.propAsset")}
                   </p>
                 </div>
 
                 <div className="space-y-3 pt-4 border-t">
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground font-medium">
-                      URL del archivo
+                      {t("mediaLibrary.propAssetUrl")}
                     </p>
                     <div className="flex gap-2">
                       <Input
@@ -660,7 +662,7 @@ export function MediaLibraryView({
                       className="w-full justify-start bg-primary text-primary-foreground hover:bg-primary/90"
                       onClick={() => onSelect(selectedItem.data)}
                     >
-                      <FileIcon className="mr-2 h-4 w-4" /> Seleccionar
+                      <FileIcon className="mr-2 h-4 w-4" /> {t("mediaLibrary.propSelect")}
                     </Button>
                   )}
                   <Button
@@ -673,7 +675,7 @@ export function MediaLibraryView({
                       )
                     }
                   >
-                    <Download className="mr-2 h-4 w-4" /> Descargar archivo
+                    <Download className="mr-2 h-4 w-4" /> {t("mediaLibrary.propDownload")}
                   </Button>
                   <Button
                     variant="destructive"
@@ -686,7 +688,7 @@ export function MediaLibraryView({
                       })
                     }
                   >
-                    <Trash2 className="mr-2 h-4 w-4" /> Eliminar archivo
+                    <Trash2 className="mr-2 h-4 w-4" /> {t("mediaLibrary.propDeleteAsset")}
                   </Button>
                 </div>
               </div>
@@ -702,20 +704,20 @@ export function MediaLibraryView({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás completamente seguro?</AlertDialogTitle>
+            <AlertDialogTitle>{t("mediaLibrary.dialogTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
               {deleteConfirm?.type === "folder"
-                ? `Esta acción eliminará la carpeta "${deleteConfirm.name}" y todo su contenido de forma permanente.`
-                : `Esta acción eliminará el archivo "${deleteConfirm?.name}" de forma permanente. Los sitios que estén usando este archivo podrían romperse.`}
+                ? t("mediaLibrary.dialogFolderDesc", { name: deleteConfirm.name })
+                : t("mediaLibrary.dialogAssetDesc", { name: deleteConfirm?.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t("mediaLibrary.dialogCancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteConfirm}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Sí, eliminar
+              {t("mediaLibrary.dialogConfirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
