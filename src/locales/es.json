@@ -1,4 +1,4 @@
-﻿{
+{
     "navbar":  {
                    "dashboard":  "Ir al Dashboard",
                    "login":  "Iniciar sesiÃ³n",
@@ -831,5 +831,12 @@
                     "themeSystem":  "Sistema",
                     "noSession":  "Sin sesión",
                     "changeTheme":  "Cambiar tema"
-                }
+                },
+    "projectLayout": {
+        "tabSites": "Sitios",
+        "tabMembers": "Miembros",
+        "tabRoles": "Roles y Permisos",
+        "defaultProjectName": "Proyecto",
+        "statusActive": "Activo"
+    }
 }
