@@ -10,6 +10,7 @@ import { Label } from "../../components/ui/label";
 import { toast } from "sonner";
 import { api } from "../../lib/api";
 import { useSetSitePageHeader } from "../../components/site/SitePageHeader";
+import { useTranslation } from "react-i18next";
 
 export default function SiteMediaPage() {
   const { currentSite, currentProject, isLoading, error } = useWorkspace();
@@ -22,6 +23,7 @@ export default function SiteMediaPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigatePathRef = useRef<((index: number) => void) | null>(null);
   const currentFolderId = mediaPath.length > 0 ? mediaPath[mediaPath.length - 1].id : null;
+  const { t } = useTranslation();
 
   const handleUploadClick = useCallback(() => {
     fileInputRef.current?.click();
@@ -31,13 +33,13 @@ export default function SiteMediaPage() {
     if (!newFolderName.trim() || !currentProject) return;
     try {
       const res = await api.createMediaFolder(currentProject.id, newFolderName.trim(), currentFolderId);
-      if (!res.success) throw new Error(res.error || "Failed to create folder");
-      toast.success("Carpeta creada");
+      if (!res.success) throw new Error(res.error || t("siteMedia.errorCreateFolder"));
+      toast.success(t("siteMedia.toastFolderCreated"));
       setIsCreateFolderOpen(false);
       setNewFolderName("");
       setRefreshKey((key) => key + 1);
     } catch {
-      toast.error("Error al crear carpeta");
+      toast.error(t("siteMedia.toastFolderError"));
     }
   };
 
@@ -51,13 +53,13 @@ export default function SiteMediaPage() {
 
     toast.promise(
       api.uploadMediaAsset(currentProject.id, formData).then((res) => {
-        if (!res.success) throw new Error(res.error || "Failed to upload");
+        if (!res.success) throw new Error(res.error || t("siteMedia.errorUpload"));
         setRefreshKey((key) => key + 1);
       }),
       {
-        loading: "Subiendo archivo...",
-        success: "Archivo subido",
-        error: "Error al subir",
+        loading: t("siteMedia.toastUploadLoading"),
+        success: t("siteMedia.toastUploadSuccess"),
+        error: t("siteMedia.toastUploadError"),
       }
     );
 
@@ -90,16 +92,16 @@ export default function SiteMediaPage() {
       if (data.type !== "asset") return;
 
       const res = await api.moveMediaAsset(currentProject.id, data.id, targetFolderId);
-      if (!res.success) throw new Error(res.error || "Failed to move asset");
-      toast.success("Archivo movido");
+      if (!res.success) throw new Error(res.error || t("siteMedia.errorMoveAsset"));
+      toast.success(t("siteMedia.toastFileMoved"));
       setRefreshKey((key) => key + 1);
     } catch {
-      toast.error("Error al mover elemento");
+      toast.error(t("siteMedia.toastMoveError"));
     }
   }, [currentProject]);
 
   const headerState = useMemo(() => ({
-    breadcrumbs: (mediaPath.length > 0 ? mediaPath : [{ id: null, name: "Proyecto" }]).map((item, index) => ({
+    breadcrumbs: (mediaPath.length > 0 ? mediaPath : [{ id: null, name: t("siteMedia.breadcrumbRoot") }]).map((item, index) => ({
       label: item.name,
       onClick: () => navigatePathRef.current?.(index),
       onDragOver: (event: DragEvent) => {
@@ -114,21 +116,21 @@ export default function SiteMediaPage() {
     search: {
       value: search,
       onChange: setSearch,
-      placeholder: "Buscar archivos...",
+      placeholder: t("siteMedia.searchPlaceholder"),
     },
     actions: (
       <>
         <Button variant="outline" size="sm" onClick={() => setIsCreateFolderOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
-          Carpeta
+          {t("siteMedia.folderBtn")}
         </Button>
         <Button size="sm" onClick={handleUploadClick}>
           <Upload className="h-4 w-4 mr-2" />
-          Subir
+          {t("siteMedia.uploadBtn")}
         </Button>
       </>
     ),
-  }), [dragOverBreadcrumbId, handleDropOnBreadcrumb, handleUploadClick, mediaPath, search]);
+  }), [dragOverBreadcrumbId, handleDropOnBreadcrumb, handleUploadClick, mediaPath, search, t]);
 
   useSetSitePageHeader(headerState);
 
@@ -143,7 +145,7 @@ export default function SiteMediaPage() {
   }
 
   if (error || !currentSite || !currentProject) {
-    return <div className="p-8 text-red-500">{error || "Sitio no encontrado."}</div>;
+    return <div className="p-8 text-red-500">{error || t("siteMedia.siteNotFound")}</div>;
   }
 
   return (
@@ -167,16 +169,16 @@ export default function SiteMediaPage() {
       <Dialog open={isCreateFolderOpen} onOpenChange={setIsCreateFolderOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Crear nueva carpeta</DialogTitle>
+            <DialogTitle>{t("siteMedia.newFolderTitle")}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="folder-name">Nombre de la carpeta</Label>
+              <Label htmlFor="folder-name">{t("siteMedia.folderNameLabel")}</Label>
               <Input
                 id="folder-name"
                 value={newFolderName}
                 onChange={(e) => setNewFolderName(e.target.value)}
-                placeholder="Ej. Imágenes de producto"
+                placeholder={t("siteMedia.folderNamePlaceholder")}
                 autoFocus
                 onKeyDown={(e) => e.key === "Enter" && handleCreateFolder()}
               />
@@ -184,10 +186,10 @@ export default function SiteMediaPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsCreateFolderOpen(false)}>
-              Cancelar
+              {t("siteMedia.cancelBtn")}
             </Button>
             <Button onClick={handleCreateFolder} disabled={!newFolderName.trim()}>
-              Crear carpeta
+              {t("siteMedia.createFolderBtn")}
             </Button>
           </DialogFooter>
         </DialogContent>
