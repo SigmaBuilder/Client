@@ -30,9 +30,9 @@ import {
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useTranslation } from "react-i18next";
 
 interface PortfolioStackItem {
   id: string;
@@ -52,6 +52,7 @@ const [limit] = useState(10);
 const [itemToDelete, setItemToDelete] = useState<PortfolioStackItem | null>(
   null,
 );
+const { t } = useTranslation();
 
   const fetchItems = async (searchValue = search, page = currentPage, perPage = limit) => {
     if (!currentSite?.id) return;
@@ -71,10 +72,10 @@ const [itemToDelete, setItemToDelete] = useState<PortfolioStackItem | null>(
           Array.isArray(res.data) ? res.data : [];
         setItems(dataArray);
       } else {
-        toast.error("Error al cargar el stack");
+        toast.error(t("sitePortfolioStack.toastLoadError"));
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error(t("sitePortfolioStack.toastConnectError"));
     } finally {
       setIsLoading(false);
     }
@@ -96,13 +97,13 @@ const [itemToDelete, setItemToDelete] = useState<PortfolioStackItem | null>(
         itemToDelete.id,
       );
       if (res.success) {
-        toast.success("Tecnología eliminada");
+        toast.success(t("sitePortfolioStack.toastDeleteSuccess"));
         fetchItems();
       } else {
-        toast.error("Error al eliminar");
+        toast.error(t("sitePortfolioStack.toastDeleteError"));
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error(t("sitePortfolioStack.toastConnectError"));
     } finally {
       setItemToDelete(null);
     }
@@ -110,23 +111,23 @@ const [itemToDelete, setItemToDelete] = useState<PortfolioStackItem | null>(
 
 const debouncedSetSearch = useDebouncedCallback((val: string) => setSearch(val), 400);
 
-const headerState = useMemo(
+  const headerState = useMemo(
     () => ({
-      breadcrumbs: [{ label: "Portfolio" }, { label: "Stack" }],
+      breadcrumbs: [{ label: t("sitePortfolioStack.breadcrumbPortfolio") }, { label: t("sitePortfolioStack.breadcrumbStack") }],
       search: {
         value: search,
         onChange: debouncedSetSearch,
-        placeholder: "Buscar tecnologías...",
+        placeholder: t("sitePortfolioStack.searchPlaceholder"),
       },
       actions: (
         <Button size="sm" onClick={() => navigate("new")}>
           <Plus className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">Añadir Tecnología</span>
-          <span className="sm:hidden">Añadir</span>
+          <span className="hidden sm:inline">{t("sitePortfolioStack.addBtnLg")}</span>
+          <span className="sm:hidden">{t("sitePortfolioStack.addBtnSm")}</span>
         </Button>
       ),
     }),
-    [search, navigate],
+    [search, navigate, t],
   );
 
   useSetSitePageHeader(headerState);
@@ -146,11 +147,10 @@ const filteredItems = items;
     );
   }
 
-  // Empty state for paginated search
   if (!isLoading && items.length === 0) {
     return (
       <div className="flex-1 p-6 flex flex-col items-center justify-center min-h-[40vh]">
-        <span className="text-muted-foreground">No hay tecnologías encontradas.</span>
+        <span className="text-muted-foreground">{t("sitePortfolioStack.emptyList")}</span>
       </div>
     );
   }
@@ -159,9 +159,9 @@ const filteredItems = items;
     <div className="flex-1 p-6">
       <Card className="mx-auto w-full max-w-6xl">
         <CardHeader>
-          <CardTitle>Stack tecnológico</CardTitle>
+          <CardTitle>{t("sitePortfolioStack.pageTitle")}</CardTitle>
           <CardDescription>
-            Administra y visualiza las tecnologías de tu portafolio.
+            {t("sitePortfolioStack.pageDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -169,9 +169,9 @@ const filteredItems = items;
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-15">Icono</TableHead>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
+                  <TableHead className="w-15">{t("sitePortfolioStack.colIcon")}</TableHead>
+                  <TableHead>{t("sitePortfolioStack.colName")}</TableHead>
+                  <TableHead className="text-right">{t("sitePortfolioStack.colActions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -181,7 +181,7 @@ const filteredItems = items;
                       colSpan={3}
                       className="text-center py-6 text-muted-foreground"
                     >
-                      No hay tecnologías encontradas.
+                      {t("sitePortfolioStack.emptyList")}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -228,11 +228,11 @@ const filteredItems = items;
       {meta && meta.totalPages > 1 && (
         <div className="flex justify-center items-center gap-4 mt-4">
           <Button size="sm" variant="secondary" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
-            &lt; Anterior
+            {t("sitePortfolioStack.btnPrev")}
           </Button>
-          <span>Página {currentPage} de {meta.totalPages}</span>
+          <span>{t("sitePortfolioStack.paginationInfo", { page: currentPage, total: meta.totalPages })}</span>
           <Button size="sm" variant="secondary" onClick={() => setCurrentPage((p) => Math.min(meta.totalPages, p + 1))} disabled={currentPage === meta.totalPages}>
-            Siguiente &gt;
+            {t("sitePortfolioStack.btnNext")}
           </Button>
         </div>
       )}
@@ -243,19 +243,18 @@ const filteredItems = items;
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar tecnología?</AlertDialogTitle>
+            <AlertDialogTitle>{t("sitePortfolioStack.deleteTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. Se eliminará "
-              {itemToDelete?.name}".
+              {t("sitePortfolioStack.deleteDesc", { name: itemToDelete?.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t("sitePortfolioStack.cancelBtn")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Eliminar
+              {t("sitePortfolioStack.deleteBtn")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
