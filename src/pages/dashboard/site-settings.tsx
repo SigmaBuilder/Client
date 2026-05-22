@@ -9,6 +9,7 @@ import { MediaLibraryManager } from "@/components/shared/MediaLibrary/MediaLibra
 import { useSetSitePageHeader } from "@/components/site/SitePageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Card,
   CardAction,
