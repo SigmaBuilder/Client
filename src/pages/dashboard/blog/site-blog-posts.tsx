@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useSetSitePageHeader } from "@/components/site/SitePageHeader";
+import { useTranslation } from "react-i18next";
 
 interface BlogPost {
   id: string;
@@ -25,6 +26,7 @@ export default function SiteBlogPostsPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   const newPostUrl = `/dashboard/site/${currentSite?.slug}/blog/posts/new`;
 
@@ -37,7 +39,7 @@ export default function SiteBlogPostsPage() {
         setPosts(res.data.blogPosts);
       }
     } catch (err) {
-      toast.error("Error al cargar posts");
+      toast.error(t("siteBlogPosts.toastLoadError"));
     } finally {
       setLoading(false);
     }
@@ -51,13 +53,13 @@ export default function SiteBlogPostsPage() {
 
   const handleDelete = async (id: string) => {
     if (!currentSite?.id) return;
-    if (!confirm("¿Seguro que deseas eliminar este post?")) return;
+    if (!confirm(t("siteBlogPosts.confirmDelete"))) return;
     try {
       await api.deleteBlogPost(currentSite.id, id);
-      toast.success("Post eliminado");
+      toast.success(t("siteBlogPosts.toastDeleteSuccess"));
       fetchPosts();
     } catch (err) {
-      toast.error("Error al eliminar post");
+      toast.error(t("siteBlogPosts.toastDeleteError"));
     }
   };
 
@@ -74,33 +76,33 @@ export default function SiteBlogPostsPage() {
 
   const headerState = useMemo(() => ({
     breadcrumbs: [
-      { label: "Blog" },
-      { label: "Posts" },
+      { label: t("siteBlogPosts.breadcrumbBlog") },
+      { label: t("siteBlogPosts.breadcrumbPosts") },
     ],
     search: {
       value: search,
       onChange: setSearch,
-      placeholder: "Buscar posts...",
+      placeholder: t("siteBlogPosts.searchPlaceholder"),
     },
     actions: (
       <>
-        <Badge variant="secondary">{posts.length} posts</Badge>
+        <Badge variant="secondary">{t("siteBlogPosts.countPosts", { count: posts.length })}</Badge>
         <Button asChild size="sm">
           <Link to={newPostUrl}>
             <Plus data-icon="inline-start" />
-            Nuevo post
+            {t("siteBlogPosts.newPostBtn")}
           </Link>
         </Button>
       </>
     ),
-  }), [newPostUrl, posts.length, search]);
+  }), [newPostUrl, posts.length, search, t]);
 
   useSetSitePageHeader(currentSite ? headerState : null);
 
   const getStatusLabel = (status: string) => {
-    if (status === "published") return "Publicado";
-    if (status === "archived") return "Archivado";
-    return "Borrador";
+    if (status === "published") return t("siteBlogPosts.statusPublished");
+    if (status === "archived") return t("siteBlogPosts.statusArchived");
+    return t("siteBlogPosts.statusDraft");
   };
 
   const getStatusVariant = (status: string) => {
@@ -124,8 +126,8 @@ export default function SiteBlogPostsPage() {
     <div className="flex-1 p-6">
       <Card className="mx-auto w-full max-w-6xl">
         <CardHeader>
-          <CardTitle>Posts del blog</CardTitle>
-          <CardDescription>Administra borradores, publicaciones y contenido archivado.</CardDescription>
+          <CardTitle>{t("siteBlogPosts.pageTitle")}</CardTitle>
+          <CardDescription>{t("siteBlogPosts.pageDesc")}</CardDescription>
         </CardHeader>
         <CardContent>
           {filteredPosts.length === 0 ? (
@@ -133,15 +135,15 @@ export default function SiteBlogPostsPage() {
               <FileText className="size-12 text-muted-foreground" />
               <div className="flex flex-col gap-1">
                 <p className="font-medium text-foreground">
-                  {posts.length === 0 ? "Aún no tienes posts" : "No hay posts para esta búsqueda"}
+                  {posts.length === 0 ? t("siteBlogPosts.emptyTitle") : t("siteBlogPosts.emptyTitleSearch")}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {posts.length === 0 ? "Empieza creando tu primer post en el blog." : "Prueba con otro título, slug o estado."}
+                  {posts.length === 0 ? t("siteBlogPosts.emptyDesc") : t("siteBlogPosts.emptyDescSearch")}
                 </p>
               </div>
               {posts.length === 0 && (
                 <Button asChild variant="outline">
-                  <Link to={newPostUrl}>Crear un post ahora</Link>
+                  <Link to={newPostUrl}>{t("siteBlogPosts.createBtn")}</Link>
                 </Button>
               )}
             </div>
@@ -149,10 +151,10 @@ export default function SiteBlogPostsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Post</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead>Fecha</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
+                  <TableHead>{t("siteBlogPosts.colPost")}</TableHead>
+                  <TableHead>{t("siteBlogPosts.colStatus")}</TableHead>
+                  <TableHead>{t("siteBlogPosts.colDate")}</TableHead>
+                  <TableHead className="text-right">{t("siteBlogPosts.colActions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
