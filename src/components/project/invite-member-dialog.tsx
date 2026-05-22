@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/select';
 import api from '@/lib/api';
 import type { Role } from '@/types/project';
+import { useTranslation } from 'react-i18next';
 
 interface InviteMemberDialogProps {
   projectId: string;
@@ -25,10 +26,11 @@ export function InviteMemberDialog({ projectId, roles, onInvited, open, onOpenCh
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRoleId, setInviteRoleId] = useState('');
   const [inviting, setInviting] = useState(false);
+  const { t } = useTranslation();
 
   const handleInvite = async () => {
     if (!inviteEmail.trim() || !inviteRoleId) {
-      toast.error('Completa todos los campos');
+      toast.error(t('inviteDialog.toastFillFields'));
       return;
     }
     setInviting(true);
@@ -36,16 +38,16 @@ export function InviteMemberDialog({ projectId, roles, onInvited, open, onOpenCh
     try {
       const res = await api.inviteProjectMember(projectId, inviteEmail.trim(), inviteRoleId);
       if (res.success) {
-        toast.success(`Invitación enviada a ${inviteEmail}`);
+        toast.success(t('inviteDialog.toastSuccess', { email: inviteEmail }));
         setInviteEmail('');
         setInviteRoleId('');
         onOpenChange(false);
         if (onInvited) onInvited();
       } else {
-        toast.error(res.error ?? 'Error enviando invitación');
+        toast.error(res.error ?? t('inviteDialog.toastError'));
       }
     } catch (err: any) {
-      toast.error(err.message || 'Error al conectar con el servidor.');
+      toast.error(err.message || t('inviteDialog.toastErrorConnect'));
     } finally {
       setInviting(false);
     }
@@ -55,25 +57,25 @@ export function InviteMemberDialog({ projectId, roles, onInvited, open, onOpenCh
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Invitar miembro</DialogTitle>
+          <DialogTitle>{t('inviteDialog.title')}</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-4 py-2">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="invite-email">Correo electrónico</Label>
+            <Label htmlFor="invite-email">{t('inviteDialog.emailLabel')}</Label>
             <Input
               id="invite-email"
               type="email"
-              placeholder="usuario@ejemplo.com"
+              placeholder={t('inviteDialog.emailPlaceholder')}
               value={inviteEmail}
               onChange={e => setInviteEmail(e.target.value)}
               disabled={inviting}
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="invite-role">Rol</Label>
+            <Label htmlFor="invite-role">{t('inviteDialog.roleLabel')}</Label>
             <Select value={inviteRoleId} onValueChange={setInviteRoleId} disabled={inviting}>
               <SelectTrigger id="invite-role">
-                <SelectValue placeholder="Seleccionar rol…" />
+                <SelectValue placeholder={t('inviteDialog.rolePlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 {roles.map(r => (
@@ -86,7 +88,7 @@ export function InviteMemberDialog({ projectId, roles, onInvited, open, onOpenCh
         <DialogFooter showCloseButton>
           <Button onClick={handleInvite} disabled={inviting}>
             {inviting && <Loader2 className="size-3.5 animate-spin" />}
-            Enviar invitación
+            {t('inviteDialog.sendBtn')}
           </Button>
         </DialogFooter>
       </DialogContent>
