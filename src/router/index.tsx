@@ -71,35 +71,35 @@ export const router = createBrowserRouter([
             </WorkspaceProvider>
           </ProtectedRoute>
         ),
-        handle: { breadcrumb: "Proyectos" },
+        handle: { breadcrumb: "breadcrumbs.projects" },
         children: [
           { index: true, element: <ProjectsList /> },
           {
             path: "account",
             element: <AccountPage />,
-            handle: { breadcrumb: "Cuenta" },
+            handle: { breadcrumb: "breadcrumbs.account" },
           },
           {
             path: ":id",
             element: <ProjectLayout />,
             handle: {
-              breadcrumb: ({ project }: any) => project?.name || "Proyecto",
+              breadcrumb: ({ project }: any) => project?.name || "breadcrumbs.projectFallback",
             },
             children: [
               {
                 index: true,
                 element: <ProjectSitesPage />,
-                handle: { breadcrumb: "Sitios" },
+                handle: { breadcrumb: "breadcrumbs.sites" },
               },
               {
                 path: "members",
                 element: <ProjectMembersPage />,
-                handle: { breadcrumb: "Miembros" },
+                handle: { breadcrumb: "breadcrumbs.members" },
               },
               {
                 path: "roles",
                 element: <ProjectRolesPage />,
-                handle: { breadcrumb: "Roles y Permisos" },
+                handle: { breadcrumb: "breadcrumbs.roles" },
               },
               { path: "*", element: <DashboardNotFound /> },
             ],
@@ -109,114 +109,114 @@ export const router = createBrowserRouter([
             element: <SiteLayout />,
             handle: {
               breadcrumb: ({ site }: any) =>
-                site?.name || site?.slug || "Sitio",
+                site?.name || site?.slug || "breadcrumbs.siteFallback",
             },
             children: [
               {
                 index: true,
                 element: <SiteHomePage />,
-                handle: { breadcrumb: "Inicio" },
+                handle: { breadcrumb: "breadcrumbs.home" },
               },
               { path: "settings", element: <SiteSettings /> },
               {
                 path: "pages",
                 element: <PagesList />,
-                handle: { breadcrumb: "Páginas" },
+                handle: { breadcrumb: "breadcrumbs.pages" },
               },
               {
                 path: "pages/new",
                 element: <PageEditor />,
-                handle: { breadcrumb: "Nueva Página" },
+                handle: { breadcrumb: "breadcrumbs.newPage" },
               },
               {
                 path: "pages/:pageId/edit",
                 element: <PageEditor />,
-                handle: { breadcrumb: "Editar Página" },
+                handle: { breadcrumb: "breadcrumbs.editPage" },
               },
               {
                 path: "modules",
                 element: <SiteModulesPage />,
-                handle: { breadcrumb: "Módulos" },
+                handle: { breadcrumb: "breadcrumbs.modules" },
               },
               {
                 path: "docs",
                 element: <SiteDocsPage />,
-                handle: { breadcrumb: "Documentación API" },
+                handle: { breadcrumb: "breadcrumbs.apiDocs" },
               },
               {
                 path: "media",
                 element: <SiteMediaPage />,
-                handle: { breadcrumb: "Medios" },
+                handle: { breadcrumb: "breadcrumbs.media" },
               },
               {
                 path: "portfolio/sections",
                 element: <PortfolioSectionsList />,
-                handle: { breadcrumb: "Secciones de Portfolio" },
+                handle: { breadcrumb: "breadcrumbs.portfolioSections" },
               },
               {
                 path: "portfolio/sections/new",
                 element: <PortfolioSectionForm />,
-                handle: { breadcrumb: "Nueva Sección" },
+                handle: { breadcrumb: "breadcrumbs.newSection" },
               },
               {
                 path: "portfolio/sections/:sectionId/edit",
                 element: <PortfolioSectionForm />,
-                handle: { breadcrumb: "Editar Sección" },
+                handle: { breadcrumb: "breadcrumbs.editSection" },
               },
               {
                 path: "portfolio/stack",
                 element: <PortfolioStackList />,
-                handle: { breadcrumb: "Stack Tecnológico" },
+                handle: { breadcrumb: "breadcrumbs.techStack" },
               },
               {
                 path: "portfolio/stack/new",
                 element: <PortfolioStackForm />,
-                handle: { breadcrumb: "Nueva Tecnología" },
+                handle: { breadcrumb: "breadcrumbs.newTech" },
               },
               {
                 path: "portfolio/stack/:stackId/edit",
                 element: <PortfolioStackForm />,
-                handle: { breadcrumb: "Editar Tecnología" },
+                handle: { breadcrumb: "breadcrumbs.editTech" },
               },
               {
                 path: "portfolio/items",
                 element: <PortfolioItemsList />,
-                handle: { breadcrumb: "Proyectos" },
+                handle: { breadcrumb: "breadcrumbs.portfolioProjects" },
               },
               {
                 path: "portfolio/items/new",
                 element: <PortfolioItemForm />,
-                handle: { breadcrumb: "Nuevo Proyecto" },
+                handle: { breadcrumb: "breadcrumbs.newProject" },
               },
               {
                 path: "portfolio/items/:itemId/edit",
                 element: <PortfolioItemForm />,
-                handle: { breadcrumb: "Editar Proyecto" },
+                handle: { breadcrumb: "breadcrumbs.editProject" },
               },
               {
                 path: "blog",
-                handle: { breadcrumb: "Blog" },
+                handle: { breadcrumb: "breadcrumbs.blog" },
                 children: [
                   { index: true, element: <Navigate to="posts" replace /> },
                   {
                     path: "categories",
                     element: <SiteBlogCategoriesPage />,
-                    handle: { breadcrumb: "Categorías" },
+                    handle: { breadcrumb: "breadcrumbs.categories" },
                   },
                   {
                     path: "posts",
                     element: <SiteBlogPostsPage />,
-                    handle: { breadcrumb: "Posts" },
+                    handle: { breadcrumb: "breadcrumbs.posts" },
                   },
                   {
                     path: "posts/new",
                     element: <SiteBlogPostEditorPage />,
-                    handle: { breadcrumb: "Nuevo Post" },
+                    handle: { breadcrumb: "breadcrumbs.newPost" },
                   },
                   {
                     path: "posts/:postId",
                     element: <SiteBlogPostEditorPage />,
-                    handle: { breadcrumb: "Editar Post" },
+                    handle: { breadcrumb: "breadcrumbs.editPost" },
                   },
                 ],
               },
