@@ -46,6 +46,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useTranslation } from "react-i18next";
 
 interface LogEntry {
   type: string;
@@ -67,6 +68,7 @@ export default function PageEditor() {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [status, setStatus] = useState<"draft" | "public">("draft");
+  const { t } = useTranslation();
 
   const defaultHtml = '<div id="app">\n  <h1>Hello World</h1>\n</div>';
   const defaultCss = "body {\n  font-family: sans-serif;\n}";
@@ -148,11 +150,11 @@ export default function PageEditor() {
             js,
           });
         } else {
-          toast.error("Error al cargar la página");
+          toast.error(t("sitePageEditor.toastLoadError"));
           navigate("..");
         }
       } catch {
-        toast.error("Error de conexión");
+        toast.error(t("sitePageEditor.toastConnectError"));
       } finally {
         setIsLoading(false);
       }
@@ -289,7 +291,7 @@ export default function PageEditor() {
   const handleSave = async () => {
     if (!currentSite?.id) return;
     if (!name || !slug) {
-      toast.error("El nombre y la ruta son obligatorios");
+      toast.error(t("sitePageEditor.toastNameSlugRequired"));
       setIsSettingsOpen(true);
       return;
     }
@@ -313,7 +315,7 @@ export default function PageEditor() {
       }
 
       if (res.success) {
-        toast.success(isNew ? "Página creada" : "Página actualizada");
+        toast.success(isNew ? t("sitePageEditor.toastCreated") : t("sitePageEditor.toastUpdated"));
         setInitialData({
           name,
           slug,
@@ -328,10 +330,10 @@ export default function PageEditor() {
           });
         }
       } else {
-        toast.error(res.error || "Error al guardar");
+        toast.error(res.error || t("sitePageEditor.toastSaveError"));
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error(t("sitePageEditor.toastConnectError"));
     } finally {
       setIsSaving(false);
     }
@@ -339,7 +341,7 @@ export default function PageEditor() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
-      toast.success("Endpoint copiado al portapapeles");
+      toast.success(t("sitePageEditor.toastCopied"));
     });
   };
 
@@ -347,17 +349,17 @@ export default function PageEditor() {
     () => ({
       breadcrumbs: [
         {
-          label: "Páginas",
+          label: t("sitePageEditor.breadcrumbPages"),
           href: `/dashboard/site/${currentSite?.slug}/pages`,
           onClick: () => navigate(".."),
         },
-        { label: isNew ? "Nueva" : name || "Editar" },
+        { label: isNew ? t("sitePageEditor.breadcrumbNew") : name || t("sitePageEditor.breadcrumbEdit") },
       ],
       actions: (
         <div className="flex items-center gap-2">
           {hasUnsavedChanges && (
             <span className="text-xs text-muted-foreground mr-2">
-              * Cambios sin guardar
+              {t("sitePageEditor.unsavedChanges")}
             </span>
           )}
 
@@ -365,31 +367,31 @@ export default function PageEditor() {
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
                 <Settings className="h-4 w-4 mr-2" />
-                Ajustes
+                {t("sitePageEditor.settingsBtn")}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Ajustes de la página</DialogTitle>
+                <DialogTitle>{t("sitePageEditor.settingsTitle")}</DialogTitle>
                 <DialogDescription>
-                  Configura el nombre y la ruta de la página.
+                  {t("sitePageEditor.settingsDesc")}
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Nombre</Label>
+                  <Label htmlFor="name">{t("sitePageEditor.settingsName")}</Label>
                   <Input
                     id="name"
-                    placeholder="Ej. Inicio"
+                    placeholder={t("sitePageEditor.settingsNamePlaceholder")}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="slug">Ruta (Slug)</Label>
+                  <Label htmlFor="slug">{t("sitePageEditor.settingsSlug")}</Label>
                   <Input
                     id="slug"
-                    placeholder="slug-de-la-ruta"
+                    placeholder={t("sitePageEditor.settingsSlugPlaceholder")}
                     value={slug}
                     onChange={(e) => setSlug(e.target.value)}
                   />
@@ -402,7 +404,7 @@ export default function PageEditor() {
             <SheetTrigger asChild>
               <Button variant="outline" size="sm">
                 <LayoutPanelLeft className="h-4 w-4 mr-2" />
-                API
+                {t("sitePageEditor.apiBtn")}
               </Button>
             </SheetTrigger>
             <SheetContent
@@ -410,9 +412,9 @@ export default function PageEditor() {
               className="w-[400px] sm:w-[540px] overflow-y-auto px-6 pt-4"
             >
               <SheetHeader className="px-0">
-                <SheetTitle>Endpoints disponibles</SheetTitle>
+                <SheetTitle>{t("sitePageEditor.apiTitle")}</SheetTitle>
                 <SheetDescription>
-                  Endpoints para los módulos activos de este sitio.
+                  {t("sitePageEditor.apiDesc")}
                 </SheetDescription>
               </SheetHeader>
               <div className="py-6 flex flex-col gap-6">
@@ -427,43 +429,42 @@ export default function PageEditor() {
                       navigate(`/dashboard/site/${currentSite?.slug}/docs`)
                     }
                   >
-                    Ver Documentación Completa
+                    {t("sitePageEditor.apiFullDocs")}
                   </Button>
                 </div>
 
                 <div className="bg-primary/5 p-4 rounded-md text-sm border border-primary/20">
                   <h4 className="font-semibold text-primary mb-2 flex items-center gap-2">
-                    <AlignLeft className="h-4 w-4" /> Filtrado y Paginación
+                    <AlignLeft className="h-4 w-4" /> {t("sitePageEditor.apiFilterTitle")}
                   </h4>
                   <p className="text-muted-foreground text-xs leading-relaxed mb-2">
-                    Los endpoints que devuelven listas soportan los siguientes
-                    parámetros en la URL:
+                    {t("sitePageEditor.apiFilterDesc")}
                   </p>
                   <ul className="text-xs text-muted-foreground space-y-1.5 list-disc pl-4 mb-3">
                     <li>
                       <code className="bg-background border px-1 py-0.5 rounded mr-1 font-mono">
                         ?page=1
                       </code>{" "}
-                      Página a cargar (por defecto 1).
+                      {t("sitePageEditor.apiFilterPage")}
                     </li>
                     <li>
                       <code className="bg-background border px-1 py-0.5 rounded mr-1 font-mono">
                         ?limit=10
                       </code>{" "}
-                      Elementos por página.
+                      {t("sitePageEditor.apiFilterLimit")}
                     </li>
                     <li>
                       <code className="bg-background border px-1 py-0.5 rounded mr-1 font-mono">
                         ?search=texto
                       </code>{" "}
-                      Busca elementos que contengan el texto en su título.
+                      {t("sitePageEditor.apiFilterSearch")}
                     </li>
                   </ul>
                 </div>
 
                 {!apiModules ? (
                   <div className="text-sm text-muted-foreground">
-                    Cargando endpoints...
+                    {t("sitePageEditor.apiLoading")}
                   </div>
                 ) : (
                   <div className="space-y-6">
@@ -495,7 +496,7 @@ export default function PageEditor() {
                                   className="mt-2 w-full h-7 text-xs"
                                   onClick={() => copyToClipboard(fullPath)}
                                 >
-                                  Copiar URL
+                                  {t("sitePageEditor.apiCopyUrl")}
                                 </Button>
                               </div>
                             );
@@ -509,7 +510,7 @@ export default function PageEditor() {
               <SheetFooter>
                 <SheetClose asChild>
                   <Button variant="outline" className="w-full">
-                    Cerrar
+                    {t("sitePageEditor.apiClose")}
                   </Button>
                 </SheetClose>
               </SheetFooter>
@@ -524,8 +525,8 @@ export default function PageEditor() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="draft">Borrador</SelectItem>
-              <SelectItem value="public">Público</SelectItem>
+              <SelectItem value="draft">{t("sitePageEditor.statusDraft")}</SelectItem>
+              <SelectItem value="public">{t("sitePageEditor.statusPublic")}</SelectItem>
             </SelectContent>
           </Select>
 
@@ -543,7 +544,7 @@ export default function PageEditor() {
 
           <Button size="sm" onClick={handleSave} disabled={isSaving}>
             <Save className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">Guardar</span>
+            <span className="hidden sm:inline">{t("sitePageEditor.saveBtn")}</span>
           </Button>
         </div>
       ),
@@ -567,7 +568,7 @@ export default function PageEditor() {
   useSetSitePageHeader(headerState);
 
   if (isLoading) {
-    return <div className="p-6">Cargando...</div>;
+    return <div className="p-6">{t("sitePageEditor.loading")}</div>;
   }
 
   return (
@@ -675,7 +676,7 @@ export default function PageEditor() {
               {isConsoleOpen && (
                 <div className="flex-1 overflow-auto p-2 font-mono text-xs bg-zinc-950 text-zinc-300">
                   {logs.length === 0 ? (
-                    <div className="text-zinc-600 italic">No hay logs...</div>
+                    <div className="text-zinc-600 italic">{t("sitePageEditor.consoleEmpty")}</div>
                   ) : (
                     logs.map((log, i) => (
                       <div
