@@ -5,7 +5,6 @@ import {
   Bot,
   Briefcase,
   Newspaper,
-  Send,
   SquareTerminal,
   Settings,
   Image,
