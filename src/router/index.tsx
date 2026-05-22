@@ -34,6 +34,7 @@ import SiteModulesPage from "@/pages/dashboard/site-modules";
 import PagesList from "@/pages/dashboard/site-pages/pages-list";
 import PageEditor from "@/pages/dashboard/site-pages/page-editor";
 import SiteHomePage from "@/pages/dashboard/site-home";
+import SiteDocsPage from "@/pages/dashboard/site-docs";
 
 export const router = createBrowserRouter([
   {
@@ -136,6 +137,11 @@ export const router = createBrowserRouter([
                 path: "modules",
                 element: <SiteModulesPage />,
                 handle: { breadcrumb: "Módulos" },
+              },
+              {
+                path: "docs",
+                element: <SiteDocsPage />,
+                handle: { breadcrumb: "Documentación API" },
               },
               {
                 path: "media",
