@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { useTranslation } from "react-i18next";
 
 interface DocParameter {
   name: string;
@@ -37,9 +38,10 @@ export default function SiteDocsPage() {
   const { currentSite } = useWorkspace();
   const [docs, setDocs] = useState<DocsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useTranslation();
 
   useSetSitePageHeader({
-    breadcrumbs: [{ label: "Documentación API" }],
+    breadcrumbs: [{ label: t("siteDocs.breadcrumb") }],
   });
 
   useEffect(() => {
@@ -51,10 +53,10 @@ export default function SiteDocsPage() {
         if (res.success && res.data) {
           setDocs(res.data as any);
         } else {
-          toast.error(res.error || "Error al cargar la documentación");
+          toast.error(res.error || t("siteDocs.toastErrorLoad"));
         }
       } catch (err) {
-        toast.error("Error de conexión");
+        toast.error(t("siteDocs.toastErrorConnect"));
       } finally {
         setIsLoading(false);
       }
@@ -64,7 +66,7 @@ export default function SiteDocsPage() {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
-      toast.success("Copiado al portapapeles");
+      toast.success(t("siteDocs.toastCopied"));
     });
   };
 
@@ -81,7 +83,7 @@ export default function SiteDocsPage() {
   }
 
   if (!docs) {
-    return <div className="p-6 text-muted-foreground">No se pudo cargar la documentación.</div>;
+    return <div className="p-6 text-muted-foreground">{t("siteDocs.loadError")}</div>;
   }
 
   return (
@@ -89,19 +91,17 @@ export default function SiteDocsPage() {
       <div>
         <h1 className="text-3xl font-bold flex items-center gap-3">
           <BookOpen className="h-8 w-8 text-primary" />
-          Documentación de API Pública
+          {t("siteDocs.pageTitle")}
         </h1>
-        <p className="text-muted-foreground mt-2">
-          Esta página contiene la documentación de todos los endpoints públicos disponibles para tu sitio <strong>{currentSite?.name}</strong>. Puedes usar estas rutas en el código JavaScript de tus páginas para obtener información dinámica.
-        </p>
+        <p className="text-muted-foreground mt-2" dangerouslySetInnerHTML={{ __html: t("siteDocs.pageDesc", { name: currentSite?.name }) }} />
       </div>
 
       <div className="bg-primary/5 border border-primary/20 rounded-lg p-5">
         <h3 className="font-semibold text-primary flex items-center gap-2 mb-2">
-          <Server className="h-5 w-5" /> Base URL
+          <Server className="h-5 w-5" /> {t("siteDocs.baseUrlTitle")}
         </h3>
         <p className="text-sm text-muted-foreground mb-3">
-          El origen (host) al que debes hacer las peticiones, que debes prefijar en los endpoints mostrados abajo.
+          {t("siteDocs.baseUrlDesc")}
         </p>
         <div className="flex items-center gap-2 bg-background p-2 rounded border font-mono text-sm">
           <span className="flex-1 overflow-x-auto whitespace-nowrap">{baseUrl}</span>
@@ -147,21 +147,21 @@ export default function SiteDocsPage() {
                         </code>
                       </div>
                       <Button variant="outline" size="sm" className="shrink-0" onClick={() => copyToClipboard(`${baseUrl}${finalPath}`)}>
-                        <Copy className="h-4 w-4 mr-2" /> Copiar Ruta
+                        <Copy className="h-4 w-4 mr-2" /> {t("siteDocs.copyRouteBtn")}
                       </Button>
                     </div>
 
                     {/* Parameters */}
                     {ep.parameters && ep.parameters.length > 0 && (
                       <div className="p-4">
-                        <h4 className="font-semibold text-sm mb-3">Parámetros</h4>
+                        <h4 className="font-semibold text-sm mb-3">{t("siteDocs.paramsTitle")}</h4>
                         <div className="overflow-x-auto">
                           <table className="w-full text-sm text-left">
                             <thead className="text-xs text-muted-foreground bg-muted/50 uppercase">
                               <tr>
-                                <th className="px-4 py-2 font-medium rounded-tl-md">Nombre</th>
-                                <th className="px-4 py-2 font-medium">Tipo</th>
-                                <th className="px-4 py-2 font-medium rounded-tr-md">Descripción</th>
+                                <th className="px-4 py-2 font-medium rounded-tl-md">{t("siteDocs.colName")}</th>
+                                <th className="px-4 py-2 font-medium">{t("siteDocs.colType")}</th>
+                                <th className="px-4 py-2 font-medium rounded-tr-md">{t("siteDocs.colDesc")}</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -183,7 +183,7 @@ export default function SiteDocsPage() {
                     {/* Returns */}
                     {ep.returns && (
                       <div className="p-4 border-t bg-muted/10">
-                        <h4 className="font-semibold text-sm mb-3">Respuesta Esperada</h4>
+                        <h4 className="font-semibold text-sm mb-3">{t("siteDocs.expectedResponse")}</h4>
                         <div className="bg-background rounded-md border p-3 overflow-x-auto">
                           <pre className="text-xs font-mono text-muted-foreground whitespace-pre-wrap">
                             {JSON.stringify(ep.returns, null, 2)}
