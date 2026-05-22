@@ -1,5 +1,5 @@
-const API_URL =
-  import.meta.env.PUBLIC_URL_API || "http://localhost:3000/api/v1";
+export const API_URL =
+  import.meta.env.VITE_API_URL || import.meta.env.PUBLIC_URL_API || "http://localhost:3000/api/v1";
 
 interface ApiResponse<T> {
   success: boolean;
@@ -218,6 +218,15 @@ class ApiClient {
   ): Promise<ApiResponse<T>> {
     return this.request<T>(
       `sites/slug/${slug}?includeProject=${includeProject}`,
+    );
+  }
+
+  async getSitePublicDocs<T>(
+    slug: string,
+    simple = false,
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>(
+      `public/sites/${slug}/docs?simple=${simple}`,
     );
   }
 
