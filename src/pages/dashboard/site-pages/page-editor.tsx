@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useWorkspace } from "@/hooks/use-workspace";
-import { api } from "@/lib/api";
+import { api, API_URL } from "@/lib/api";
 import { useSetSitePageHeader } from "@/components/site/SitePageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,43 +53,7 @@ interface LogEntry {
   timestamp: number;
 }
 
-const apiModules = {
-  core: [{ name: "Obtener Sitio", path: "/sites/slug/{slug}", method: "GET" }],
-  blog: [
-    {
-      name: "Listar Posts",
-      path: "/sites/slug/{slug}/blog/posts",
-      method: "GET",
-    },
-    {
-      name: "Obtener Post",
-      path: "/sites/slug/{slug}/blog/posts/{postSlug}",
-      method: "GET",
-    },
-    {
-      name: "Listar Categorías",
-      path: "/sites/slug/{slug}/blog/categories",
-      method: "GET",
-    },
-  ],
-  portfolio: [
-    {
-      name: "Listar Secciones",
-      path: "/sites/slug/{slug}/portfolio/sections",
-      method: "GET",
-    },
-    {
-      name: "Listar Tecnologías",
-      path: "/sites/slug/{slug}/portfolio/stack",
-      method: "GET",
-    },
-    {
-      name: "Listar Proyectos",
-      path: "/sites/slug/{slug}/portfolio/items",
-      method: "GET",
-    },
-  ],
-};
+// apiModules se carga dinámicamente desde el backend ahora
 
 export default function PageEditor() {
   const { currentSite } = useWorkspace();
@@ -99,6 +63,7 @@ export default function PageEditor() {
 
   const [isLoading, setIsLoading] = useState(!isNew);
   const [isSaving, setIsSaving] = useState(false);
+  const [apiModules, setApiModules] = useState<any>(null);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [status, setStatus] = useState<"draft" | "public">("draft");
@@ -119,8 +84,7 @@ export default function PageEditor() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const baseUrl =
-    import.meta.env.PUBLIC_URL_API || window.location.origin + "/api/v1";
+  const baseUrl = API_URL.replace(/\/api\/v1\/?$/, "");
 
   // Unsaved changes detection
   const [initialData, setInitialData] = useState({
@@ -196,6 +160,25 @@ export default function PageEditor() {
 
     fetchPage();
   }, [currentSite?.id, pageId, isNew, navigate]);
+
+  // Fetch API Docs
+  useEffect(() => {
+    const fetchDocs = async () => {
+      if (!currentSite?.slug) return;
+      try {
+        const res = await api.getSitePublicDocs<{ data: any }>(
+          currentSite.slug,
+          true,
+        );
+        if (res.success && res.data) {
+          setApiModules(res.data);
+        }
+      } catch (err) {
+        console.error("Error fetching docs", err);
+      }
+    };
+    fetchDocs();
+  }, [currentSite?.slug]);
 
   // Run preview
   const updatePreview = useCallback(() => {
@@ -433,8 +416,19 @@ export default function PageEditor() {
                 </SheetDescription>
               </SheetHeader>
               <div className="py-6 flex flex-col gap-6">
-                <div className="text-sm font-medium">
-                  Clave Pública (API Key): {currentSite?.slug}
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-muted/30 p-3 rounded-md border">
+                  <div className="text-sm font-medium">
+                    API Key: {currentSite?.slug}
+                  </div>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() =>
+                      navigate(`/dashboard/site/${currentSite?.slug}/docs`)
+                    }
+                  >
+                    Ver Documentación Completa
+                  </Button>
                 </div>
 
                 <div className="bg-primary/5 p-4 rounded-md text-sm border border-primary/20">
@@ -442,128 +436,75 @@ export default function PageEditor() {
                     <AlignLeft className="h-4 w-4" /> Filtrado y Paginación
                   </h4>
                   <p className="text-muted-foreground text-xs leading-relaxed mb-2">
-                    Los endpoints que devuelven listas (como "Listar Posts" o "Listar Secciones") soportan los siguientes parámetros en la URL para que puedas filtrar la información:
+                    Los endpoints que devuelven listas soportan los siguientes
+                    parámetros en la URL:
                   </p>
                   <ul className="text-xs text-muted-foreground space-y-1.5 list-disc pl-4 mb-3">
-                    <li><code className="bg-background border px-1 py-0.5 rounded mr-1 font-mono">?page=1</code> Página a cargar (por defecto 1).</li>
-                    <li><code className="bg-background border px-1 py-0.5 rounded mr-1 font-mono">?limit=10</code> Elementos por página (por defecto 10). Para cargar todos, puedes usar un número alto como 100 o 1000.</li>
-                    <li><code className="bg-background border px-1 py-0.5 rounded mr-1 font-mono">?search=texto</code> Busca elementos que contengan el texto en su título.</li>
+                    <li>
+                      <code className="bg-background border px-1 py-0.5 rounded mr-1 font-mono">
+                        ?page=1
+                      </code>{" "}
+                      Página a cargar (por defecto 1).
+                    </li>
+                    <li>
+                      <code className="bg-background border px-1 py-0.5 rounded mr-1 font-mono">
+                        ?limit=10
+                      </code>{" "}
+                      Elementos por página.
+                    </li>
+                    <li>
+                      <code className="bg-background border px-1 py-0.5 rounded mr-1 font-mono">
+                        ?search=texto
+                      </code>{" "}
+                      Busca elementos que contengan el texto en su título.
+                    </li>
                   </ul>
-                  <div className="text-xs text-muted-foreground bg-background border p-2 rounded break-all">
-                    <span className="font-semibold block mb-1">Ejemplo:</span> 
-                    <code className="font-mono text-[11px]">{baseUrl}/sites/slug/{currentSite?.slug}/portfolio/sections?page=1&limit=50&search=hola</code>
-                  </div>
                 </div>
 
-                <div className="space-y-6">
-                  <div className="space-y-3">
-                    <h4 className="text-sm font-semibold border-b pb-2">
-                      Core
-                    </h4>
-                    {apiModules.core.map((ep, i) => {
-                      const fullPath = `${baseUrl}${ep.path.replace("{slug}", currentSite?.slug || "")}`;
-                      return (
-                        <div
-                          key={i}
-                          className="flex flex-col gap-1 p-3 rounded-md bg-secondary/50 border"
-                        >
-                          <div className="font-semibold text-sm">{ep.name}</div>
-                          <div className="font-mono text-[11px] text-muted-foreground break-all flex items-start gap-2">
-                            <span className="font-bold text-primary shrink-0">
-                              {ep.method}
-                            </span>
-                            <span className="break-all">{fullPath}</span>
-                          </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="mt-2 w-full h-7 text-xs"
-                            onClick={() => copyToClipboard(fullPath)}
-                          >
-                            Copiar URL
-                          </Button>
+                {!apiModules ? (
+                  <div className="text-sm text-muted-foreground">
+                    Cargando endpoints...
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {Object.entries(apiModules).map(
+                      ([modKey, mod]: [string, any]) => (
+                        <div key={modKey} className="space-y-3">
+                          <h4 className="text-sm font-semibold border-b pb-2 capitalize">
+                            {modKey}
+                          </h4>
+                          {mod.map((ep: any, i: number) => {
+                            const fullPath = `${baseUrl}${ep.path.replace("{slug}", currentSite?.slug || "")}`;
+                            return (
+                              <div
+                                key={i}
+                                className="flex flex-col gap-1 p-3 rounded-md bg-secondary/50 border"
+                              >
+                                <div className="font-semibold text-sm">
+                                  {ep.name}
+                                </div>
+                                <div className="font-mono text-[11px] text-muted-foreground break-all flex items-start gap-2">
+                                  <span className="font-bold text-primary shrink-0">
+                                    {ep.method}
+                                  </span>
+                                  <span className="break-all">{fullPath}</span>
+                                </div>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="mt-2 w-full h-7 text-xs"
+                                  onClick={() => copyToClipboard(fullPath)}
+                                >
+                                  Copiar URL
+                                </Button>
+                              </div>
+                            );
+                          })}
                         </div>
-                      );
-                    })}
+                      ),
+                    )}
                   </div>
-
-                  {currentSite?.features?.modules?.blog && (
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-semibold border-b pb-2">Blog</h4>
-                      {apiModules.blog.map((ep, i) => {
-                        const fullPath = `${baseUrl}${ep.path.replace('{slug}', currentSite?.slug || '')}`;
-                        return (
-                          <div key={i} className="flex flex-col gap-1 p-3 rounded-md bg-secondary/50 border">
-                            <div className="font-semibold text-sm">{ep.name}</div>
-                            <div className="font-mono text-[11px] text-muted-foreground break-all flex items-start gap-2">
-                              <span className="font-bold text-primary shrink-0">{ep.method}</span>
-                              <span className="break-all">{fullPath}</span>
-                            </div>
-                            <Button variant="outline" size="sm" className="mt-2 w-full h-7 text-xs" onClick={() => copyToClipboard(fullPath)}>
-                              Copiar URL
-                            </Button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  {currentSite?.features?.modules?.portfolio && (
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-semibold border-b pb-2">Portfolio</h4>
-                      {apiModules.portfolio.map((ep, i) => {
-                        const fullPath = `${baseUrl}${ep.path.replace('{slug}', currentSite?.slug || '')}`;
-                        return (
-                          <div key={i} className="flex flex-col gap-1 p-3 rounded-md bg-secondary/50 border">
-                            <div className="font-semibold text-sm">{ep.name}</div>
-                            <div className="font-mono text-[11px] text-muted-foreground break-all flex items-start gap-2">
-                              <span className="font-bold text-primary shrink-0">{ep.method}</span>
-                              <span className="break-all">{fullPath}</span>
-                            </div>
-                            <Button variant="outline" size="sm" className="mt-2 w-full h-7 text-xs" onClick={() => copyToClipboard(fullPath)}>
-                              Copiar URL
-                            </Button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                  {currentSite?.features?.portfolio && (
-                    <div className="space-y-3">
-                      <h4 className="text-sm font-semibold border-b pb-2">
-                        Portfolio
-                      </h4>
-                      {apiModules.portfolio.map((ep, i) => {
-                        const fullPath = `${baseUrl}${ep.path.replace("{slug}", currentSite?.slug || "")}`;
-                        return (
-                          <div
-                            key={i}
-                            className="flex flex-col gap-1 p-3 rounded-md bg-secondary/50 border"
-                          >
-                            <div className="font-semibold text-sm">
-                              {ep.name}
-                            </div>
-                            <div className="font-mono text-[11px] text-muted-foreground break-all flex items-start gap-2">
-                              <span className="font-bold text-primary shrink-0">
-                                {ep.method}
-                              </span>
-                              <span className="break-all">{fullPath}</span>
-                            </div>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="mt-2 w-full h-7 text-xs"
-                              onClick={() => copyToClipboard(fullPath)}
-                            >
-                              Copiar URL
-                            </Button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
               <SheetFooter>
                 <SheetClose asChild>
