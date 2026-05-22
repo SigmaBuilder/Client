@@ -30,9 +30,9 @@ import {
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useTranslation } from "react-i18next";
 
 interface PortfolioSection {
   id: string;
@@ -51,6 +51,7 @@ export default function PortfolioSectionsList() {
   const [limit] = useState(15);
   const [sectionToDelete, setSectionToDelete] =
   useState<PortfolioSection | null>(null);
+  const { t } = useTranslation();
 
   const fetchSections = async (searchValue = search, page = currentPage, perPage = limit) => {
     if (!currentSite?.id) return;
@@ -70,10 +71,10 @@ export default function PortfolioSectionsList() {
           Array.isArray(res.data) ? res.data : [];
         setSections(dataArray);
       } else {
-        toast.error("Error al cargar las secciones");
+        toast.error(t("sitePortfolioSections.toastLoadError"));
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error(t("sitePortfolioSections.toastConnectError"));
     } finally {
       setIsLoading(false);
     }
@@ -95,13 +96,13 @@ export default function PortfolioSectionsList() {
         sectionToDelete.id,
       );
       if (res.success) {
-        toast.success("Sección eliminada");
+        toast.success(t("sitePortfolioSections.toastDeleteSuccess"));
         fetchSections();
       } else {
-        toast.error("Error al eliminar la sección");
+        toast.error(t("sitePortfolioSections.toastDeleteError"));
       }
     } catch {
-      toast.error("Error de conexión");
+      toast.error(t("sitePortfolioSections.toastConnectError"));
     } finally {
       setSectionToDelete(null);
     }
@@ -111,21 +112,21 @@ export default function PortfolioSectionsList() {
 
   const headerState = useMemo(
     () => ({
-      breadcrumbs: [{ label: "Portfolio" }, { label: "Secciones" }],
+      breadcrumbs: [{ label: t("sitePortfolioSections.breadcrumbPortfolio") }, { label: t("sitePortfolioSections.breadcrumbSections") }],
       search: {
         value: search,
         onChange: debouncedSetSearch,
-        placeholder: "Buscar secciones...",
+        placeholder: t("sitePortfolioSections.searchPlaceholder"),
       },
       actions: (
         <Button size="sm" onClick={() => navigate("new")}>
           <Plus className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">Añadir Sección</span>
-          <span className="sm:hidden">Añadir</span>
+          <span className="hidden sm:inline">{t("sitePortfolioSections.addBtnLg")}</span>
+          <span className="sm:hidden">{t("sitePortfolioSections.addBtnSm")}</span>
         </Button>
       ),
     }),
-    [search, navigate],
+    [search, navigate, t],
   );
 
   useSetSitePageHeader(headerState);
@@ -149,7 +150,7 @@ const filteredSections = sections;
   if (!isLoading && sections.length === 0) {
     return (
       <div className="flex-1 p-6 flex flex-col items-center justify-center min-h-[40vh]">
-        <span className="text-muted-foreground">No hay secciones encontradas.</span>
+        <span className="text-muted-foreground">{t("sitePortfolioSections.emptyList")}</span>
       </div>
     );
   }
@@ -158,9 +159,9 @@ const filteredSections = sections;
     <div className="flex-1 p-6">
       <Card className="mx-auto w-full max-w-6xl">
         <CardHeader>
-          <CardTitle>Secciones del portafolio</CardTitle>
+          <CardTitle>{t("sitePortfolioSections.pageTitle")}</CardTitle>
           <CardDescription>
-            Administra y visualiza las secciones de tu portafolio.
+            {t("sitePortfolioSections.pageDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -168,9 +169,9 @@ const filteredSections = sections;
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Título</TableHead>
-                  <TableHead className="w-25">Orden</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
+                  <TableHead>{t("sitePortfolioSections.colTitle")}</TableHead>
+                  <TableHead className="w-25">{t("sitePortfolioSections.colOrder")}</TableHead>
+                  <TableHead className="text-right">{t("sitePortfolioSections.colActions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -180,7 +181,7 @@ const filteredSections = sections;
                       colSpan={3}
                       className="text-center py-6 text-muted-foreground"
                     >
-                      No hay secciones encontradas.
+                      {t("sitePortfolioSections.emptyList")}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -219,11 +220,11 @@ const filteredSections = sections;
       {meta && meta.totalPages > 1 && (
         <div className="flex justify-center items-center gap-4 mt-4">
           <Button size="sm" variant="secondary" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
-            &lt; Anterior
+            {t("sitePortfolioSections.btnPrev")}
           </Button>
-          <span>Página {currentPage} de {meta.totalPages}</span>
+          <span>{t("sitePortfolioSections.paginationInfo", { page: currentPage, total: meta.totalPages })}</span>
           <Button size="sm" variant="secondary" onClick={() => setCurrentPage((p) => Math.min(meta.totalPages, p + 1))} disabled={currentPage === meta.totalPages}>
-            Siguiente &gt;
+            {t("sitePortfolioSections.btnNext")}
           </Button>
         </div>
       )}
@@ -234,19 +235,18 @@ const filteredSections = sections;
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar sección?</AlertDialogTitle>
+            <AlertDialogTitle>{t("sitePortfolioSections.deleteTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. Se eliminará la sección "
-              {sectionToDelete?.title}".
+              {t("sitePortfolioSections.deleteDesc", { name: sectionToDelete?.title })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t("sitePortfolioSections.cancelBtn")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Eliminar
+              {t("sitePortfolioSections.deleteBtn")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
