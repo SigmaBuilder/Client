@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import api from '@/lib/api';
 import type { Site } from '@/types/project';
+import { useTranslation } from 'react-i18next';
 
 interface SitesTabProps {
   sites: Site[] | null;
@@ -47,6 +48,7 @@ function toSlug(value: string) {
 
 export function SitesTab({ sites, isLoading, projectId, onSiteCreated }: SitesTabProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Create site dialog
   const [createOpen, setCreateOpen] = useState(false);
@@ -76,11 +78,11 @@ export function SitesTab({ sites, isLoading, projectId, onSiteCreated }: SitesTa
 
   const handleCreateSite = async () => {
     if (!siteName.trim()) {
-      toast.error('El nombre del sitio es obligatorio');
+      toast.error(t('projectSites.toastNameRequired'));
       return;
     }
     if (!siteSlug.trim()) {
-      toast.error('El slug del sitio es obligatorio');
+      toast.error(t('projectSites.toastSlugRequired'));
       return;
     }
     setCreating(true);
@@ -89,11 +91,11 @@ export function SitesTab({ sites, isLoading, projectId, onSiteCreated }: SitesTa
       slug: siteSlug.trim(),
     });
     if (res.success && res.data) {
-      toast.success(`Sitio "${res.data.site.name}" creado correctamente`);
+      toast.success(t('projectSites.toastCreated', { name: res.data.site.name }));
       setCreateOpen(false);
       onSiteCreated?.();
     } else {
-      toast.error(res.error ?? 'Error creando el sitio');
+      toast.error(res.error ?? t('projectSites.toastErrorCreate'));
     }
     setCreating(false);
   };
@@ -111,13 +113,13 @@ export function SitesTab({ sites, isLoading, projectId, onSiteCreated }: SitesTa
       <>
         <div className="flex flex-col items-center justify-center py-24 text-center border-2 border-dashed rounded-xl">
           <Globe className="size-12 text-muted-foreground mb-4" />
-          <p className="font-semibold text-lg mb-1">Sin sitios aún</p>
+          <p className="font-semibold text-lg mb-1">{t('projectSites.noSitesTitle')}</p>
           <p className="text-sm text-muted-foreground mb-4 max-w-xs">
-            Crea el primer sitio de este proyecto para empezar.
+            {t('projectSites.noSitesDesc')}
           </p>
           <Button size="sm" onClick={openCreateDialog}>
             <Plus data-icon="inline-start" />
-            Crear sitio
+            {t('projectSites.createSiteBtn')}
           </Button>
         </div>
 
@@ -150,7 +152,7 @@ export function SitesTab({ sites, isLoading, projectId, onSiteCreated }: SitesTa
                   {site.content?.favicon_url ? (
                     <img
                       src={site.content.favicon_url}
-                      alt={`Favicon de ${site.name || site.slug}`}
+                      alt={t('projectSites.faviconAlt', { name: site.name || site.slug })}
                       className="size-full object-cover"
                     />
                   ) : (
@@ -164,7 +166,7 @@ export function SitesTab({ sites, isLoading, projectId, onSiteCreated }: SitesTa
               </div>
               <CardAction>
                 <Badge variant={site.status === 'public' ? 'default' : 'secondary'}>
-                  {site.status === 'public' ? 'Publicado' : 'Borrador'}
+                  {site.status === 'public' ? t('projectSites.published') : t('projectSites.draft')}
                 </Badge>
               </CardAction>
             </CardHeader>
@@ -183,7 +185,7 @@ export function SitesTab({ sites, isLoading, projectId, onSiteCreated }: SitesTa
           onClick={openCreateDialog}
         >
           <Plus className="size-5" />
-          <span className="text-sm">Nuevo sitio</span>
+          <span className="text-sm">{t('projectSites.newSiteTitle')}</span>
         </button>
       </div>
 
@@ -216,25 +218,26 @@ function CreateSiteDialog({
   open, onOpenChange, siteName, siteSlug, creating,
   onNameChange, onSlugChange, onSubmit,
 }: CreateSiteDialogProps) {
+  const { t } = useTranslation();
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Nuevo sitio</DialogTitle>
+          <DialogTitle>{t('projectSites.newSiteTitle')}</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-4 py-2">
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="site-name">Nombre del sitio</Label>
+            <Label htmlFor="site-name">{t('projectSites.nameLabel')}</Label>
             <Input
               id="site-name"
               value={siteName}
               onChange={e => onNameChange(e.target.value)}
               disabled={creating}
-              placeholder="Mi sitio web"
+              placeholder={t('projectSites.namePlaceholder')}
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label htmlFor="site-slug">Slug (URL)</Label>
+            <Label htmlFor="site-slug">{t('projectSites.slugLabel')}</Label>
             <div className="flex items-center gap-0 rounded-md border overflow-hidden focus-within:ring-2 focus-within:ring-ring">
               <span className="px-3 py-2 text-sm text-muted-foreground bg-muted border-r select-none">
                 /
@@ -245,18 +248,18 @@ function CreateSiteDialog({
                 value={siteSlug}
                 onChange={e => onSlugChange(e.target.value)}
                 disabled={creating}
-                placeholder="mi-sitio-web"
+                placeholder={t('projectSites.slugPlaceholder')}
               />
             </div>
             <p className="text-xs text-muted-foreground">
-              Solo letras minúsculas, números y guiones.
+              {t('projectSites.slugHelp')}
             </p>
           </div>
         </div>
         <DialogFooter showCloseButton>
           <Button onClick={onSubmit} disabled={creating}>
             {creating && <Loader2 className="size-3.5 animate-spin" />}
-            Crear sitio
+            {t('projectSites.createSiteBtn')}
           </Button>
         </DialogFooter>
       </DialogContent>
