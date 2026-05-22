@@ -9,6 +9,7 @@ import {
   SquareTerminal,
   Settings,
   Image,
+  Book,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -60,9 +61,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     ],
     navSecondary: [
       {
-        title: "Comentarios",
-        url: "https://github.com/SigmaBuilder/Client/issues/new",
-        icon: Send,
+        title: "Documentación API",
+        url: `${siteBaseUrl}/docs`,
+        icon: Book,
       },
       {
         title: "Ir al proyecto",
