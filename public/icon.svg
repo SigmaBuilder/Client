@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <style>
+    /* Color por defecto para modo claro */
+    .figura { fill: #000000; } 
+    
+    /* Si el navegador/sistema está en modo oscuro, cambia a blanco */
+    @media (prefers-color-scheme: dark) {
+      .figura { fill: #FFFFFF; }
+    }
+  </style>
+  <path 
+    class="figura"
+    fill-rule="evenodd" 
+    d="M 0 0 L 100 0 L 100 100 L 0 100 Z M 82 13 L 82 35 L 70 35 L 70 24 L 36 24 L 57 49 L 36 75 L 70 75 L 70 64 L 82 64 L 82 86 L 18 86 L 18 76 L 41 49 L 18 22 L 18 13 Z"
+  />
+</svg>
