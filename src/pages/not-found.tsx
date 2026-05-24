@@ -4,9 +4,11 @@ import Navbar from "../components/landing/Navbar";
 import Footer from "../components/shared/Footer";
 import { FileQuestion } from "lucide-react";
 import { useAuth } from "../hooks/use-auth";
+import { useTranslation } from "react-i18next";
 
 export default function NotFoundPage() {
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -27,18 +29,18 @@ export default function NotFoundPage() {
           </div>
           <div className="space-y-4">
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight">404</h1>
-            <h2 className="text-2xl md:text-3xl font-semibold text-muted-foreground">Página no encontrada</h2>
+            <h2 className="text-2xl md:text-3xl font-semibold text-muted-foreground">{t("notFound.title")}</h2>
             <p className="max-w-md mx-auto text-muted-foreground">
-              Lo sentimos, no pudimos encontrar la página que estás buscando.
+              {t("notFound.desc")}
             </p>
           </div>
           <div className="flex justify-center gap-4">
             <Button asChild size="lg">
-              <Link to="/">Volver al inicio</Link>
+              <Link to="/">{t("notFound.btnHome")}</Link>
             </Button>
             {isAuthenticated && (
               <Button asChild variant="outline" size="lg">
-                <Link to="/dashboard">Ir al Dashboard</Link>
+                <Link to="/dashboard">{t("notFound.btnDashboard")}</Link>
               </Button>
             )}
           </div>

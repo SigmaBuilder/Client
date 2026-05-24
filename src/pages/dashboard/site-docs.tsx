@@ -38,7 +38,7 @@ export default function SiteDocsPage() {
   const { currentSite } = useWorkspace();
   const [docs, setDocs] = useState<DocsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   useSetSitePageHeader({
     breadcrumbs: [{ label: t("siteDocs.breadcrumb") }],
@@ -62,7 +62,7 @@ export default function SiteDocsPage() {
       }
     };
     fetchDocs();
-  }, [currentSite?.slug]);
+  }, [currentSite?.slug, i18n.language]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
