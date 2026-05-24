@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useRef } from "react";
-import api from "../lib/api";
-import { Project, Site, WorkspaceProject } from "../types/project";
+import api from "@/lib/api";
+import { Project, Site, WorkspaceProject } from "@/types/project";
 
 interface WorkspaceContextType {
   projects: WorkspaceProject[] | null;

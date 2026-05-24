@@ -18,11 +18,11 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
-import { MediaLibraryManager } from '../MediaLibrary/MediaLibraryManager';
-import { MediaAsset } from '../MediaLibrary/MediaLibraryView';
+import { MediaLibraryManager } from '@/components/shared/MediaLibrary/MediaLibraryManager';
+import { MediaAsset } from '@/components/shared/MediaLibrary/MediaLibraryView';
 import { useCallback, useState } from 'react';
 import { useTranslation } from "react-i18next";
-import './tiptap.css';
+import '@/components/shared/TiptapEditor/tiptap.css';
 
 interface TiptapEditorProps {
   value: any;

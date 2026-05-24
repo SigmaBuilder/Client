@@ -1,5 +1,5 @@
-import api from './api';
-import { User, AuthResponse } from '../types/auth';
+import api from '@/lib/api';
+import { User, AuthResponse } from '@/types/auth';
 
 export const setAuthData = (accessToken: string, user: User) => {
   localStorage.setItem('accessToken', accessToken);
