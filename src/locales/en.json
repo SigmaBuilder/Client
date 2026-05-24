@@ -429,7 +429,10 @@
     "settingsSlug": "Path (Slug)",
     "apiDesc": "Endpoints for the active modules of this site.",
     "apiFullDocs": "View Full Documentation",
-    "settingsBtn": "Settings"
+    "settingsBtn": "Settings",
+    "mobileNotAvailableTitle": "Editor Not Available on Mobile",
+    "mobileNotAvailableDesc": "The page editor requires a larger screen. Please access from a desktop or laptop computer to edit your pages.",
+    "mobileNotAvailableBack": "Back to Pages"
   },
   "siteBlogPosts": {
     "statusArchived": "Archived",

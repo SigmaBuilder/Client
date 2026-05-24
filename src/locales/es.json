@@ -429,7 +429,10 @@
     "settingsSlug": "Ruta (Slug)",
     "apiDesc": "Endpoints para los módulos activos de este sitio.",
     "apiFullDocs": "Ver Documentación Completa",
-    "settingsBtn": "Ajustes"
+    "settingsBtn": "Ajustes",
+    "mobileNotAvailableTitle": "Editor no disponible en móviles",
+    "mobileNotAvailableDesc": "El editor de páginas requiere una pantalla más grande. Por favor, accede desde un ordenador de escritorio o portátil para editar tus páginas.",
+    "mobileNotAvailableBack": "Volver a Páginas"
   },
   "siteBlogPosts": {
     "statusArchived": "Archivado",
