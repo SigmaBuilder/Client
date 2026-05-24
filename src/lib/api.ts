@@ -17,8 +17,10 @@ class ApiClient {
 
   getAuthHeaders() {
     const token = localStorage.getItem("accessToken");
+    const lang = localStorage.getItem("i18nextLng") || "es";
     return {
       "Content-Type": "application/json",
+      "Accept-Language": lang,
       ...(token && { Authorization: `Bearer ${token}` }),
     };
   }
