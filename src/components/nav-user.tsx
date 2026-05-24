@@ -42,15 +42,15 @@ export function NavUser() {
     : "??";
 
   return (
-    <SidebarMenu className="w-full sm:ml-auto sm:w-auto">
+    <SidebarMenu className="w-fit sm:ml-auto">
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="w-fit px-1.5 sm:px-2 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="grid flex-1 text-right text-sm leading-tight">
+              <div className="hidden sm:grid flex-1 text-right text-sm leading-tight mr-2">
                 <span className="truncate font-medium">
                   {user ? `${user.first_name} ${user.last_name}` : t("navUser.fallbackName")}
                 </span>
@@ -69,7 +69,7 @@ export function NavUser() {
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className="w-56 rounded-lg"
             side="bottom"
             align="end"
             sideOffset={4}
