@@ -4,10 +4,12 @@ import Navbar from "../components/landing/Navbar";
 import Footer from "../components/shared/Footer";
 import { ServerCrash } from "lucide-react";
 import { useAuth } from "../hooks/use-auth";
+import { useTranslation } from "react-i18next";
 
 export default function ErrorPage() {
   const error = useRouteError() as any;
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -28,9 +30,9 @@ export default function ErrorPage() {
           </div>
           <div className="space-y-4">
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight">500</h1>
-            <h2 className="text-2xl md:text-3xl font-semibold text-muted-foreground">Error del servidor</h2>
+            <h2 className="text-2xl md:text-3xl font-semibold text-muted-foreground">{t("errorPage.title")}</h2>
             <p className="max-w-md mx-auto text-muted-foreground">
-              Ha ocurrido un error inesperado de nuestro lado. Estamos trabajando para solucionarlo lo antes posible.
+              {t("errorPage.desc")}
             </p>
             {error && error.statusText || error.message ? (
               <div className="mt-4 p-4 bg-muted rounded-md max-w-lg mx-auto text-sm text-left overflow-auto border">
@@ -42,14 +44,14 @@ export default function ErrorPage() {
           </div>
           <div className="flex justify-center gap-4">
             <Button onClick={() => window.location.reload()} size="lg">
-              Intentar de nuevo
+              {t("errorPage.btnRetry")}
             </Button>
             <Button asChild variant="outline" size="lg">
-              <Link to="/">Volver al inicio</Link>
+              <Link to="/">{t("errorPage.btnHome")}</Link>
             </Button>
             {isAuthenticated && (
               <Button asChild variant="outline" size="lg">
-                <Link to="/dashboard">Ir al Dashboard</Link>
+                <Link to="/dashboard">{t("errorPage.btnDashboard")}</Link>
               </Button>
             )}
           </div>
