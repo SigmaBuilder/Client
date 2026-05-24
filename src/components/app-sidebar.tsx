@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useWorkspace } from "@/hooks/use-workspace";
 import {
   Bot,
@@ -22,12 +22,22 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { useTranslation } from "react-i18next";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { currentProject, currentSite } = useWorkspace();
   const { t } = useTranslation();
+  const { isMobile, setOpenMobile } = useSidebar();
+  const location = useLocation();
+
+  React.useEffect(() => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  }, [location.pathname, isMobile, setOpenMobile]);
+
   const enabledModules = currentSite?.features?.modules ?? {};
   const siteBaseUrl = `/dashboard/site/${currentSite?.slug}`;
   const modulesUrl = `${siteBaseUrl}/modules`;
