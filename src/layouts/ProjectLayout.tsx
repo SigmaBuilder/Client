@@ -67,7 +67,7 @@ export default function ProjectLayout() {
   return (
     <div className="flex flex-col h-full min-h-0">
       {/* Page header */}
-      <div className="flex items-end justify-between px-6 pt-6 pb-4 gap-4">
+      <div className="flex items-center justify-between px-4 md:px-6 pt-6 pb-4 gap-4">
         <div className="flex flex-col gap-1 min-w-0">
           {isLoading ? (
             <>
@@ -76,11 +76,11 @@ export default function ProjectLayout() {
             </>
           ) : (
             <>
-              <h1 className="text-2xl font-bold tracking-tight truncate">
+              <h1 className="text-xl md:text-2xl font-bold tracking-tight truncate">
                 {currentProject?.name ?? t('projectLayout.defaultProjectName')}
               </h1>
               {currentProject?.description && (
-                <p className="text-sm text-muted-foreground truncate">
+                <p className="text-xs md:text-sm text-muted-foreground truncate">
                   {currentProject.description}
                 </p>
               )}
@@ -97,7 +97,7 @@ export default function ProjectLayout() {
 
       {/* Sticky nav bar */}
       <div className="sticky top-[var(--header-height,56px)] z-10 bg-background border-b border-muted/60">
-        <div className="flex items-center px-6 gap-0">
+        <div className="flex items-center px-4 md:px-6 gap-0 overflow-x-auto">
           {TABS.map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.key;
@@ -106,7 +106,7 @@ export default function ProjectLayout() {
                 key={tab.key}
                 onClick={() => navigate(`${basePath}${tab.path}`)}
                 className={cn(
-                  'flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors',
+                  'flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors shrink-0',
                   isActive
                     ? 'border-primary text-primary'
                     : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30'
@@ -115,7 +115,7 @@ export default function ProjectLayout() {
                 <Icon className="size-4" />
                 {tab.label}
                 {tab.key === 'sites' && sites && sites.length > 0 && (
-                  <Badge variant="secondary">{sites.length}</Badge>
+                  <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{sites.length}</Badge>
                 )}
               </button>
             );
@@ -124,7 +124,7 @@ export default function ProjectLayout() {
       </div>
 
       {/* Sub-page content */}
-      <div className="flex-1 overflow-auto p-6">
+      <div className="flex-1 overflow-auto p-4 md:p-6">
         <Outlet context={outletContext} />
       </div>
     </div>
