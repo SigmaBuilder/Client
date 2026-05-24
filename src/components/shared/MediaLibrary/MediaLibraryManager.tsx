@@ -7,7 +7,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { MediaLibraryView, MediaAsset } from "./MediaLibraryView";
+import { MediaLibraryView, MediaAsset } from "@/components/shared/MediaLibrary/MediaLibraryView";
 import { useTranslation } from "react-i18next";
 
 interface MediaLibraryManagerProps {
