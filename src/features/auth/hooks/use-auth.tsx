@@ -6,7 +6,7 @@ import {
   useCallback,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { User } from "../types/auth";
+import { User } from "@/types/auth";
 import {
   login as authLogin,
   register as authRegister,

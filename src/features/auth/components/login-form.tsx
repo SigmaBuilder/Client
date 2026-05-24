@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Link, useSearchParams } from "react-router-dom";
 import { useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { toast } from "sonner";
 import api from "@/lib/api";
 import { useTranslation } from "react-i18next";

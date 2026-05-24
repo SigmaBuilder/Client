@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import LoaderComponent from "@/components/loader";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
