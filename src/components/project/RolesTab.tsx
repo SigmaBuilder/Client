@@ -13,6 +13,9 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from '@/components/ui/dialog';
 import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
+import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
@@ -195,9 +198,38 @@ export function RolesTab({ projectId }: RolesTabProps) {
   };
 
   return (
-    <div className="grid grid-cols-[200px_1fr] gap-6 items-start">
+    <div className="flex flex-col md:grid md:grid-cols-[200px_1fr] gap-6 items-start w-full">
+      {/* Mobile selector */}
+      <div className="md:hidden flex items-center gap-2 w-full mb-2">
+        <div className="flex-1">
+          <Select value={selectedRoleId ?? ''} onValueChange={setSelectedRoleId}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder={t('projectRoles.rolesLabel')} />
+            </SelectTrigger>
+            <SelectContent>
+              {(roles ?? []).map(role => (
+                <SelectItem key={role.id} value={role.id}>
+                  <div className="flex items-center gap-2">
+                    <span>{role.name}</span>
+                    {role.super && <Badge variant="secondary" className="ml-1 py-0 px-1 text-[10px]">super</Badge>}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <Button
+          variant="outline"
+          size="icon"
+          className="shrink-0 border-dashed"
+          onClick={() => setNewRoleOpen(true)}
+        >
+          <Plus className="size-4" />
+        </Button>
+      </div>
+
       {/* Role sidebar */}
-      <div className="flex flex-col gap-1">
+      <div className="hidden md:flex md:flex-col gap-1 w-full">
         <p className="text-xs font-medium text-muted-foreground px-2 mb-1">{t('projectRoles.rolesLabel')}</p>
         {loading ? <SidebarSkeleton /> : (roles ?? []).map(role => (
           <button
@@ -227,7 +259,7 @@ export function RolesTab({ projectId }: RolesTabProps) {
       </div>
 
       {/* Permissions panel */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 w-full">
         {loading ? <PermissionsSkeleton /> : selectedRole && (
           <>
             {/* Role header */}

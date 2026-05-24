@@ -90,13 +90,13 @@ export function SitePageHeaderProvider({
 
       {/* Mobile: show last breadcrumb only as context */}
       {headerState.breadcrumbs && headerState.breadcrumbs.length > 0 && (
-        <span className="sm:hidden text-sm text-muted-foreground truncate">
+        <span className="sm:hidden text-sm font-medium text-muted-foreground truncate">
           {headerState.breadcrumbs[headerState.breadcrumbs.length - 1].label}
         </span>
       )}
 
       {/* Right: searchbar + actions */}
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-auto">
+      <div className="flex items-center gap-1.5 sm:gap-3 shrink-0 ml-auto">
         {headerState.search && (
           <input
             type="text"
@@ -107,7 +107,7 @@ export function SitePageHeaderProvider({
           />
         )}
         {headerState.actions && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {headerState.actions}
           </div>
         )}

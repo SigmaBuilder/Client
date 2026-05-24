@@ -4,7 +4,7 @@ import * as React from "react"
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
-import { CheckIcon, ChevronRightIcon } from "lucide-react"
+import { CheckIcon, ChevronLeftIcon } from "lucide-react"
 
 function DropdownMenu({
   ...props
@@ -231,8 +231,8 @@ function DropdownMenuSubTrigger({
       )}
       {...props}
     >
+      <ChevronLeftIcon className="mr-1.5 size-4" />
       {children}
-      <ChevronRightIcon className="ml-auto" />
     </DropdownMenuPrimitive.SubTrigger>
   )
 }
