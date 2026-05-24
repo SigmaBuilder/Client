@@ -14,6 +14,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Card } from '@/components/ui/card';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -118,8 +119,100 @@ export function MembersTab({ projectId, roles }: MembersTabProps) {
         </Button>
       </div>
 
-      {/* Members table */}
-      <div className="rounded-lg border">
+      {/* Mobile view - cards */}
+      <div className="flex flex-col gap-3 sm:hidden">
+        {loading ? (
+          Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i} className="p-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="size-8 rounded-full" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+                <Skeleton className="h-8 w-24" />
+              </div>
+            </Card>
+          ))
+        ) : (members ?? []).length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground text-sm">
+            {t('projectMembers.noMembers') || 'No members found'}
+          </div>
+        ) : (
+          (members ?? []).map((member) => {
+            const fullName = `${member.profile.first_name} ${member.profile.last_name}`;
+            const initials = `${member.profile.first_name[0]}${member.profile.last_name[0]}`.toUpperCase();
+            const isUpdating = updatingId === member.profile.id;
+            return (
+              <Card key={member.profile.id} className="p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Avatar className="size-9 shrink-0">
+                      <AvatarFallback>{initials}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex flex-col">
+                      <span className="font-medium text-sm truncate">{fullName}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {t('projectMembers.colJoined')}: {new Date(member.joined_at).toLocaleDateString('es-ES', {
+                          day: '2-digit', month: 'short', year: 'numeric',
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="size-8">
+                          <MoreHorizontal className="size-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          variant="destructive"
+                          onClick={() => openRemoveDialog(member)}
+                        >
+                          <Trash2 className="size-4" />
+                          {t('projectMembers.removeAction')}
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+                
+                <div className="mt-3 flex items-center justify-between border-t pt-3">
+                  <span className="text-xs text-muted-foreground font-medium">{t('projectMembers.colRole')}</span>
+                  <div className="w-[140px]">
+                    {isUpdating ? (
+                      <div className="flex justify-end pr-4">
+                        <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                      </div>
+                    ) : (
+                      <Select
+                        value={member.role?.id ?? ''}
+                        onValueChange={(val) => handleRoleChange(member.profile.id, val)}
+                        disabled={isUpdating}
+                      >
+                        <SelectTrigger className="h-8 text-xs">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {roles.map(r => (
+                            <SelectItem key={r.id} value={r.id} className="text-xs">
+                              {r.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            );
+          })
+        )}
+      </div>
+
+      {/* Desktop view - table */}
+      <div className="hidden sm:block rounded-lg border">
         <Table>
           <TableHeader>
             <TableRow>
