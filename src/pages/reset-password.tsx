@@ -12,8 +12,10 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import api from "@/lib/api";
+import { useTranslation } from "react-i18next";
 
 export function ResetPasswordPage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const navigate = useNavigate();
@@ -28,13 +30,13 @@ export function ResetPasswordPage() {
         <div className="w-full max-w-sm">
           <Alert variant="destructive" className="mb-4">
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
+            <AlertTitle>{t("resetPassword.errorTitle")}</AlertTitle>
             <AlertDescription>
-              El enlace para restablecer la contraseña no es válido o está incompleto.
+              {t("resetPassword.errorDesc")}
             </AlertDescription>
           </Alert>
           <Button asChild className="w-full">
-            <Link to="/login">Volver a Iniciar Sesión</Link>
+            <Link to="/login">{t("resetPassword.btnGoToLogin")}</Link>
           </Button>
         </div>
       </div>
@@ -45,12 +47,12 @@ export function ResetPasswordPage() {
     e.preventDefault();
 
     if (password.length < 8) {
-      toast.error("La contraseña debe tener al menos 8 caracteres.");
+      toast.error(t("resetPassword.toastPasswordLength"));
       return;
     }
 
     if (password !== confirmPassword) {
-      toast.error("Las contraseñas no coinciden.");
+      toast.error(t("resetPassword.toastPasswordMismatch"));
       return;
     }
 
@@ -59,13 +61,13 @@ export function ResetPasswordPage() {
     try {
       const response = await api.resetPassword(token, password);
       if (response.success) {
-        toast.success("Contraseña actualizada exitosamente.");
+        toast.success(t("resetPassword.toastSuccessUpdate"));
         navigate("/login");
       } else {
-        toast.error(response.error || "El enlace es inválido o ha expirado.");
+        toast.error(response.error || t("resetPassword.toastErrorInvalidLink"));
       }
     } catch (err: any) {
-      toast.error(err.message || "Error al conectar con el servidor.");
+      toast.error(err.message || t("resetPassword.toastErrorConnect"));
     } finally {
       setLoading(false);
     }
@@ -79,13 +81,13 @@ export function ResetPasswordPage() {
             <form onSubmit={handleSubmit}>
               <FieldGroup>
                 <div className="flex flex-col items-center gap-2 text-center">
-                  <h1 className="text-2xl font-bold">Restablecer Contraseña</h1>
+                  <h1 className="text-2xl font-bold">{t("resetPassword.title")}</h1>
                   <p className="text-sm text-muted-foreground">
-                    Ingresa tu nueva contraseña a continuación.
+                    {t("resetPassword.subtitle")}
                   </p>
                 </div>
                 <Field>
-                  <FieldLabel htmlFor="password">Nueva Contraseña</FieldLabel>
+                  <FieldLabel htmlFor="password">{t("resetPassword.newPassword")}</FieldLabel>
                   <Input
                     id="password"
                     type="password"
@@ -96,7 +98,7 @@ export function ResetPasswordPage() {
                   />
                 </Field>
                 <Field>
-                  <FieldLabel htmlFor="confirmPassword">Confirmar Contraseña</FieldLabel>
+                  <FieldLabel htmlFor="confirmPassword">{t("resetPassword.confirmPassword")}</FieldLabel>
                   <Input
                     id="confirmPassword"
                     type="password"
@@ -107,7 +109,7 @@ export function ResetPasswordPage() {
                   />
                 </Field>
                 <Button type="submit" disabled={loading} className="w-full mt-4">
-                  {loading ? "Actualizando..." : "Actualizar Contraseña"}
+                  {loading ? t("resetPassword.btnUpdating") : t("resetPassword.btnUpdate")}
                 </Button>
               </FieldGroup>
             </form>
