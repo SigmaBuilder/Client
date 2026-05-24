@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import ThemeToggle from "../shared/ThemeToggle"
-import LanguageToggle from "../shared/LanguageToggle"
-import { useAuth } from "@/hooks/use-auth"
+import ThemeToggle from "@/components/shared/ThemeToggle"
+import LanguageToggle from "@/components/shared/LanguageToggle"
+import { useAuth } from "@/features/auth/hooks/use-auth"
 import { useTranslation } from "react-i18next"
 
 export default function Navbar() {

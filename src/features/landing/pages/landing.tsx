@@ -1,6 +1,6 @@
-import Navbar from "../components/landing/Navbar";
-import Hero from "../components/landing/Hero";
-import Footer from "../components/shared/Footer";
+import Navbar from "@/features/landing/components/Navbar";
+import Hero from "@/features/landing/components/Hero";
+import Footer from "@/components/shared/Footer";
 
 export default function Landing() {
   return (
