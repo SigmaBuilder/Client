@@ -1,28 +1,28 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { useWorkspace } from "../../hooks/use-workspace";
-import { WorkspaceProject } from "../../types/project";
+import { useWorkspace } from "@/hooks/use-workspace";
+import { WorkspaceProject } from "@/types/project";
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
-} from "../../components/ui/card";
-import { Skeleton } from "../../components/ui/skeleton";
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Briefcase, Plus, Loader2 } from "lucide-react";
-import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "../../components/ui/dialog";
-import api from "../../lib/api";
+} from "@/components/ui/dialog";
+import api from "@/lib/api";
 import { useTranslation } from "react-i18next";
 
 export default function ProjectsList() {

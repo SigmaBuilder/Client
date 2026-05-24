@@ -21,7 +21,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import api from '@/lib/api';
 import type { Member, Role } from '@/types/project';
-import { InviteMemberDialog } from './invite-member-dialog';
+import { InviteMemberDialog } from '@/features/project/components/invite-member-dialog';
 import { useTranslation } from 'react-i18next';
 
 interface MembersTabProps {

@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { useWorkspace } from '@/hooks/use-workspace';
 import api from '@/lib/api';
 import type { Role } from '@/types/project';
-import DashboardNotFound from '../pages/dashboard/not-found';
+import DashboardNotFound from '@/components/shared/pages/dashboard-not-found';
 import { useTranslation } from 'react-i18next';
 
 /** Context passed down to child pages via Outlet context */

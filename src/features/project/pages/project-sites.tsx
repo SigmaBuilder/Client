@@ -1,7 +1,7 @@
 import { useOutletContext } from 'react-router-dom';
 import { useWorkspace } from '@/hooks/use-workspace';
-import { SitesTab } from '@/components/project/SitesTab';
-import type { ProjectOutletContext } from '@/layouts/ProjectLayout';
+import { SitesTab } from '@/features/project/components/SitesTab';
+import type { ProjectOutletContext } from '@/features/project/layouts/ProjectLayout';
 
 export default function ProjectSitesPage() {
   const { projectId } = useOutletContext<ProjectOutletContext>();
