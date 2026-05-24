@@ -109,6 +109,19 @@ export function SiteHeader() {
           </BreadcrumbList>
         </Breadcrumb>
 
+        {/* Mobile title context */}
+        <div className="sm:hidden flex-1 min-w-0 px-2">
+          {currentSite ? (
+            <span className="font-semibold text-sm truncate block">
+              {currentSite.name || currentSite.slug}
+            </span>
+          ) : crumbs.length > 0 ? (
+            <span className="font-semibold text-sm truncate block">
+              {t(crumbs[crumbs.length - 1].label)}
+            </span>
+          ) : null}
+        </div>
+
         <NavUser />
       </div>
     </header>
