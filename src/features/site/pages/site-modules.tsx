@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { Site } from "@/types/project";
-import { useSetSitePageHeader } from "@/components/site/SitePageHeader";
+import { useSetSitePageHeader } from "@/features/site/components/SitePageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";

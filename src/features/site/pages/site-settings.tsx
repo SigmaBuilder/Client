@@ -6,7 +6,7 @@ import { api } from "@/lib/api";
 import { useWorkspace } from "@/hooks/use-workspace";
 import type { Site } from "@/types/project";
 import { MediaLibraryManager } from "@/components/shared/MediaLibrary/MediaLibraryManager";
-import { useSetSitePageHeader } from "@/components/site/SitePageHeader";
+import { useSetSitePageHeader } from "@/features/site/components/SitePageHeader";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import DashboardNotFound from "./not-found";
+import DashboardNotFound from "@/components/shared/pages/dashboard-not-found";
 import { useTranslation } from "react-i18next";
 
 function toSlug(value: string) {

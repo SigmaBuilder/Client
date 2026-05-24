@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { api, API_URL } from "@/lib/api";
-import { useSetSitePageHeader } from "@/components/site/SitePageHeader";
+import { useSetSitePageHeader } from "@/features/site/components/SitePageHeader";
 import { BookOpen, Copy, Server, FileJson } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";

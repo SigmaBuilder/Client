@@ -1,15 +1,15 @@
 import { useRef, useState, useCallback, useMemo, type DragEvent } from "react";
-import { useWorkspace } from "../../hooks/use-workspace";
-import { MediaLibraryView, type MediaLibraryPathItem } from "../../components/shared/MediaLibrary/MediaLibraryView";
-import { Skeleton } from "../../components/ui/skeleton";
-import { Button } from "../../components/ui/button";
+import { useWorkspace } from "@/hooks/use-workspace";
+import { MediaLibraryView, type MediaLibraryPathItem } from "@/components/shared/MediaLibrary/MediaLibraryView";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { Plus, Upload } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../../components/ui/dialog";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { api } from "../../lib/api";
-import { useSetSitePageHeader } from "../../components/site/SitePageHeader";
+import { api } from "@/lib/api";
+import { useSetSitePageHeader } from "@/features/site/components/SitePageHeader";
 import { useTranslation } from "react-i18next";
 
 export default function SiteMediaPage() {

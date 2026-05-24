@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { getAccessToken } from "@/lib/auth";
 import { useChat } from "@ai-sdk/react";

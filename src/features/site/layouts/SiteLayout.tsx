@@ -5,8 +5,8 @@ import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { useWorkspace } from '@/hooks/use-workspace';
-import { SitePageHeaderProvider } from '@/components/site/SitePageHeader';
-import DashboardNotFound from '../pages/dashboard/not-found';
+import { SitePageHeaderProvider } from '@/features/site/components/SitePageHeader';
+import DashboardNotFound from '@/components/shared/pages/dashboard-not-found';
 
 export default function SiteLayout() {
   const { slug } = useParams<{ slug: string }>();
