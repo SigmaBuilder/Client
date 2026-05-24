@@ -11,9 +11,9 @@ import {
   Book,
 } from "lucide-react";
 
-import { NavMain } from "@/components/nav-main";
-import { NavModules } from "@/components/nav-modules";
-import { NavSecondary } from "@/components/nav-secondary";
+import { NavMain } from "@/components/layout/nav-main";
+import { NavModules } from "@/components/layout/nav-modules";
+import { NavSecondary } from "@/components/layout/nav-secondary";
 import {
   Sidebar,
   SidebarContent,

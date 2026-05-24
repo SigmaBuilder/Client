@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useSidebar } from "@/components/ui/sidebar";
 import { PanelLeftIcon } from "lucide-react";
-import { NavUser } from "@/components/nav-user";
+import { NavUser } from "@/components/layout/nav-user";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { useTranslation } from "react-i18next";
 

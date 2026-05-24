@@ -28,7 +28,7 @@ import {
   UserRound,
   Languages,
 } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useTheme } from "@/components/theme-provider";
 import { useTranslation } from "react-i18next";
 

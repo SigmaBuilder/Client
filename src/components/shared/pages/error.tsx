@@ -1,9 +1,9 @@
 import { useRouteError, Link } from "react-router-dom";
-import { Button } from "../components/ui/button";
-import Navbar from "../components/landing/Navbar";
-import Footer from "../components/shared/Footer";
+import { Button } from "@/components/ui/button";
+import Navbar from "@/features/landing/components/Navbar";
+import Footer from "@/components/shared/Footer";
 import { ServerCrash } from "lucide-react";
-import { useAuth } from "../hooks/use-auth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { useTranslation } from "react-i18next";
 
 export default function ErrorPage() {
