@@ -8,8 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import api from "@/lib/api";
+import { useTranslation } from "react-i18next";
 
 export function InvitePage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const navigate = useNavigate();
@@ -31,10 +33,10 @@ export function InvitePage() {
         if (res.success && res.data) {
           setInvitationData(res.data);
         } else {
-          setError(res.error || "La invitación no es válida o ha expirado.");
+          setError(res.error || t("invite.invalidTitle"));
         }
       } catch (err: any) {
-        setError(err.message || "Error al cargar la invitación.");
+        setError(err.message || t("invite.toastErrorConnect"));
       } finally {
         setLoading(false);
       }
@@ -49,13 +51,13 @@ export function InvitePage() {
         <div className="w-full max-w-md">
           <Alert variant="destructive" className="mb-4">
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Falta el token</AlertTitle>
+            <AlertTitle>{t("invite.missingTokenTitle")}</AlertTitle>
             <AlertDescription>
-              El enlace de invitación está incompleto.
+              {t("invite.missingTokenDesc")}
             </AlertDescription>
           </Alert>
           <Button asChild className="w-full">
-            <Link to="/dashboard">Ir al Dashboard</Link>
+            <Link to="/dashboard">{t("invite.btnGoToDashboard")}</Link>
           </Button>
         </div>
       </div>
@@ -85,11 +87,11 @@ export function InvitePage() {
         <div className="w-full max-w-md">
           <Alert variant="destructive" className="mb-4">
             <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Invitación no válida</AlertTitle>
+            <AlertTitle>{t("invite.invalidTitle")}</AlertTitle>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
           <Button asChild className="w-full">
-            <Link to="/dashboard">Ir al Dashboard</Link>
+            <Link to="/dashboard">{t("invite.btnGoToDashboard")}</Link>
           </Button>
         </div>
       </div>
@@ -101,13 +103,13 @@ export function InvitePage() {
     try {
       const res = await api.acceptInvitation(token);
       if (res.success) {
-        toast.success("Te has unido al proyecto exitosamente.");
+        toast.success(t("invite.toastSuccessJoin"));
         navigate("/dashboard");
       } else {
-        toast.error(res.error || "Ocurrió un error al aceptar la invitación.");
+        toast.error(res.error || t("invite.toastErrorAccept"));
       }
     } catch (err: any) {
-      toast.error(err.message || "Error al conectar con el servidor.");
+      toast.error(err.message || t("invite.toastErrorConnect"));
     } finally {
       setAccepting(false);
     }
@@ -127,14 +129,14 @@ export function InvitePage() {
               {invitationData?.invitation?.projectName?.charAt(0)?.toUpperCase() || "P"}
             </span>
           </div>
-          <CardTitle className="text-xl">Invitación a Proyecto</CardTitle>
+          <CardTitle className="text-xl">{t("invite.projectInvite")}</CardTitle>
         </CardHeader>
         <CardContent className="text-center space-y-4">
           <p className="text-muted-foreground">
             <strong className="text-foreground">
               {invitationData?.invitation?.inviterName}
             </strong>{" "}
-            te ha invitado a unirte a{" "}
+            {t("invite.invitedBy")}{" "}
             <strong className="text-foreground">
               {invitationData?.invitation?.projectName}
             </strong>
@@ -142,7 +144,7 @@ export function InvitePage() {
           </p>
           {invitationData?.invitation?.roleName && (
             <Badge variant="secondary" className="px-3 py-1">
-              Rol: {invitationData?.invitation?.roleName}
+              {t("invite.role")} {invitationData?.invitation?.roleName}
             </Badge>
           )}
         </CardContent>
@@ -152,7 +154,7 @@ export function InvitePage() {
             disabled={accepting}
             className="w-full"
           >
-            {accepting ? "Aceptando..." : "Aceptar invitación"}
+            {accepting ? t("invite.btnAccepting") : t("invite.btnAccept")}
           </Button>
           <Button
             variant="outline"
@@ -160,7 +162,7 @@ export function InvitePage() {
             disabled={accepting}
             className="w-full"
           >
-            Rechazar
+            {t("invite.btnReject")}
           </Button>
         </CardFooter>
       </Card>
