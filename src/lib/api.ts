@@ -1,6 +1,9 @@
 export const API_URL =
   import.meta.env.VITE_API_URL || import.meta.env.PUBLIC_URL_API || "http://localhost:3000/api/v1";
 
+export const SITE_VIEWER_URL =
+  import.meta.env.VITE_SITE_VIEWER_URL || "http://localhost:4000";
+
 interface ApiResponse<T> {
   success: boolean;
   error?: string | null;

@@ -18,9 +18,11 @@ import {
   PanelRightClose,
   PanelRightOpen,
   Settings,
+  Smartphone,
 } from "lucide-react";
 import Editor from "@monaco-editor/react";
 import { NavigationBlocker } from "@/components/NavigationBlocker";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Select,
   SelectContent,
@@ -61,6 +63,8 @@ export default function PageEditor() {
   const { pageId } = useParams();
   const navigate = useNavigate();
   const isNew = !pageId || pageId === "new";
+  const isMobile = useIsMobile();
+  const [nextRoute, setNextRoute] = useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState(!isNew);
   const [isSaving, setIsSaving] = useState(false);
@@ -69,6 +73,13 @@ export default function PageEditor() {
   const [slug, setSlug] = useState("");
   const [status, setStatus] = useState<"draft" | "public">("draft");
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (nextRoute) {
+      navigate(nextRoute, { replace: true });
+      setNextRoute(null);
+    }
+  }, [nextRoute, navigate]);
 
   const defaultHtml = '<div id="app">\n  <h1>Hello World</h1>\n</div>';
   const defaultCss = "body {\n  font-family: sans-serif;\n}";
@@ -151,7 +162,7 @@ export default function PageEditor() {
           });
         } else {
           toast.error(t("sitePageEditor.toastLoadError"));
-          navigate("..");
+          navigate(`/dashboard/site/${currentSite?.slug}/pages`);
         }
       } catch {
         toast.error(t("sitePageEditor.toastConnectError"));
@@ -325,9 +336,7 @@ export default function PageEditor() {
           js: jsContent,
         });
         if (isNew && (res.data?.id || res.data?.page?.id)) {
-          navigate(`../${res.data?.id || res.data?.page?.id}/edit`, {
-            replace: true,
-          });
+          setNextRoute(`/dashboard/site/${currentSite?.slug}/pages/${res.data?.id || res.data?.page?.id}/edit`);
         }
       } else {
         toast.error(res.error || t("sitePageEditor.toastSaveError"));
@@ -351,7 +360,7 @@ export default function PageEditor() {
         {
           label: t("sitePageEditor.breadcrumbPages"),
           href: `/dashboard/site/${currentSite?.slug}/pages`,
-          onClick: () => navigate(".."),
+          onClick: () => navigate(`/dashboard/site/${currentSite?.slug}/pages`),
         },
         { label: isNew ? t("sitePageEditor.breadcrumbNew") : name || t("sitePageEditor.breadcrumbEdit") },
       ],
@@ -566,6 +575,27 @@ export default function PageEditor() {
   );
 
   useSetSitePageHeader(headerState);
+
+  if (isMobile) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[80vh] px-4 py-12 text-center bg-background text-foreground">
+        <div className="flex flex-col items-center max-w-md p-6 bg-card border border-border rounded-2xl shadow-xl animate-in fade-in-0 zoom-in-95 duration-200">
+          <div className="flex items-center justify-center w-16 h-16 rounded-full bg-amber-500/10 text-amber-500 mb-6 ring-8 ring-amber-500/5 animate-pulse">
+            <Smartphone className="h-8 w-8" />
+          </div>
+          <h2 className="text-xl font-bold mb-3">
+            {t("sitePageEditor.mobileNotAvailableTitle")}
+          </h2>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+            {t("sitePageEditor.mobileNotAvailableDesc")}
+          </p>
+          <Button onClick={() => navigate(`/dashboard/site/${currentSite?.slug}/pages`)} variant="outline" className="w-full">
+            {t("sitePageEditor.mobileNotAvailableBack")}
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return <div className="p-6">{t("sitePageEditor.loading")}</div>;
