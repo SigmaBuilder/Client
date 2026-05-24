@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { api } from "@/lib/api";
-import { useSetSitePageHeader } from "@/components/site/SitePageHeader";
+import { useSetSitePageHeader } from "@/features/site/components/SitePageHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

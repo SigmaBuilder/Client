@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { api } from "@/lib/api";
-import { useSetSitePageHeader } from "@/components/site/SitePageHeader";
+import { useSetSitePageHeader } from "@/features/site/components/SitePageHeader";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Plus, Pencil, Trash2 } from "lucide-react";

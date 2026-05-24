@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useSetSitePageHeader } from "@/components/site/SitePageHeader";
+import { useSetSitePageHeader } from "@/features/site/components/SitePageHeader";
 import { useTranslation } from "react-i18next";
 
 interface BlogPost {

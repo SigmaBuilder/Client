@@ -17,7 +17,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useSetSitePageHeader } from "@/components/site/SitePageHeader";
+import { useSetSitePageHeader } from "@/features/site/components/SitePageHeader";
 import { useTranslation } from "react-i18next";
 
 interface Category {
