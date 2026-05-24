@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import ImageUploadDropzone from "@/components/upload/ImageUploadDropzone";

@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import ProfileField from "./ProfileField";
-import AvatarProfileField from "./AvatarProfileField";
-import EditNameDialog from "./EditNameDialog";
-import EditEmailDialog from "./EditEmailDialog";
-import EditPasswordDialog from "./EditPasswordDialog";
+import ProfileField from "@/features/account/components/ProfileField";
+import AvatarProfileField from "@/features/account/components/AvatarProfileField";
+import EditNameDialog from "@/features/account/components/EditNameDialog";
+import EditEmailDialog from "@/features/account/components/EditEmailDialog";
+import EditPasswordDialog from "@/features/account/components/EditPasswordDialog";
 import { useTranslation } from "react-i18next";
 
 export default function ProfileSection() {

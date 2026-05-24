@@ -1,6 +1,6 @@
-import ProfileSection from "@/components/account/ProfileSection";
-import LinkedAccounts from "@/components/account/LinkedAccounts";
-import ConnectedDevices from "@/components/account/ConnectedDevices";
+import ProfileSection from "@/features/account/components/ProfileSection";
+import LinkedAccounts from "@/features/account/components/LinkedAccounts";
+import ConnectedDevices from "@/features/account/components/ConnectedDevices";
 import { useTranslation } from "react-i18next";
 
 export default function AccountPage() {
