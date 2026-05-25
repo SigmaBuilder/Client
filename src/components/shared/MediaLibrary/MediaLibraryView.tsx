@@ -9,6 +9,10 @@ import {
   X,
   Copy,
   Upload,
+  Search,
+  Info,
+  Check,
+  FolderOpen,
 } from "lucide-react";
 import {
   ContextMenu,
@@ -32,6 +36,7 @@ import {
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
 
 export interface MediaAsset {
   id: string;
@@ -96,6 +101,14 @@ export function MediaLibraryView({
   >(null);
 
   const [selectedItem, setSelectedItem] = useState<SelectedItem>(null);
+
+  const [showMobileDetails, setShowMobileDetails] = useState(false);
+  const [isMobileSearching, setIsMobileSearching] = useState(false);
+
+  // Reset mobile details view when selected item changes
+  useEffect(() => {
+    setShowMobileDetails(false);
+  }, [selectedItem?.data.id]);
 
   // Dialog states
   const [deleteConfirm, setDeleteConfirm] = useState<{
@@ -321,67 +334,120 @@ export function MediaLibraryView({
         {/* Sticky Header / Toolbar */}
         {!hideHeader && (
           <div className="sticky top-0 z-10 flex items-center justify-between gap-4 px-4 py-3 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
-              {path.length > 1 && (
+            {isMobileSearching ? (
+              <div className="flex items-center gap-2 w-full">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 mr-1"
-                  onClick={navigateUp}
+                  className="h-8 w-8 shrink-0"
+                  onClick={() => {
+                    setIsMobileSearching(false);
+                    setInternalSearch("");
+                  }}
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
-              )}
-              <div className="flex items-center gap-1.5">
-                {path.map((p, i) => (
-                  <React.Fragment key={p.id || "root"}>
-                    <span
-                      className={`cursor-pointer px-2 py-1 rounded-md transition-all border ${
-                        dragOverBreadcrumbId === (p.id || "root")
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-transparent hover:bg-muted text-foreground"
-                      }`}
-                      onClick={() => {
-                        navigateToPathIndex(i);
-                      }}
-                      onDragOver={(e) => {
-                        e.preventDefault();
-                        setDragOverBreadcrumbId(p.id || "root");
-                      }}
-                      onDragLeave={handleDragLeaveBreadcrumb}
-                      onDrop={(e) => {
-                        setDragOverBreadcrumbId(null);
-                        handleDropOnFolder(e, p.id);
-                      }}
-                    >
-                      {p.name}
-                    </span>
-                    {i < path.length - 1 && (
-                      <span className="text-muted-foreground/40">/</span>
-                    )}
-                  </React.Fragment>
-                ))}
+                <Input
+                  autoFocus
+                  placeholder={t("mediaLibrary.searchPlaceholder")}
+                  value={search}
+                  onChange={(e) => setInternalSearch(e.target.value)}
+                  className="flex-1 bg-background h-9"
+                />
+                {search && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 shrink-0"
+                    onClick={() => setInternalSearch("")}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
-            </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium min-w-0">
+                  {path.length > 1 && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 mr-1 shrink-0"
+                      onClick={navigateUp}
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                    </Button>
+                  )}
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    {path.map((p, i) => {
+                      const isLast = i === path.length - 1;
+                      return (
+                        <React.Fragment key={p.id || "root"}>
+                          <span
+                            className={cn(
+                              "cursor-pointer px-2 py-1 rounded-md transition-all border truncate max-w-[120px]",
+                              !isLast && "hidden sm:inline-block",
+                              dragOverBreadcrumbId === (p.id || "root")
+                                ? "border-primary bg-primary/10 text-primary"
+                                : "border-transparent hover:bg-muted text-foreground"
+                            )}
+                            onClick={() => {
+                              navigateToPathIndex(i);
+                            }}
+                            onDragOver={(e) => {
+                              e.preventDefault();
+                              setDragOverBreadcrumbId(p.id || "root");
+                            }}
+                            onDragLeave={handleDragLeaveBreadcrumb}
+                            onDrop={(e) => {
+                              setDragOverBreadcrumbId(null);
+                              handleDropOnFolder(e, p.id);
+                            }}
+                          >
+                            {p.name}
+                          </span>
+                          {i < path.length - 1 && (
+                            <span className="text-muted-foreground/40 hidden sm:inline-block">/</span>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                  </div>
+                </div>
 
-            <div className="flex items-center gap-3">
-              <Button onClick={openFileDialog} variant="default" size="sm" className="h-9">
-                <Upload className="mr-2 h-4 w-4" /> {t("mediaLibrary.uploadBtn")}
-              </Button>
-              <Input
-                placeholder={t("mediaLibrary.searchPlaceholder")}
-                value={search}
-                onChange={(e) => setInternalSearch(e.target.value)}
-                className="w-56 bg-background hidden sm:block h-9"
-              />
-            </div>
+                <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 sm:hidden"
+                    onClick={() => setIsMobileSearching(true)}
+                  >
+                    <Search className="h-4 w-4" />
+                  </Button>
+                  <Button onClick={openFileDialog} variant="default" size="sm" className="h-9 px-2 sm:px-3">
+                    <Upload className="h-4 w-4" />
+                    <span className="hidden sm:inline ml-1.5">{t("mediaLibrary.uploadBtn")}</span>
+                  </Button>
+                  <Input
+                    placeholder={t("mediaLibrary.searchPlaceholder")}
+                    value={search}
+                    onChange={(e) => setInternalSearch(e.target.value)}
+                    className="w-56 bg-background hidden sm:block h-9"
+                  />
+                </div>
+              </>
+            )}
           </div>
         )}
 
         {/* Scrollable Grid Area */}
         <div
           {...getRootProps()}
-          className={`flex-1 overflow-y-auto p-4 transition-colors ${selectedItem ? "pr-[23rem]" : ""} ${isDragActive ? "bg-primary/5 ring-inset ring-2 ring-primary/20" : "bg-muted/10"}`}
+          className={cn(
+            "flex-1 overflow-y-auto p-4 transition-colors bg-muted/10",
+            selectedItem ? "pb-24 lg:pb-4 lg:pr-[23rem]" : "pb-4",
+            isDragActive && "bg-primary/5 ring-inset ring-2 ring-primary/20"
+          )}
           onClick={(e) => {
             // Deselect if clicking on empty background
             if (e.target === e.currentTarget) setSelectedItem(null);
@@ -412,7 +478,7 @@ export function MediaLibraryView({
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3 content-start">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3 content-start">
               {folders.map((folder) => {
                 const isSelected =
                   selectedItem?.type === "folder" &&
@@ -421,7 +487,7 @@ export function MediaLibraryView({
                   <ContextMenu key={folder.id}>
                     <ContextMenuTrigger>
                       <div
-                        className={`group box-border flex flex-col items-center gap-2 p-4 rounded-xl cursor-pointer text-center transition-all border ${
+                        className={`group relative box-border flex flex-col items-center gap-2 p-4 rounded-xl cursor-pointer text-center transition-all border ${
                           dragOverFolderId === folder.id
                             ? "border-primary bg-primary/10 shadow-[0_0_0_2px_hsl(var(--primary)/0.2)]"
                             : isSelected
@@ -446,6 +512,11 @@ export function MediaLibraryView({
                           handleDropOnFolder(e, folder.id);
                         }}
                       >
+                        {isSelected && (
+                          <div className="absolute top-2 right-2 z-10 bg-primary text-primary-foreground rounded-full p-1 shadow-md">
+                            <Check className="h-3 w-3 stroke-[3]" />
+                          </div>
+                        )}
                         <Folder className="h-14 w-14 fill-blue-500/20 text-blue-500 transition-transform group-hover:scale-105" />
                         <span
                           className="text-sm font-medium truncate w-full"
@@ -499,6 +570,11 @@ export function MediaLibraryView({
                           if (onSelect) onSelect(asset);
                         }}
                       >
+                        {isSelected && (
+                          <div className="absolute top-2.5 right-2.5 z-10 bg-primary text-primary-foreground rounded-full p-1 shadow-md">
+                            <Check className="h-3 w-3 stroke-[3]" />
+                          </div>
+                        )}
                         <div className="aspect-square bg-muted flex items-center justify-center overflow-hidden">
                           {asset.mime_type.startsWith("image/") ? (
                             <img
@@ -553,18 +629,102 @@ export function MediaLibraryView({
             </div>
           )}
         </div>
+
+        {/* MOBILE BOTTOM ACTION BAR */}
+        {selectedItem && (
+          <div className="lg:hidden border-t bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80 px-4 py-3 flex items-center justify-between gap-3 sticky bottom-0 left-0 right-0 z-10 shadow-[0_-4px_12px_rgba(0,0,0,0.08)]">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="h-10 w-10 shrink-0 rounded-lg overflow-hidden border bg-muted flex items-center justify-center">
+                {selectedItem.type === "folder" ? (
+                  <Folder className="h-5 w-5 text-blue-500 fill-blue-500/20" />
+                ) : selectedItem.data.mime_type.startsWith("image/") ? (
+                  <img
+                    src={selectedItem.data.file_url}
+                    alt={selectedItem.data.file_name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <FileIcon className="h-5 w-5 text-muted-foreground/60" />
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-medium truncate max-w-[100px] xs:max-w-[160px] sm:max-w-[220px]" title={selectedItem.type === "folder" ? selectedItem.data.name : selectedItem.data.file_name}>
+                  {selectedItem.type === "folder" ? selectedItem.data.name : selectedItem.data.file_name}
+                </p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                  {selectedItem.type === "folder"
+                    ? t("mediaLibrary.propFolder")
+                    : selectedItem.data.mime_type.split("/")[1] || t("mediaLibrary.propAsset")}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 shrink-0">
+              {selectedItem.type === "folder" ? (
+                <Button
+                  size="sm"
+                  variant="default"
+                  className="h-9 px-3 bg-primary text-primary-foreground hover:bg-primary/90"
+                  onClick={() => navigateToFolder(selectedItem.data)}
+                >
+                  <FolderOpen className="mr-1.5 h-4 w-4" />
+                  <span>{t("mediaLibrary.propOpenFolder").split(" ")[0]}</span>
+                </Button>
+              ) : (
+                onSelect && (
+                  <Button
+                    size="sm"
+                    variant="default"
+                    className="h-9 px-3 bg-primary text-primary-foreground hover:bg-primary/90"
+                    onClick={() => onSelect(selectedItem.data)}
+                  >
+                    <Check className="mr-1.5 h-4 w-4" />
+                    <span>{t("mediaLibrary.propSelect")}</span>
+                  </Button>
+                )
+              )}
+
+              <Button
+                size="icon"
+                variant="outline"
+                className="h-9 w-9"
+                onClick={() => setShowMobileDetails(true)}
+              >
+                <Info className="h-4 w-4" />
+              </Button>
+
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-9 w-9 text-muted-foreground"
+                onClick={() => setSelectedItem(null)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* SIDEBAR AREA */}
       {selectedItem && (
-        <div className="absolute right-3 top-3 bottom-3 z-20 w-80 rounded-xl border bg-card/95 backdrop-blur flex flex-col shadow-xl">
+        <div className={cn(
+          "absolute right-0 top-0 bottom-0 lg:right-3 lg:top-3 lg:bottom-3 z-20 w-full lg:w-80 rounded-none lg:rounded-xl border-l lg:border bg-card/95 backdrop-blur flex flex-col shadow-xl transition-all duration-200",
+          showMobileDetails ? "flex" : "hidden lg:flex"
+        )}>
           <div className="flex items-center justify-between px-4 py-3 border-b">
             <h3 className="font-semibold text-sm">{t("mediaLibrary.propTitle")}</h3>
             <Button
               variant="ghost"
               size="icon"
               className="h-8 w-8"
-              onClick={() => setSelectedItem(null)}
+              onClick={() => {
+                if (showMobileDetails) {
+                  setShowMobileDetails(false);
+                } else {
+                  setSelectedItem(null);
+                }
+              }}
             >
               <X className="h-4 w-4" />
             </Button>

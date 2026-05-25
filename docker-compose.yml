@@ -1,0 +1,15 @@
+services:
+  # Frontend Editor Service (Vite React preview SPA)
+  client:
+    image: ghcr.io/sigmabuilder/client:latest
+    container_name: sigmabuilder_client
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    # All environment variables (VITE_API_URL, etc.) are embedded into this container's build files at build time in CI
+    networks:
+      - sigmanet
+
+networks:
+  sigmanet:
+    external: true
