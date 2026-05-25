@@ -1,0 +1,66 @@
+name: Deploy Client to EC2
+
+on:
+  pull_request:
+
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=sha,value=${{ github.sha }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VITE_API_URL=${{ secrets.VITE_API_URL }}
+            PUBLIC_URL_API=${{ secrets.PUBLIC_URL_API }}
+            VITE_SITE_VIEWER_URL=${{ secrets.VITE_SITE_VIEWER_URL }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: self-hosted
+    permissions:
+      packages: read
+    steps:
+      - name: Deploy to Local Docker Compose
+        run: |
+          # Authenticate Docker daemon on EC2 to GitHub Packages using workflow GITHUB_TOKEN
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          
+          # Navigate to deployment directory, pull the latest frontend editor image, and update container
+          cd /home/ubuntu/sigmabuilder
+          docker compose pull client
+          docker compose up -d --remove-orphans client
+
+
