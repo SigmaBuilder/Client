@@ -163,7 +163,7 @@ export default function SiteHomePage() {
   const { messages, sendMessage, status, setMessages } = useChat({
     messages: getInitialMessages(),
     transport: new DefaultChatTransport({
-      api: `${import.meta.env.PUBLIC_URL_API || "http://localhost:3000/api/v1"}/sites/${currentSite?.id}/ai/chat`,
+      api: `${import.meta.env.VITE_API_URL || import.meta.env.PUBLIC_URL_API || "http://localhost:3000/api/v1"}/sites/${currentSite?.id}/ai/chat`,
       headers: {
         Authorization: `Bearer ${getAccessToken()}`,
       },
