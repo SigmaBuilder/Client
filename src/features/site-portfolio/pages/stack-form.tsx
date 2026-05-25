@@ -172,7 +172,7 @@ export default function PortfolioStackForm() {
 
   if (isLoading) {
     return (
-      <div className="p-6 max-w-2xl space-y-6">
+      <div className="container mx-auto p-4 md:p-6 max-w-3xl space-y-6 w-full">
         <Skeleton className="h-10 w-full" />
         <Skeleton className="h-32 w-full" />
       </div>
@@ -180,18 +180,20 @@ export default function PortfolioStackForm() {
   }
 
   return (
-    <div className="p-6 max-w-2xl">
-      <div className="flex items-center mb-6">
-        <Button variant="ghost" size="sm" onClick={() => navigate(sectionsPath)} className="mr-4">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          {t("sitePortfolioStackForm.backBtn")}
-        </Button>
-        <h2 className="text-xl font-semibold tracking-tight">
-          {isEditing ? t("sitePortfolioStackForm.titleEdit") : t("sitePortfolioStackForm.titleNew")}
-        </h2>
+    <div className="container mx-auto p-4 md:p-6 max-w-3xl w-full">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="sm" onClick={() => navigate(sectionsPath)} className="shrink-0">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            {t("sitePortfolioStackForm.backBtn")}
+          </Button>
+          <h2 className="text-2xl font-bold tracking-tight">
+            {isEditing ? t("sitePortfolioStackForm.titleEdit") : t("sitePortfolioStackForm.titleNew")}
+          </h2>
+        </div>
       </div>
 
-      <div className="space-y-6 bg-card border rounded-md p-6">
+      <div className="space-y-8 bg-card border border-border/50 rounded-xl p-6 md:p-8 shadow-sm">
         <div className="space-y-2" ref={dropdownRef}>
           <Label>{t("sitePortfolioStackForm.labelSearch")}</Label>
           <div className="relative">
