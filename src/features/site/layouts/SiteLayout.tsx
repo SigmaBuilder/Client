@@ -91,7 +91,7 @@ export default function SiteLayout() {
         <div className="flex flex-col h-full min-h-0">
           {/* Compact header */}
           <div className={cn(
-            "items-center justify-between px-4 sm:px-6 py-1.5 sm:py-3 gap-2 sm:gap-4 border-b bg-background shrink-0 h-11 sm:h-14",
+            "sticky top-[var(--header-height)] z-30 items-center justify-between px-4 sm:px-6 py-1.5 sm:py-3 gap-2 sm:gap-4 border-b bg-background/95 backdrop-blur-md shrink-0 h-11 sm:h-14",
             header ? "flex" : "hidden sm:flex"
           )}>
             <div className="hidden sm:flex items-center gap-2 min-w-0 shrink-0">
@@ -215,7 +215,7 @@ export default function SiteLayout() {
           </div>
 
           {/* Content */}
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 overflow-auto relative">
             <Outlet />
           </div>
         </div>
