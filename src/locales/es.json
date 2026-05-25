@@ -360,7 +360,13 @@
     "poweredBy": "Powered by IA — Describe cambios en lenguaje natural",
     "sugColors": "Cambiar colores del sitio",
     "errPrefix": "Error:",
-    "questionMark": "?"
+    "questionMark": "?",
+    "newChatBtn": "Nueva conversación",
+    "newChatConfirmTitle": "¿Iniciar nueva conversación?",
+    "newChatConfirmDesc": "Esto borrará los mensajes actuales. Ten en cuenta que esta conversación no se guardará en el servidor y se eliminará por completo.",
+    "newChatCancel": "Cancelar",
+    "newChatConfirm": "Confirmar",
+    "aiAssistant": "Asistente SigmaAI"
   },
   "sitePagesList": {
     "addPageLg": "Añadir Página",

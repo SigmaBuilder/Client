@@ -331,7 +331,7 @@
     "toolGetPages": "Site pages",
     "greetingEvening": "Good evening",
     "errUnexpected": "An unexpected error occurred. Try again.",
-    "sugImages": "Optimize images",
+    "sugImages": "Give me ideas of images for my site",
     "yourSite": "your site",
     "inputPlaceholder": "Ask the AI about your site or request changes...",
     "sugColorsDesc": "Adjust the color palette and visual theme",
@@ -342,7 +342,7 @@
     "toolCreatePage": "Create page",
     "toolSetHomeActive": "Setting home page…",
     "toolSearchActive": "Searching content…",
-    "sugImagesDesc": "Compress and adjust site images",
+    "sugImagesDesc": "Ideas realated to your site's theme and content",
     "toolCreatePageActive": "Creating page…",
     "toolPublishPageDone": "Page published",
     "toolPublishPage": "Publish page",
@@ -360,7 +360,13 @@
     "poweredBy": "Powered by AI — Describe changes in natural language",
     "sugColors": "Change site colors",
     "errPrefix": "Error:",
-    "questionMark": "?"
+    "questionMark": "?",
+    "newChatBtn": "New conversation",
+    "newChatConfirmTitle": "Start new conversation?",
+    "newChatConfirmDesc": "This will clear the current messages. Please note that this conversation will not be saved on the server and will be completely removed.",
+    "newChatCancel": "Cancel",
+    "newChatConfirm": "Confirm",
+    "aiAssistant": "SigmaAI Assistant"
   },
   "sitePagesList": {
     "addPageLg": "Add Page",

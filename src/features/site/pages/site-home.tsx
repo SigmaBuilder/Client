@@ -25,7 +25,19 @@ import {
   CheckCircle2,
   XCircle,
   RotateCcw,
+  Plus,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 /* ─── Tool metadata for pretty rendering ─────────────────────────────────── */
 const getToolMeta = (t: any): Record<
@@ -127,7 +139,6 @@ export default function SiteHomePage() {
   const { user } = useAuth();
   const { currentSite } = useWorkspace();
   const [isFocused, setIsFocused] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
@@ -137,7 +148,20 @@ export default function SiteHomePage() {
   const greeting =
     hour < 12 ? t("siteHome.greetingMorning") : hour < 19 ? t("siteHome.greetingAfternoon") : t("siteHome.greetingEvening");
 
+  // Load initial messages from local storage synchronously
+  const getInitialMessages = useCallback(() => {
+    if (!currentSite?.id) return [];
+    try {
+      const saved = localStorage.getItem(`sigmabuilder_chat_${currentSite.id}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  }, [currentSite?.id]);
+
   const { messages, sendMessage, status, setMessages } = useChat({
+    messages: getInitialMessages(),
     transport: new DefaultChatTransport({
       api: `${import.meta.env.PUBLIC_URL_API || "http://localhost:3000/api/v1"}/sites/${currentSite?.id}/ai/chat`,
       headers: {
@@ -158,12 +182,54 @@ export default function SiteHomePage() {
 
   const isLoading = status === "streaming" || status === "submitted";
 
-  /* ── Auto-scroll ──────────────────────────────────────────────────────── */
+  // Track site ID synchronization with local storage to avoid overwriting during loads
+  const [activeSiteId, setActiveSiteId] = useState(currentSite?.id);
+
+  // Load chat when active site changes
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    if (currentSite?.id && currentSite.id !== activeSiteId) {
+      setActiveSiteId(currentSite.id);
+      try {
+        const saved = localStorage.getItem(`sigmabuilder_chat_${currentSite.id}`);
+        setMessages(saved ? JSON.parse(saved) : []);
+      } catch (e) {
+        console.error(e);
+        setMessages([]);
+      }
     }
-  }, [messages, isLoading]);
+  }, [currentSite?.id, activeSiteId, setMessages]);
+
+  // Save chat to local storage when messages change
+  useEffect(() => {
+    if (currentSite?.id && currentSite.id === activeSiteId) {
+      localStorage.setItem(`sigmabuilder_chat_${currentSite.id}`, JSON.stringify(messages));
+    }
+  }, [messages, currentSite?.id, activeSiteId]);
+
+  /* ── Auto-scroll ──────────────────────────────────────────────── */
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
+
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "auto") => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      scrollToBottom("auto");
+      isFirstRender.current = false;
+    } else {
+      const handle = requestAnimationFrame(() => {
+        scrollToBottom(isLoading ? "auto" : "smooth");
+      });
+      return () => cancelAnimationFrame(handle);
+    }
+  }, [messages, isLoading, scrollToBottom]);
 
   /* ── Submit handler ───────────────────────────────────────────────────── */
   const onSubmit = useCallback(
@@ -203,10 +269,17 @@ export default function SiteHomePage() {
     }
   };
 
+  const handleNewConversation = () => {
+    setMessages([]);
+    if (currentSite?.id) {
+      localStorage.removeItem(`sigmabuilder_chat_${currentSite.id}`);
+    }
+  };
+
   const hasMessages = messages.length > 0;
 
   return (
-    <div className="relative flex flex-col items-center justify-between h-full overflow-hidden px-4 py-8 sm:px-6 sm:py-8 transition-all duration-500">
+    <div className="absolute inset-0 flex flex-col items-center justify-between overflow-hidden px-4 py-8 sm:px-6 sm:py-8 transition-all duration-500">
       {/* Inject keyframe animation */}
       <style>{thinkingDotsStyle}</style>
 
@@ -222,10 +295,49 @@ export default function SiteHomePage() {
         style={{ background: "oklch(0.65 0.22 310)" }}
       />
 
+      {/* Fixed Header (only when there are messages) */}
+      {hasMessages && (
+        <div className="w-full max-w-3xl border-b border-border/60 pb-4 mb-2 shrink-0 flex items-center justify-between animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center size-8 rounded-lg bg-primary/10">
+              <Bot className="size-4.5 text-primary" />
+            </div>
+            <span className="font-semibold text-sm text-foreground">
+              {t("siteHome.aiAssistant", "Asistente de IA")}
+            </span>
+          </div>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button
+                type="button"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-secondary hover:bg-secondary/80 text-secondary-foreground transition-all duration-200 cursor-pointer border border-border"
+              >
+                <Plus className="size-3.5" />
+                {t("siteHome.newChatBtn", "Nueva conversación")}
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t("siteHome.newChatConfirmTitle", "¿Iniciar nueva conversación?")}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {t("siteHome.newChatConfirmDesc", "Esto borrará los mensajes actuales. Ten en cuenta que esta conversación no se guardará en el servidor y se eliminará por completo.")}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t("siteHome.newChatCancel", "Cancelar")}</AlertDialogCancel>
+                <AlertDialogAction onClick={handleNewConversation} variant="destructive">
+                  {t("siteHome.newChatConfirm", "Confirmar")}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      )}
+
       {/* ── Main content area ──────────────────────────────────────────── */}
       <div
         ref={scrollRef}
-        className={`relative z-10 flex flex-col w-full max-w-3xl flex-1 overflow-y-auto pb-32 px-2 ${
+        className={`relative z-10 flex flex-col w-full max-w-3xl flex-1 overflow-y-auto custom-scrollbar px-2 ${
           !hasMessages ? "justify-center items-center" : "justify-start"
         }`}
       >
@@ -285,7 +397,7 @@ export default function SiteHomePage() {
           </div>
         ) : (
           /* ── Messages ─────────────────────────────────────────────── */
-          <div className="flex flex-col gap-6 w-full py-4">
+          <div className="flex flex-col gap-6 w-full py-4 pb-32">
             {messages.map((m) => (
               <div
                 key={m.id}
@@ -335,9 +447,12 @@ export default function SiteHomePage() {
                           ? (part as any).toolName
                           : part.type.replace("tool-", "");
                       const state = (part as any).state as string;
-                      // When the stream is done, treat all non-error tool parts as completed
+                      // When the stream is done, treat all non-error tool parts as completed.
+                      // Only show loading if it's the last message and currently loading.
+                      const isLastMessage = messages[messages.length - 1]?.id === m.id;
                       const isCompleted =
-                        state === "result" || (!isLoading && state !== "error");
+                        state === "result" ||
+                        ((!isLoading || !isLastMessage) && state !== "error");
                       const isFailed = state === "error";
                       const info = getToolInfo(toolName, t);
                       const ToolIcon = info.icon;
