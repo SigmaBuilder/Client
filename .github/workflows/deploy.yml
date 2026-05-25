@@ -1,7 +1,9 @@
 name: Deploy Client to EC2
 
 on:
-  pull_request:
+  push:
+    branches:
+      - main
 
 
 env:
