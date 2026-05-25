@@ -11,4 +11,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  preview: {
+    allowedHosts: ['sigmabuilder.app', 'www.sigmabuilder.app'],
+  },
 })
