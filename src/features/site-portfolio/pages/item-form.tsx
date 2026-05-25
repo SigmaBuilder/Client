@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback, useRef } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { api } from "@/lib/api";
@@ -9,13 +9,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Save, ArrowLeft, ImagePlus, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { MediaLibraryView } from "@/components/shared/MediaLibrary/MediaLibraryView";
+import { MediaLibraryManager } from "@/components/shared/MediaLibrary/MediaLibraryManager";
 import { useTranslation } from "react-i18next";
 
 export default function PortfolioItemForm() {
@@ -27,8 +21,6 @@ export default function PortfolioItemForm() {
 
   const [isLoading, setIsLoading] = useState(isEditing);
   const [isSaving, setIsSaving] = useState(false);
-  const [isMediaOpen, setIsMediaOpen] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -84,37 +76,7 @@ export default function PortfolioItemForm() {
 
   const handleMediaSelect = useCallback((asset: { file_url: string }) => {
     setFormData((prev) => ({ ...prev, image_url: asset.file_url }));
-    setIsMediaOpen(false);
   }, []);
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !currentProject) return;
-
-    const formDataUpload = new FormData();
-    formDataUpload.append("file", file);
-
-    toast.promise(
-      api
-        .uploadMediaAsset<any>(currentProject.id, formDataUpload)
-        .then((res) => {
-          if (!res.success) throw new Error(res.error || t("sitePortfolioItemForm.toastUploadError"));
-          if (res.data?.asset?.file_url) {
-            setFormData((prev) => ({
-              ...prev,
-              image_url: res.data.asset.file_url,
-            }));
-          }
-        }),
-      {
-        loading: t("sitePortfolioItemForm.toastUploadLoading"),
-        success: t("sitePortfolioItemForm.toastUploadSuccess"),
-        error: t("sitePortfolioItemForm.toastUploadError"),
-      },
-    );
-
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
 
   const handleSave = async () => {
     if (!currentSite?.id) return;
@@ -175,7 +137,7 @@ export default function PortfolioItemForm() {
 
   if (isLoading) {
     return (
-      <div className="p-6 max-w-2xl space-y-6">
+      <div className="container mx-auto p-4 md:p-6 max-w-4xl space-y-6 w-full">
         <Skeleton className="h-10 w-full" />
         <Skeleton className="h-32 w-full" />
       </div>
@@ -184,23 +146,25 @@ export default function PortfolioItemForm() {
 
   return (
     <>
-      <div className="p-6 max-w-2xl">
-        <div className="flex items-center mb-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(itemsPath)}
-            className="mr-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {t("sitePortfolioItemForm.backBtn")}
-          </Button>
-          <h2 className="text-xl font-semibold tracking-tight">
-            {isEditing ? t("sitePortfolioItemForm.titleEdit") : t("sitePortfolioItemForm.titleNew")}
-          </h2>
+      <div className="container mx-auto p-4 md:p-6 max-w-4xl w-full">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate(itemsPath)}
+              className="shrink-0"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              {t("sitePortfolioItemForm.backBtn")}
+            </Button>
+            <h2 className="text-2xl font-bold tracking-tight">
+              {isEditing ? t("sitePortfolioItemForm.titleEdit") : t("sitePortfolioItemForm.titleNew")}
+            </h2>
+          </div>
         </div>
 
-        <div className="space-y-6 bg-card border rounded-md p-6">
+        <div className="space-y-8 bg-card border border-border/50 rounded-xl p-6 md:p-8 shadow-sm">
           <div className="space-y-2">
             <Label htmlFor="title">{t("sitePortfolioItemForm.labelTitle")}</Label>
             <Input
@@ -234,13 +198,16 @@ export default function PortfolioItemForm() {
                   className="w-full h-48 object-cover"
                 />
                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => setIsMediaOpen(true)}
-                  >
-                    {t("sitePortfolioItemForm.btnChangeImage")}
-                  </Button>
+                  <MediaLibraryManager
+                    projectId={currentProject?.id || ""}
+                    siteId={currentSite?.id}
+                    onSelect={handleMediaSelect}
+                    trigger={
+                      <Button variant="secondary" size="sm" type="button">
+                        {t("sitePortfolioItemForm.btnChangeImage")}
+                      </Button>
+                    }
+                  />
                   <Button
                     variant="destructive"
                     size="icon"
@@ -248,30 +215,28 @@ export default function PortfolioItemForm() {
                     onClick={() =>
                       setFormData((prev) => ({ ...prev, image_url: "" }))
                     }
+                    type="button"
                   >
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
             ) : (
-              <div className="grid gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsMediaOpen(true)}
-                  className="flex flex-col items-center justify-center h-32 rounded-md border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 hover:bg-accent/50 transition-colors gap-2 text-muted-foreground"
-                >
-                  <ImagePlus className="h-6 w-6" />
-                  <span className="text-xs">{t("sitePortfolioItemForm.btnSelectLibrary")}</span>
-                </button>
-              </div>
+              <MediaLibraryManager
+                projectId={currentProject?.id || ""}
+                siteId={currentSite?.id}
+                onSelect={handleMediaSelect}
+                trigger={
+                  <button
+                    type="button"
+                    className="w-full flex flex-col items-center justify-center h-32 rounded-md border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 hover:bg-accent/50 transition-colors gap-2 text-muted-foreground"
+                  >
+                    <ImagePlus className="h-6 w-6" />
+                    <span className="text-xs">{t("sitePortfolioItemForm.btnSelectLibrary")}</span>
+                  </button>
+                }
+              />
             )}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleFileUpload}
-            />
             <Input
               name="image_url"
               value={formData.image_url}
@@ -315,24 +280,6 @@ export default function PortfolioItemForm() {
           </div>
         </div>
       </div>
-
-      <Dialog open={isMediaOpen} onOpenChange={setIsMediaOpen}>
-        <DialogContent className="max-w-4xl h-[80vh] flex flex-col p-0 overflow-hidden">
-          <DialogHeader className="p-6 pb-0">
-            <DialogTitle>{t("sitePortfolioItemForm.dialogSelectImage")}</DialogTitle>
-          </DialogHeader>
-          <div className="flex-1 overflow-auto">
-            {currentProject && currentSite && (
-              <MediaLibraryView
-                projectId={currentProject.id}
-                siteId={currentSite.id}
-                hideHeader
-                onSelect={handleMediaSelect}
-              />
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }
