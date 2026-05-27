@@ -1,5 +1,7 @@
 export const API_URL =
-  import.meta.env.VITE_API_URL || import.meta.env.PUBLIC_URL_API || "http://localhost:3000/api/v1";
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.PUBLIC_URL_API ||
+  "http://localhost:3000/api/v1";
 
 export const SITE_VIEWER_URL =
   import.meta.env.VITE_SITE_VIEWER_URL || "http://localhost:4000";
@@ -37,8 +39,8 @@ class ApiClient {
       // Si el body es FormData, el navegador necesita generar el boundary, no le forzamos application/json
       const isFormData = options.body instanceof FormData;
       const headers = { ...this.getAuthHeaders(), ...options.headers };
-      if (isFormData && headers['Content-Type'] === 'application/json') {
-        delete (headers as any)['Content-Type'];
+      if (isFormData && headers["Content-Type"] === "application/json") {
+        delete (headers as any)["Content-Type"];
       }
 
       const response = await fetch(`${this.API_URL}/${endpoint}`, {
@@ -80,6 +82,7 @@ class ApiClient {
         return {
           success: false,
           error: body.error || body.message || "Error en la petición",
+          meta: { statusCode: response.status, endpoint },
         };
       }
 
@@ -124,7 +127,10 @@ class ApiClient {
     });
   }
 
-  async resetPassword<T>(token: string, newPassword: string): Promise<ApiResponse<T>> {
+  async resetPassword<T>(
+    token: string,
+    newPassword: string,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>("auth/reset-password", {
       method: "POST",
       body: JSON.stringify({ token, newPassword }),
@@ -141,7 +147,10 @@ class ApiClient {
     return this.request<T>("auth/me");
   }
 
-  async updateProfile<T>(body: { first_name?: string; last_name?: string }): Promise<ApiResponse<T>> {
+  async updateProfile<T>(body: {
+    first_name?: string;
+    last_name?: string;
+  }): Promise<ApiResponse<T>> {
     return this.request<T>("auth/me/profile", {
       method: "PATCH",
       body: JSON.stringify(body),
@@ -162,7 +171,10 @@ class ApiClient {
     });
   }
 
-  async updatePassword<T>(current_password: string, new_password: string): Promise<ApiResponse<T>> {
+  async updatePassword<T>(
+    current_password: string,
+    new_password: string,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>("auth/me/password", {
       method: "PATCH",
       body: JSON.stringify({ current_password, new_password }),
@@ -230,9 +242,7 @@ class ApiClient {
     slug: string,
     simple = false,
   ): Promise<ApiResponse<T>> {
-    return this.request<T>(
-      `public/sites/${slug}/docs?simple=${simple}`,
-    );
+    return this.request<T>(`public/sites/${slug}/docs?simple=${simple}`);
   }
 
   async updateSite<T>(
@@ -364,22 +374,35 @@ class ApiClient {
     );
   }
   // Media
-  async getMediaFolders<T>(projectId: string, queryParams = ""): Promise<ApiResponse<T>> {
+  async getMediaFolders<T>(
+    projectId: string,
+    queryParams = "",
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(`projects/${projectId}/media/folders${queryParams}`);
   }
 
-  async createMediaFolder<T>(projectId: string, name: string, parentId: string | null): Promise<ApiResponse<T>> {
+  async createMediaFolder<T>(
+    projectId: string,
+    name: string,
+    parentId: string | null,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(`projects/${projectId}/media/folders`, {
       method: "POST",
       body: JSON.stringify({ name, parentId }),
     });
   }
 
-  async getMediaAssets<T>(projectId: string, queryParams = ""): Promise<ApiResponse<T>> {
+  async getMediaAssets<T>(
+    projectId: string,
+    queryParams = "",
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(`projects/${projectId}/media/assets${queryParams}`);
   }
 
-  async uploadMediaAsset<T>(projectId: string, formData: FormData): Promise<ApiResponse<T>> {
+  async uploadMediaAsset<T>(
+    projectId: string,
+    formData: FormData,
+  ): Promise<ApiResponse<T>> {
     // FormData NO debe llevar header de Content-Type 'application/json' ni ninguno manual para que el browser ponga el boundary
     return this.request<T>(`projects/${projectId}/media/assets/upload`, {
       method: "POST",
@@ -387,37 +410,59 @@ class ApiClient {
     });
   }
 
-  async moveMediaAsset<T>(projectId: string, assetId: string, folderId: string | null): Promise<ApiResponse<T>> {
+  async moveMediaAsset<T>(
+    projectId: string,
+    assetId: string,
+    folderId: string | null,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(`projects/${projectId}/media/assets/${assetId}`, {
       method: "PUT",
       body: JSON.stringify({ folderId }),
     });
   }
 
-  async deleteMediaAsset<T>(projectId: string, assetId: string): Promise<ApiResponse<T>> {
+  async deleteMediaAsset<T>(
+    projectId: string,
+    assetId: string,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(`projects/${projectId}/media/assets/${assetId}`, {
       method: "DELETE",
     });
   }
 
-  async deleteMediaFolder<T>(projectId: string, folderId: string): Promise<ApiResponse<T>> {
+  async deleteMediaFolder<T>(
+    projectId: string,
+    folderId: string,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(`projects/${projectId}/media/folders/${folderId}`, {
       method: "DELETE",
     });
   }
   // Portfolio Sections
-  async getPortfolioSections<T>(siteId: string, page = 1, limit = 10, search = ""): Promise<ApiResponse<T>> {
+  async getPortfolioSections<T>(
+    siteId: string,
+    page = 1,
+    limit = 10,
+    search = "",
+  ): Promise<ApiResponse<T>> {
     const searchParam = search ? `&search=${encodeURIComponent(search)}` : "";
-    return this.request<T>(`sites/${siteId}/modules/portfolio/sections?page=${page}&limit=${limit}${searchParam}`);
+    return this.request<T>(
+      `sites/${siteId}/modules/portfolio/sections?page=${page}&limit=${limit}${searchParam}`,
+    );
   }
 
-  async getPortfolioSection<T>(siteId: string, sectionId: string): Promise<ApiResponse<T>> {
-    return this.request<T>(`sites/${siteId}/modules/portfolio/sections/${sectionId}`);
+  async getPortfolioSection<T>(
+    siteId: string,
+    sectionId: string,
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>(
+      `sites/${siteId}/modules/portfolio/sections/${sectionId}`,
+    );
   }
 
   async createPortfolioSection<T>(
     siteId: string,
-    body: { title: string; content?: any; sort_order?: number }
+    body: { title: string; content?: any; sort_order?: number },
   ): Promise<ApiResponse<T>> {
     return this.request<T>(`sites/${siteId}/modules/portfolio/sections`, {
       method: "POST",
@@ -428,33 +473,54 @@ class ApiClient {
   async updatePortfolioSection<T>(
     siteId: string,
     sectionId: string,
-    body: { title?: string; content?: any; sort_order?: number }
+    body: { title?: string; content?: any; sort_order?: number },
   ): Promise<ApiResponse<T>> {
-    return this.request<T>(`sites/${siteId}/modules/portfolio/sections/${sectionId}`, {
-      method: "PATCH",
-      body: JSON.stringify(body),
-    });
+    return this.request<T>(
+      `sites/${siteId}/modules/portfolio/sections/${sectionId}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      },
+    );
   }
 
-  async deletePortfolioSection<T>(siteId: string, sectionId: string): Promise<ApiResponse<T>> {
-    return this.request<T>(`sites/${siteId}/modules/portfolio/sections/${sectionId}`, {
-      method: "DELETE",
-    });
+  async deletePortfolioSection<T>(
+    siteId: string,
+    sectionId: string,
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>(
+      `sites/${siteId}/modules/portfolio/sections/${sectionId}`,
+      {
+        method: "DELETE",
+      },
+    );
   }
 
   // Portfolio Stack
-  async getPortfolioStack<T>(siteId: string, page = 1, limit = 20, search = ""): Promise<ApiResponse<T>> {
+  async getPortfolioStack<T>(
+    siteId: string,
+    page = 1,
+    limit = 20,
+    search = "",
+  ): Promise<ApiResponse<T>> {
     const searchParam = search ? `&search=${encodeURIComponent(search)}` : "";
-    return this.request<T>(`sites/${siteId}/modules/portfolio/stack?page=${page}&limit=${limit}${searchParam}`);
+    return this.request<T>(
+      `sites/${siteId}/modules/portfolio/stack?page=${page}&limit=${limit}${searchParam}`,
+    );
   }
 
-  async getPortfolioStackItem<T>(siteId: string, stackId: string): Promise<ApiResponse<T>> {
-    return this.request<T>(`sites/${siteId}/modules/portfolio/stack/${stackId}`);
+  async getPortfolioStackItem<T>(
+    siteId: string,
+    stackId: string,
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>(
+      `sites/${siteId}/modules/portfolio/stack/${stackId}`,
+    );
   }
 
   async createPortfolioStackItem<T>(
     siteId: string,
-    body: { name: string; icon_url?: string }
+    body: { name: string; icon_url?: string },
   ): Promise<ApiResponse<T>> {
     return this.request<T>(`sites/${siteId}/modules/portfolio/stack`, {
       method: "POST",
@@ -465,18 +531,27 @@ class ApiClient {
   async updatePortfolioStackItem<T>(
     siteId: string,
     stackId: string,
-    body: { name?: string; icon_url?: string }
+    body: { name?: string; icon_url?: string },
   ): Promise<ApiResponse<T>> {
-    return this.request<T>(`sites/${siteId}/modules/portfolio/stack/${stackId}`, {
-      method: "PATCH",
-      body: JSON.stringify(body),
-    });
+    return this.request<T>(
+      `sites/${siteId}/modules/portfolio/stack/${stackId}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      },
+    );
   }
 
-  async deletePortfolioStackItem<T>(siteId: string, stackId: string): Promise<ApiResponse<T>> {
-    return this.request<T>(`sites/${siteId}/modules/portfolio/stack/${stackId}`, {
-      method: "DELETE",
-    });
+  async deletePortfolioStackItem<T>(
+    siteId: string,
+    stackId: string,
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>(
+      `sites/${siteId}/modules/portfolio/stack/${stackId}`,
+      {
+        method: "DELETE",
+      },
+    );
   }
 
   // Portfolio Items (Projects)
@@ -484,13 +559,23 @@ class ApiClient {
     return this.request<T>(`sites/${siteId}/modules/portfolio/items`);
   }
 
-  async getPortfolioItem<T>(siteId: string, itemId: string): Promise<ApiResponse<T>> {
+  async getPortfolioItem<T>(
+    siteId: string,
+    itemId: string,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(`sites/${siteId}/modules/portfolio/items/${itemId}`);
   }
 
   async createPortfolioItem<T>(
     siteId: string,
-    body: { title: string; description?: string; image_url?: string; live_url?: string; repository_url?: string; sort_order?: number }
+    body: {
+      title: string;
+      description?: string;
+      image_url?: string;
+      live_url?: string;
+      repository_url?: string;
+      sort_order?: number;
+    },
   ): Promise<ApiResponse<T>> {
     return this.request<T>(`sites/${siteId}/modules/portfolio/items`, {
       method: "POST",
@@ -501,18 +586,34 @@ class ApiClient {
   async updatePortfolioItem<T>(
     siteId: string,
     itemId: string,
-    body: { title?: string; description?: string; image_url?: string; live_url?: string; repository_url?: string; sort_order?: number }
+    body: {
+      title?: string;
+      description?: string;
+      image_url?: string;
+      live_url?: string;
+      repository_url?: string;
+      sort_order?: number;
+    },
   ): Promise<ApiResponse<T>> {
-    return this.request<T>(`sites/${siteId}/modules/portfolio/items/${itemId}`, {
-      method: "PATCH",
-      body: JSON.stringify(body),
-    });
+    return this.request<T>(
+      `sites/${siteId}/modules/portfolio/items/${itemId}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      },
+    );
   }
 
-  async deletePortfolioItem<T>(siteId: string, itemId: string): Promise<ApiResponse<T>> {
-    return this.request<T>(`sites/${siteId}/modules/portfolio/items/${itemId}`, {
-      method: "DELETE",
-    });
+  async deletePortfolioItem<T>(
+    siteId: string,
+    itemId: string,
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>(
+      `sites/${siteId}/modules/portfolio/items/${itemId}`,
+      {
+        method: "DELETE",
+      },
+    );
   }
 
   // Blog
@@ -520,31 +621,50 @@ class ApiClient {
     return this.request<T>(`sites/${siteId}/modules/blog/categories`);
   }
 
-  async createBlogCategory<T>(siteId: string, body: { name: string; slug: string }): Promise<ApiResponse<T>> {
+  async createBlogCategory<T>(
+    siteId: string,
+    body: { name: string; slug: string },
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(`sites/${siteId}/modules/blog/categories`, {
       method: "POST",
       body: JSON.stringify(body),
     });
   }
 
-  async updateBlogCategory<T>(siteId: string, categoryId: string, body: { name?: string; slug?: string }): Promise<ApiResponse<T>> {
-    return this.request<T>(`sites/${siteId}/modules/blog/categories/${categoryId}`, {
-      method: "PATCH",
-      body: JSON.stringify(body),
-    });
+  async updateBlogCategory<T>(
+    siteId: string,
+    categoryId: string,
+    body: { name?: string; slug?: string },
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>(
+      `sites/${siteId}/modules/blog/categories/${categoryId}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(body),
+      },
+    );
   }
 
-  async deleteBlogCategory<T>(siteId: string, categoryId: string): Promise<ApiResponse<T>> {
-    return this.request<T>(`sites/${siteId}/modules/blog/categories/${categoryId}`, {
-      method: "DELETE",
-    });
+  async deleteBlogCategory<T>(
+    siteId: string,
+    categoryId: string,
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>(
+      `sites/${siteId}/modules/blog/categories/${categoryId}`,
+      {
+        method: "DELETE",
+      },
+    );
   }
 
   async getBlogPosts<T>(siteId: string): Promise<ApiResponse<T>> {
     return this.request<T>(`sites/${siteId}/modules/blog/posts`);
   }
 
-  async getBlogPost<T>(siteId: string, postId: string): Promise<ApiResponse<T>> {
+  async getBlogPost<T>(
+    siteId: string,
+    postId: string,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(`sites/${siteId}/modules/blog/posts/${postId}`);
   }
 
@@ -555,26 +675,43 @@ class ApiClient {
     });
   }
 
-  async updateBlogPost<T>(siteId: string, postId: string, body: any): Promise<ApiResponse<T>> {
+  async updateBlogPost<T>(
+    siteId: string,
+    postId: string,
+    body: any,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(`sites/${siteId}/modules/blog/posts/${postId}`, {
       method: "PATCH",
       body: JSON.stringify(body),
     });
   }
 
-  async deleteBlogPost<T>(siteId: string, postId: string): Promise<ApiResponse<T>> {
+  async deleteBlogPost<T>(
+    siteId: string,
+    postId: string,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(`sites/${siteId}/modules/blog/posts/${postId}`, {
       method: "DELETE",
     });
   }
 
   // Site Pages
-  async getSitePages<T>(siteId: string, page = 1, limit = 10, search = ""): Promise<ApiResponse<T>> {
+  async getSitePages<T>(
+    siteId: string,
+    page = 1,
+    limit = 10,
+    search = "",
+  ): Promise<ApiResponse<T>> {
     const searchParam = search ? `&search=${encodeURIComponent(search)}` : "";
-    return this.request<T>(`sites/${siteId}/pages?page=${page}&limit=${limit}${searchParam}`);
+    return this.request<T>(
+      `sites/${siteId}/pages?page=${page}&limit=${limit}${searchParam}`,
+    );
   }
 
-  async getSitePage<T>(siteId: string, pageId: string): Promise<ApiResponse<T>> {
+  async getSitePage<T>(
+    siteId: string,
+    pageId: string,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(`sites/${siteId}/pages/${pageId}`);
   }
 
@@ -585,20 +722,30 @@ class ApiClient {
     });
   }
 
-  async updateSitePage<T>(siteId: string, pageId: string, data: any): Promise<ApiResponse<T>> {
+  async updateSitePage<T>(
+    siteId: string,
+    pageId: string,
+    data: any,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(`sites/${siteId}/pages/${pageId}`, {
       method: "PATCH",
       body: JSON.stringify(data),
     });
   }
 
-  async setSitePageAsHome<T>(siteId: string, pageId: string): Promise<ApiResponse<T>> {
+  async setSitePageAsHome<T>(
+    siteId: string,
+    pageId: string,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(`sites/${siteId}/pages/${pageId}/set-home`, {
       method: "PATCH",
     });
   }
 
-  async deleteSitePage<T>(siteId: string, pageId: string): Promise<ApiResponse<T>> {
+  async deleteSitePage<T>(
+    siteId: string,
+    pageId: string,
+  ): Promise<ApiResponse<T>> {
     return this.request<T>(`sites/${siteId}/pages/${pageId}`, {
       method: "DELETE",
     });
