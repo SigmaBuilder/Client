@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dialog";
 import api from "@/lib/api";
 import { useTranslation } from "react-i18next";
+import { Alert } from "@/components/ui/alert";
 
 export default function ProjectsList() {
   const { projects, isLoading, fetchProjects, clearWorkspace } = useWorkspace();
@@ -35,6 +36,8 @@ export default function ProjectsList() {
   const [projectName, setProjectName] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
   const [creating, setCreating] = useState(false);
+
+  const [creatingError, setCreatingError] = useState("");
 
   useEffect(() => {
     clearWorkspace();
@@ -53,15 +56,32 @@ export default function ProjectsList() {
       return;
     }
     setCreating(true);
-    const res = await api.createProject<{ project: WorkspaceProject["project"] }>({
+    const res = await api.createProject<{
+      project: WorkspaceProject["project"];
+    }>({
       name: projectName.trim(),
       description: projectDescription.trim() || undefined,
     });
     if (res.success && res.data) {
-      toast.success(t("dashboard.toastCreated", { name: res.data.project.name }));
+      toast.success(
+        t("dashboard.toastCreated", { name: res.data.project.name }),
+      );
       setCreateOpen(false);
       await fetchProjects();
     } else {
+      //alert(res.statusCode);
+      console.log(res);
+      if (res?.meta?.statusCode === 422) {
+        setCreatingError(
+          "ENDPOINT: " +
+            res?.meta?.endpoint +
+            " | " +
+            (res.error as string) +
+            " | ERROR CODE: " +
+            res?.meta?.statusCode,
+        );
+      }
+
       toast.error(res.error ?? t("dashboard.toastErrorCreate"));
     }
     setCreating(false);
@@ -70,7 +90,9 @@ export default function ProjectsList() {
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-3xl font-bold tracking-tight">{t("dashboard.projectsTitle")}</h2>
+        <h2 className="text-3xl font-bold tracking-tight">
+          {t("dashboard.projectsTitle")}
+        </h2>
         <div className="flex items-center space-x-2">
           <Button onClick={openCreateDialog}>
             <Plus className="mr-2 h-4 w-4" /> {t("dashboard.newProjectBtn")}
@@ -94,12 +116,15 @@ export default function ProjectsList() {
         ) : projects !== null && projects.length === 0 ? (
           <div className="col-span-3 flex flex-col items-center justify-center p-8 text-center bg-muted/20 rounded-lg border border-dashed">
             <Briefcase className="h-10 w-10 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium">{t("dashboard.noProjectsTitle")}</h3>
+            <h3 className="text-lg font-medium">
+              {t("dashboard.noProjectsTitle")}
+            </h3>
             <p className="text-sm text-muted-foreground mb-4">
               {t("dashboard.noProjectsDesc")}
             </p>
             <Button onClick={openCreateDialog}>
-              <Plus className="mr-2 h-4 w-4" /> {t("dashboard.createProjectBtn")}
+              <Plus className="mr-2 h-4 w-4" />{" "}
+              {t("dashboard.createProjectBtn")}
             </Button>
           </div>
         ) : (
@@ -120,7 +145,9 @@ export default function ProjectsList() {
               <CardContent>
                 <p className="text-xs text-muted-foreground">
                   {t("dashboard.createdAt")}{" "}
-                  {new Date(item.project.created_at).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'es-ES')}
+                  {new Date(item.project.created_at).toLocaleDateString(
+                    i18n.language === "en" ? "en-US" : "es-ES",
+                  )}
                 </p>
               </CardContent>
             </Card>
@@ -160,6 +187,9 @@ export default function ProjectsList() {
                 placeholder={t("dashboard.descPlaceholder")}
               />
             </div>
+            {creatingError && (
+              <Alert variant={"destructive"}>{creatingError}</Alert>
+            )}
           </div>
           <DialogFooter showCloseButton>
             <Button onClick={handleCreateProject} disabled={creating}>
