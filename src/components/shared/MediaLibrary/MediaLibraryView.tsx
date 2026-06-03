@@ -440,6 +440,22 @@ export function MediaLibraryView({
           </div>
         )}
 
+        {/* Preview Warning Banner */}
+        <div className="mx-4 mt-3 p-3 rounded-lg border bg-amber-500/10 border-amber-500/20 text-amber-700 dark:text-amber-400 text-xs sm:text-sm flex items-center justify-between gap-3 shrink-0">
+          <div className="flex items-center gap-2">
+            <Info className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+            <span>{t("mediaLibrary.previewWarning")}</span>
+          </div>
+          <a
+            href="https://github.com/SigmaBuilder"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline font-semibold hover:text-amber-900 dark:hover:text-amber-200 shrink-0"
+          >
+            {t("mediaLibrary.viewOnGithub")}
+          </a>
+        </div>
+
         {/* Scrollable Grid Area */}
         <div
           {...getRootProps()}
