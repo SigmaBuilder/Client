@@ -366,7 +366,12 @@
     "newChatConfirmDesc": "This will clear the current messages. Please note that this conversation will not be saved on the server and will be completely removed.",
     "newChatCancel": "Cancel",
     "newChatConfirm": "Confirm",
-    "aiAssistant": "SigmaAI Assistant"
+    "aiAssistant": "SigmaAI Assistant",
+    "aiNotAvailableTitle": "AI Not Available in Preview",
+    "aiNotAvailableDesc": "The Artificial Intelligence feature is not available because this is a project preview.",
+    "aiNotAvailableRepo": "If you want to test the AI, you can try it by running it yourself from the official repository.",
+    "viewGithub": "View repository on GitHub",
+    "inputDisabledPlaceholder": "AI chat is disabled in this preview"
   },
   "sitePagesList": {
     "addPageLg": "Add Page",

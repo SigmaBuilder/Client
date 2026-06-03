@@ -366,7 +366,12 @@
     "newChatConfirmDesc": "Esto borrará los mensajes actuales. Ten en cuenta que esta conversación no se guardará en el servidor y se eliminará por completo.",
     "newChatCancel": "Cancelar",
     "newChatConfirm": "Confirmar",
-    "aiAssistant": "Asistente SigmaAI"
+    "aiAssistant": "Asistente SigmaAI",
+    "aiNotAvailableTitle": "IA No Disponible en Previsualización",
+    "aiNotAvailableDesc": "La funcionalidad de Inteligencia Artificial no está disponible debido a que es una previsualización del proyecto.",
+    "aiNotAvailableRepo": "Si deseas probar las capacidades de la IA, puedes clonar y ejecutar el proyecto tú mismo desde el repositorio oficial.",
+    "viewGithub": "Ver repositorio en GitHub",
+    "inputDisabledPlaceholder": "El chat de IA está deshabilitado en esta previsualización"
   },
   "sitePagesList": {
     "addPageLg": "Añadir Página",
