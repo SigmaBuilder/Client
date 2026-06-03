@@ -811,7 +811,9 @@
     "ctxDelete": "Delete",
     "toastAssetDeleted": "Asset deleted",
     "toastDownloadError": "Error downloading file",
-    "searchPlaceholder": "Search files..."
+    "searchPlaceholder": "Search files...",
+    "previewWarning": "These features may experience delays or not work because this is only a project preview.",
+    "viewOnGithub": "View on GitHub"
   },
   "tiptap": {
     "linkUrlLabel": "Link URL",

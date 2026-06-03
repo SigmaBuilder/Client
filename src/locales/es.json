@@ -811,7 +811,9 @@
     "ctxDelete": "Eliminar",
     "toastAssetDeleted": "Archivo eliminado",
     "toastDownloadError": "Error al descargar archivo",
-    "searchPlaceholder": "Buscar archivos..."
+    "searchPlaceholder": "Buscar archivos...",
+    "previewWarning": "Es posible que estas funciones sufran retrasos o no funcionen debido a que esto solo es una previsualización del proyecto.",
+    "viewOnGithub": "Ver en GitHub"
   },
   "tiptap": {
     "linkUrlLabel": "URL del enlace",
